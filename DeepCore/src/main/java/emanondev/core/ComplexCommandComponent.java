@@ -1,5 +1,6 @@
 package emanondev.core;
 
+@Deprecated
 public interface ComplexCommandComponent {
 
 	

@@ -32,7 +32,8 @@
 	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/PlaceholderAPI-2.9.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/SuperVanish.jar"/>
 	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/VirginBlock-1.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/ProtocolLib 1.15.jar"/>
 	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/spigot-1.16.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/Towny-0.96.7.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/utente/Desktop/FlavioRPG2/ProtocolLib.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

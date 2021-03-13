@@ -17,6 +17,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
+@Deprecated
 public abstract class CoreComplexCommand extends CoreCommand implements ComplexCommandComponent {
 
 	public CoreComplexCommand(@Nonnull String id, @Nonnull CorePlugin plugin, @Nullable Permission permission,

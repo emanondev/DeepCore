@@ -21,6 +21,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+@Deprecated
 public class EntityBuilder {
 
 	private EntityType type;
@@ -74,6 +75,10 @@ public class EntityBuilder {
 		return e;
 	}
 
+	/**
+	 * incomplete / too much effort
+	 * @param type
+	 */
 	public EntityBuilder(EntityType type) {
 		if (type == null)
 			throw new NullPointerException();

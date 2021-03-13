@@ -1,4 +1,4 @@
-package emanondev.core;
+package emanondev.core.spigot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.permissions.Permission;
 
+import emanondev.core.CorePlugin;
+import emanondev.core.PermissionBuilder;
 import net.md_5.bungee.api.ChatColor;
 
 public class UpdateChecker {

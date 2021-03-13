@@ -14,6 +14,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
+@Deprecated
 public abstract class CoreComplexSubCommand implements ComplexCommandComponent {
 	private final String name;
 	private ComplexCommandComponent parent;

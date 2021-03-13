@@ -3,4 +3,4 @@ main: emanondev.core.CoreMain
 version: 2.2
 author: emanon
 api-version: 1.13
-softdepend: [SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI]
+softdepend: [SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny]

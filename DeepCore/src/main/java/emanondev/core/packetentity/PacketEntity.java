@@ -13,7 +13,7 @@ public abstract class PacketEntity {
 	private int id;
 	private final UUID uuid;
 	private Location location;
-	private boolean lock;
+	protected boolean lock;
 	private boolean isSilent;
 	private final PacketManager manager;
 
@@ -26,6 +26,7 @@ public abstract class PacketEntity {
 		this.location = location.clone();
 		this.lock = false;
 		this.isSilent = false;
+		this.manager.trackPacketEntity(this);
 	}
 
 	public int cacheCode() {
@@ -108,13 +109,13 @@ public abstract class PacketEntity {
 	protected Collection<Player> active = new HashSet<>();
 	protected Integer cache = null;
 
-	protected abstract void handleRemovePackets(Collection<Player> players);
+	protected abstract void handleRemovePackets(Collection<? extends Player> players);
 
 	public PacketEntity remove() {
 		return remove(active);
 	}
 
-	public PacketEntity remove(Collection<Player> players) {
+	public PacketEntity remove(Collection<? extends Player> players) {
 		if (players == active)
 			players = new HashSet<>(players);
 		active.removeAll(players);
@@ -122,25 +123,25 @@ public abstract class PacketEntity {
 		return this;
 	}
 
-	protected abstract void handleSpawnPackets(Collection<Player> players);
+	protected abstract void handleSpawnPackets(Collection<? extends Player> players);
 
-	public PacketEntity spawn(Collection<Player> players) {
+	public PacketEntity spawn(Collection<? extends Player> players) {
 		active.addAll(players);
 		handleSpawnPackets(players);
 		return this;
 	}
 
-	protected abstract void handleUpdatePackets(Collection<Player> players);
+	protected abstract void handleUpdatePackets(Collection<? extends Player> players);
 
 	public PacketEntity update() {
 		return update(active);
 	}
 
-	public PacketEntity update(Collection<Player> players) {
+	public PacketEntity update(Collection<? extends Player> players) {
 		return update(players, false);
 	}
 
-	public PacketEntity update(Collection<Player> players, boolean bypasscache) {
+	public PacketEntity update(Collection<? extends Player> players, boolean bypasscache) {
 		if (!bypasscache) {
 			if (cache != null) {
 				if (cache == this.cacheCode()) {
