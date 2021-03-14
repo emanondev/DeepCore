@@ -1,18 +1,12 @@
 package emanondev.core.gui;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
 import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
-import emanondev.core.gui.anvil.AnvilInternalGui;
 
 public class StringListEditorButton extends EditorButton<List<String>> {
 
