@@ -7,46 +7,49 @@ import emanondev.virginblock.VirginBlockAPI;
 
 public class Hooks {
 	public static boolean isVault() {
-		return Bukkit.getPluginManager().isPluginEnabled("Vault");
+		return isEnabled("Vault");
 	}
 	public static boolean isVanishEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("SuperVanish")||Bukkit.getPluginManager().isPluginEnabled("PremiumVanish");
+		return isEnabled("SuperVanish")||isEnabled("PremiumVanish");
 	}
 	public static boolean isPAPIEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+		return isEnabled("PlaceholderAPI");
 	}
 	public static boolean isMcmmoEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("Mcmmo");
+		return isEnabled("Mcmmo");
 	}
 	public static boolean isBlockVirgin(Block block) {
-		if (!Bukkit.getPluginManager().isPluginEnabled("VirginBlock"))
+		if (!isEnabled("VirginBlock"))
 			return true;
 		else
 			return VirginBlockAPI.isBlockVirgin(block);
 	}
 	public static boolean isCitizenEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("Citizens");
+		return isEnabled("Citizens");
 	}
 	public static boolean isVirginBlockPluginEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("VirginBlock");
+		return isEnabled("VirginBlock");
 	}
 	public static boolean isRegionAPIEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("WorldGuard")&&
-				Bukkit.getPluginManager().isPluginEnabled("WorldGuardRegionAPI");
+		return isEnabled("WorldGuard")&&
+				isEnabled("WorldGuardRegionAPI");
 	}
 	public static boolean isJobsEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("Jobs");
+		return isEnabled("Jobs");
 	}
 	public static boolean isMythicMobsEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("MythicMobs");
+		return isEnabled("MythicMobs");
 	}
 	public static boolean isSkillAPIEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("SkillAPI");
+		return isEnabled("SkillAPI");
 	}
 	public static boolean isTownyEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("Towny");
+		return isEnabled("Towny");
 	}
 	public static boolean isPartiesEnabled() {
-		return Bukkit.getPluginManager().isPluginEnabled("Parties");
+		return isEnabled("Parties");
+	}
+	public static boolean isEnabled(String pluginName) {
+		return Bukkit.getPluginManager().isPluginEnabled(pluginName);
 	}
 }
