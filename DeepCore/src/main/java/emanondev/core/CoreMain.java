@@ -24,6 +24,7 @@ public final class CoreMain extends CorePlugin {
 			throw new IllegalStateException("Plugin already loaded");
 		inst = this;
 		ConfigurationSerialization.registerClass(SoundInfo.class,"SoundInfo");
+		ConfigurationSerialization.registerClass(PlayerSnapshot.class,"PlayerSnapshot");
 		this.logDone("Registered &aSoundInfo &fas ConfigurationSerializable");
 	}
 	public void enable() {

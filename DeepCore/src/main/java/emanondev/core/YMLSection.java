@@ -193,6 +193,19 @@ public interface YMLSection extends ConfigurationSection {
 	}
 
 	/**
+	 * Gets the object from the config or default.<br>
+	 * Get the object from path, if object at selected path is null or of another
+	 * class, default value is set and returned
+	 * 
+	 * @param path Path of the Object
+	 * @param def Default Object
+	 * @return object or default
+	 */
+	public default @Nullable Boolean getBoolean(@Nonnull String path, @Nullable Boolean def) {
+		return get(path, def, Boolean.class);
+	}
+	
+	/**
 	 * Gets the object from the config or set default.<br>
 	 * Get the object from path, if object at selected path is null or of another
 	 * class, default value is set and returned
@@ -222,6 +235,15 @@ public interface YMLSection extends ConfigurationSection {
 	public default @Nullable Integer getInteger(@Nonnull String path, @Nullable Integer def) {
 		Number val = get(path, def, Number.class);
 		return val == null ? null : val.intValue();
+	}
+	
+
+	public default @Nullable PlayerSnapshot loadPlayerSnapshot(@Nonnull String path, @Nullable PlayerSnapshot def) {
+		return load(path, def, PlayerSnapshot.class);
+	}
+
+	public default @Nullable PlayerSnapshot getPlayerSnapshot(@Nonnull String path, @Nullable PlayerSnapshot def) {
+		return get(path, def, PlayerSnapshot.class);
 	}
 
 	/**
@@ -723,6 +745,56 @@ public interface YMLSection extends ConfigurationSection {
 		return destination;
 	}
 
+
+	/**
+	 * assumes that enum costants are all uppercased null enum values contained in
+	 * def might be lost
+	 * 
+	 * @param <T>
+	 *            the class of the enum
+	 * @param path Path of the Object
+	 * @param clazz
+	 *            the class of the enum
+	 * @param def Default Object
+	 * @return the value found or default if none
+	 */
+	public default @Nonnull <T extends Enum<T>> List<T> getEnumList(@Nonnull String path, @Nullable Collection<T> def,
+			@Nonnull Class<T> clazz) {
+		ArrayList<T> destination = new ArrayList<>();
+		List<String> from;
+		if (def == null)
+			from = null;
+		else {
+			from = new ArrayList<>();
+			for (T enumValue : def)
+				from.add(enumValue.name());
+		}
+		from = getStringList(path, from);
+		if (from == null || from.isEmpty())
+			return destination;
+		for (String value : from) {
+			T val;
+			try {
+				if (value == null || value.isEmpty())
+					val = null;
+				val = (T) Enum.valueOf(clazz, value);
+			} catch (IllegalArgumentException e) {
+				try {
+					val = (T) Enum.valueOf(clazz, value.toUpperCase());
+				} catch (IllegalArgumentException e2) {
+					e2.printStackTrace();
+					new IllegalArgumentException("Value has wrong type or wrong value at '" + path + ":' on file "
+							+ getFile().getName() + "; can't find value for '" + value + "' from enum '"
+							+ clazz.getName() + "' skipping it").printStackTrace();
+					val = null;
+				}
+			}
+			if (val != null)
+				destination.add(val);
+		}
+		return destination;
+	}
+	
 	public default @Nonnull <T extends Enum<T>> EnumSet<T> loadEnumSet(@Nonnull String path,
 			@Nullable Collection<T> def, @Nonnull Class<T> clazz) {
 		EnumSet<T> destination = EnumSet.noneOf(clazz);
@@ -841,6 +913,11 @@ public interface YMLSection extends ConfigurationSection {
 	 */
 	public default @Nullable List<Material> loadMaterialList(@Nonnull String path, @Nullable Collection<Material> def) {
 		return loadEnumList(path, def, Material.class);
+	}
+	
+
+	public default @Nullable List<Material> getMaterialList(@Nonnull String path, @Nullable Collection<Material> def) {
+		return getEnumList(path, def, Material.class);
 	}
 
 	/**
