@@ -38,6 +38,9 @@ public class CooldownAPI {
 	}
 	private HashMap<UUID,HashMap<String,Long>> cooldowns = new HashMap<>();
 
+	/**
+	 * as milliseconds
+	 */
 	public void setCooldown(UUID uuid,String cooldownId,long duration) {
 		if (duration<=0 && cooldowns.containsKey(uuid))
 			cooldowns.get(uuid).remove(cooldownId);
@@ -47,11 +50,17 @@ public class CooldownAPI {
 			cooldowns.get(uuid).put(cooldownId, System.currentTimeMillis()+duration);
 		}
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void addCooldown(UUID uuid,String cooldownId,long duration) {
 		if (duration<0)
 			throw new IllegalArgumentException();
 		setCooldown(uuid,cooldownId,getCooldownMillis(uuid,cooldownId)+duration);
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void reduceCooldown(UUID uuid,String cooldownId,long duration) {
 		if (duration<0)
 			throw new IllegalArgumentException();
@@ -88,12 +97,21 @@ public class CooldownAPI {
 	public long getCooldownHours(UUID uuid,String cooldownId) {
 		return getCooldownMillis(uuid,cooldownId)/3600000;
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void setCooldown(OfflinePlayer player,String cooldownId,long duration) {
 		setCooldown(player.getUniqueId(),cooldownId,duration);
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void addCooldown(OfflinePlayer player,String cooldownId,long duration) {
 		addCooldown(player.getUniqueId(), cooldownId, duration);
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void reduceCooldown(OfflinePlayer player,String cooldownId,long duration) {
 		reduceCooldown(player.getUniqueId(), cooldownId, duration);
 	}
@@ -125,12 +143,21 @@ public class CooldownAPI {
 		return getCooldownHours(player.getUniqueId(), cooldownId);
 	}
 
+	/**
+	 * as milliseconds
+	 */
 	public void setCooldown(Block block,String cooldownId,long duration) {
 		setCooldown(new UUID((((long) block.getX())<<32)+block.getZ(),(((long) block.getWorld().getName().hashCode())<<8) + block.getY()),cooldownId,duration);
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void addCooldown(Block block,String cooldownId,long duration) {
 		addCooldown(new UUID((((long) block.getX())<<32)+block.getZ(),(((long) block.getWorld().getName().hashCode())<<8) + block.getY()), cooldownId, duration);
 	}
+	/**
+	 * as milliseconds
+	 */
 	public void reduceCooldown(Block block,String cooldownId,long duration) {
 		reduceCooldown(new UUID((((long) block.getX())<<32)+block.getZ(),(((long) block.getWorld().getName().hashCode())<<8) + block.getY()), cooldownId, duration);
 	}

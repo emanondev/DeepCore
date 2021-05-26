@@ -36,7 +36,7 @@ public class UtilsString {
 	 *            additional Holders, must be even number with the format "to
 	 *            replace","replacer","to replace 2","replacer 2"....
 	 */
-	public static void updateDescription(@Nullable ItemStack item, @Nullable List<String> desc, @Nullable Player p, boolean color,
+	public static void updateDescription(@Nullable ItemStack item, @Nullable List<String> desc, @Nullable Player papiTarget, boolean color,
 			String... holders) {
 		if (item == null)
 			return;
@@ -73,8 +73,8 @@ public class UtilsString {
 		}
 
 		// apply holders and colors for title and lore
-		title = fix(title, p, color, holders);
-		fix(lore, p, color, holders);
+		title = fix(title, papiTarget, color, holders);
+		fix(lore, papiTarget, color, holders);
 
 		// apply title and lore to item
 		ItemMeta meta = item.getItemMeta();
@@ -102,12 +102,12 @@ public class UtilsString {
 	 *            "to replace#1","replacer#1","to replace#2","replacer#2"....
 	 * @return a new list with fixed text, or null if list was null
 	 */
-	public static @Nullable ArrayList<String> fix(@Nullable List<String> list,@Nullable Player player, boolean color, String... holders) {
+	public static @Nullable ArrayList<String> fix(@Nullable List<String> list,@Nullable Player papiTarget, boolean color, String... holders) {
 		if (list == null)
 			return null;
 		ArrayList<String> newList = new ArrayList<>();
 		for (String line : list)
-			newList.add(fix(line, player, color, holders));
+			newList.add(fix(line, papiTarget, color, holders));
 		return newList;
 	}
 
@@ -138,7 +138,7 @@ public class UtilsString {
 		return itemCopy;
 	}
 
-	public static String fix(@Nullable String text,@Nullable Player player, boolean color, String... holders) {
+	public static String fix(@Nullable String text,@Nullable Player papiTarget, boolean color, String... holders) {
 		if (text == null)
 			return null;
 
@@ -150,8 +150,8 @@ public class UtilsString {
 				text = text.replace(holders[i], holders[i + 1]);
 
 		// papi
-		if (player != null && Hooks.isPAPIEnabled())
-			text = PlaceholderAPI.setPlaceholders(player, text);
+		if (papiTarget != null && Hooks.isPAPIEnabled())
+			text = PlaceholderAPI.setPlaceholders(papiTarget, text);
 		
 		// colore
 		if (color)

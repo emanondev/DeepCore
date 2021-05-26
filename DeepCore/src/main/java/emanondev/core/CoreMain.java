@@ -9,7 +9,7 @@ import emanondev.core.gui.GuiHandler;
 public final class CoreMain extends CorePlugin {
 
 	private static CoreMain inst;
-	
+
 	/**
 	 * 
 	 * @return the instance of the plugin
@@ -18,15 +18,16 @@ public final class CoreMain extends CorePlugin {
 		return inst;
 	}
 
-	
 	public void load() {
-		if (inst!=null)
+		if (inst != null)
 			throw new IllegalStateException("Plugin already loaded");
 		inst = this;
-		ConfigurationSerialization.registerClass(SoundInfo.class,"SoundInfo");
-		ConfigurationSerialization.registerClass(PlayerSnapshot.class,"PlayerSnapshot");
+		ConfigurationSerialization.registerClass(SoundInfo.class, "SoundInfo");
 		this.logDone("Registered &aSoundInfo &fas ConfigurationSerializable");
+		ConfigurationSerialization.registerClass(PlayerSnapshot.class, "PlayerSnapshot");
+		this.logDone("Registered &aPlayerSnapshot &fas ConfigurationSerializable");
 	}
+
 	public void enable() {
 		this.registerListener(new CustomEventListener());
 		this.logDone("Enabled &aPlayerBuyMerchantRecipeEvent");
@@ -34,8 +35,10 @@ public final class CoreMain extends CorePlugin {
 		this.logDone("Enabled &aDeepCore Guis");
 		this.registerListener(new SpawnReasonTracker());
 		this.logDone("Enabled &aSpawnReasonTracker");
+		this.registerListener(new EquipChangeListener());
+		this.logDone("Enabled &aEquipmentChangeEvent");
 	}
-	
+
 	public void reload() {
 	}
 
@@ -47,6 +50,6 @@ public final class CoreMain extends CorePlugin {
 	public void disable() {
 		ConfigurationSerialization.unregisterClass(SoundInfo.class);
 		this.logDone("Unregistered &eSoundInfo &ffrom ConfigurationSerializables");
-		
+
 	}
 }

@@ -6,14 +6,67 @@ import javax.annotation.*;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class UtilsInventory {
 	
 	UtilsInventory(){
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * A utility method to support versions that use null or air ItemStacks.
+	 */
+	public static boolean isAirOrNull(ItemStack item) {
+		return item == null || item.getType().equals(Material.AIR);
+	}
+
+	public static boolean isSimilarIgnoreDamage(ItemStack item, ItemStack item2) {
+		if (isAirOrNull(item))
+			if (isAirOrNull(item2))
+				return true;
+			else
+				return false;
+		if (isAirOrNull(item2))
+			return false;
+		if (item.isSimilar(item2))
+			return true;
+		if (item.getType() != item2.getType())
+			return false;
+		ItemMeta meta1 = item.getItemMeta();
+		if (!(meta1 instanceof Damageable))
+			return false;
+		ItemMeta meta2 = item2.getItemMeta();
+		if (meta1.isUnbreakable() && meta2.isUnbreakable())
+			return false;
+		((Damageable) meta2).setDamage(((Damageable) meta1).getDamage());
+		return meta1.equals(meta2);
+	}
+	
+
+	public static ItemStack getEquip(Player p, EquipmentSlot slot) {
+		switch (slot) {
+		case CHEST:
+			return p.getEquipment().getChestplate();
+		case FEET:
+			return p.getEquipment().getBoots();
+		case HAND:
+			return p.getInventory().getItemInMainHand();
+		case HEAD:
+			return p.getEquipment().getHelmet();
+		case LEGS:
+			return p.getEquipment().getLeggings();
+		case OFF_HAND:
+			return p.getInventory().getItemInOffHand();
+		default:
+			return null;
+		}
 	}
 
 	/**

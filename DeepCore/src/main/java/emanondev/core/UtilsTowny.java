@@ -12,6 +12,7 @@ import com.palmergames.bukkit.towny.object.*;
 
 public class UtilsTowny {
 	
+	@SuppressWarnings("deprecation")
 	public static @Nullable Resident getResident(Player p) {
 		try {
 			return TownyAPI.getInstance().getDataSource().getResident(p.getName());

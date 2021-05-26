@@ -76,6 +76,10 @@ public abstract class CorePlugin extends JavaPlugin {
 		enable();
 		logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
 	}
+	
+	public Set<Command> getRegisteredCommands(){
+		return Collections.unmodifiableSet(registeredCommands);
+	}
 
 	private void setupLanguageConfig() {
 		YMLConfig language = getConfig("languageConfig.yml");

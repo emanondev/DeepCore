@@ -12,6 +12,7 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -300,12 +301,26 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 			return;
 		case ARMOR:
 			this.armor = new ArrayList<>(Arrays.asList(who.getInventory().getArmorContents()));
+			for (int i=0;i<this.armor.size();i++) {
+				ItemStack el = this.armor.get(i);
+				if (el==null)
+					continue;
+				if (el.getType()==Material.AIR)
+					this.armor.set(i,null);
+			}
 			return;
 		case EFFECTS:
 			this.effects = new ArrayList<>(who.getActivePotionEffects());
 			return;
 		case ENDERCHEST:
 			this.enderChest = new ArrayList<>(Arrays.asList(who.getEnderChest().getStorageContents()));
+			for (int i=0;i<this.enderChest.size();i++) {
+				ItemStack el = this.enderChest.get(i);
+				if (el==null)
+					continue;
+				if (el.getType()==Material.AIR)
+					this.enderChest.set(i,null);
+			}
 			return;
 		case EXHAUSTION:
 			this.exhaustion = who.getExhaustion();
@@ -336,6 +351,13 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 			return;
 		case INVENTORY:
 			this.inventory = new ArrayList<>(Arrays.asList(who.getInventory().getStorageContents()));
+			for (int i=0;i<this.inventory.size();i++) {
+				ItemStack el = this.inventory.get(i);
+				if (el==null)
+					continue;
+				if (el.getType()==Material.AIR)
+					this.inventory.set(i,null);
+			}
 			return;
 		case LEVEL:
 			this.level = who.getLevel();
