@@ -1,6 +1,6 @@
 name: DeepCore
 main: emanondev.core.CoreMain
-version: 2.2
+version: 2.3
 author: emanon
 api-version: 1.13
 softdepend: [SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny]
