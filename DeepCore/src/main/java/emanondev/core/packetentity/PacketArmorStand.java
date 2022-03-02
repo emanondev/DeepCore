@@ -1,15 +1,18 @@
 package emanondev.core.packetentity;
 
 import java.util.Collection;
+import java.util.EnumMap;
+
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
+import emanondev.core.UtilsInventory;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -31,10 +34,8 @@ public class PacketArmorStand extends PacketEntity {
 	private EulerAngle rightArmPose;
 
 	private EulerAngle headPose;
-
-	private ItemStack helmet;
-
-	private ItemStack mainhand;
+	
+	private final EnumMap<EquipmentSlot,ItemStack> equip = new EnumMap<>(EquipmentSlot.class);
 
 	private BaseComponent customName;
 
@@ -53,8 +54,6 @@ public class PacketArmorStand extends PacketEntity {
 		this.isVisible = true;
 		this.rightArmPose = new EulerAngle(0.0D, 0.0D, 0.0D);
 		this.headPose = new EulerAngle(0.0D, 0.0D, 0.0D);
-		this.helmet = new ItemStack(Material.AIR);
-		this.mainhand = new ItemStack(Material.AIR);
 		this.customName = (BaseComponent) new TextComponent();
 		this.custonNameVisible = false;
 		this.velocity = new Vector(0.0D, 0.0D, 0.0D);
@@ -72,8 +71,8 @@ public class PacketArmorStand extends PacketEntity {
 		result = prime * result + (this.isVisible ? 6779 : 6679);
 		result = prime * result + ((this.rightArmPose == null) ? 0 : this.rightArmPose.hashCode());
 		result = prime * result + ((this.headPose == null) ? 0 : this.headPose.hashCode());
-		result = prime * result + ((this.helmet == null) ? 0 : this.helmet.hashCode());
-		result = prime * result + ((this.mainhand == null) ? 0 : this.mainhand.hashCode());
+		for (ItemStack item:equip.values())
+			result = prime * result + ((item == null) ? 0 : item.hashCode());
 		result = prime * result + ((this.customName == null) ? 0 : this.customName.hashCode());
 		result = prime * result + (this.custonNameVisible ? 6199 : 8647);
 		result = prime * result + ((this.velocity == null) ? 0 : this.velocity.hashCode());
@@ -196,27 +195,15 @@ public class PacketArmorStand extends PacketEntity {
 	public EulerAngle getHeadPose() {
 		return this.headPose;
 	}
-
-	public PacketArmorStand setHelmet(ItemStack item) {
-		if (this.lock)
-			return this;
-		this.helmet = item.clone();
+	
+	public PacketArmorStand setItem(EquipmentSlot slot,ItemStack item) {
+		if (UtilsInventory.isAirOrNull(item))
+			equip.remove(slot);
 		return this;
 	}
-
-	public ItemStack getHelmet() {
-		return this.helmet;
-	}
-
-	public PacketArmorStand setItemInMainHand(ItemStack item) {
-		if (this.lock)
-			return this;
-		this.mainhand = item.clone();
-		return this;
-	}
-
-	public ItemStack getItemInMainHand() {
-		return this.mainhand;
+	
+	public ItemStack getItem(EquipmentSlot slot) {
+		return equip.get(slot);
 	}
 
 	public PacketArmorStand setVelocity(Vector vector) {

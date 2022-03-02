@@ -3,11 +3,14 @@ package emanondev.core;
 import java.io.File;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
+import emanondev.core.util.ConsoleLogger;
 import net.md_5.bungee.api.ChatColor;
 
-public abstract class Module implements Listener {
+public abstract class Module implements Listener,ConsoleLogger {
 
 	private final CorePlugin plugin;
 
@@ -67,81 +70,9 @@ public abstract class Module implements Listener {
 						ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + getPlugin().getName() + ChatColor.DARK_BLUE + "|"
 								+ ChatColor.WHITE + getID() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
 	}
+	
 
-	/**
-	 * logs on console message with plugin name and a green ✓ prefix
-	 * 
-	 * @param log Message to print
-	 */
-	public void logDone(String log) {
-		logDone(ChatColor.GREEN, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and a colored ✓ prefix
-	 * 
-	 * @param log Message to print
-	 * @param color Symbol color
-	 */
-	public void logDone(ChatColor color, String log) {
-		log(color + "✓  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and red ✗ prefix
-	 * 
-	 * @param log Message to print
-	 */
-	public void logProblem(String log) {
-		logProblem(ChatColor.RED, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ✗ prefix
-	 * 
-	 * @param log Message to print
-	 * @param color Symbol color
-	 */
-	public void logProblem(ChatColor color, String log) {
-		log(color + "✗  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and yellow signal prefix
-	 * 
-	 * @param log Message to print
-	 */
-	public void logIssue(String log) {
-		logIssue(ChatColor.YELLOW, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored signal prefix
-	 * 
-	 * @param log Message to print
-	 * @param color Symbol color
-	 */
-	public void logIssue(ChatColor color, String log) {
-		log(color + "⚠  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ✧ prefix
-	 * 
-	 * @param log Message to print
-	 * @param color Symbol color
-	 */
-	public void logTetraStar(ChatColor color, String log) {
-		log(color + "✧  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ☆ prefix
-	 * 
-	 * @param log Message to print
-	 * @param color Symbol color
-	 */
-	public void logPentaStar(ChatColor color, String log) {
-		log(color + "☆  " + ChatColor.WHITE + log);
+	public YMLSection getLanguageSection(@NotNull CommandSender who) {
+		return getPlugin().getLanguageConfig(who).loadSection("module." + this.getID());
 	}
 }

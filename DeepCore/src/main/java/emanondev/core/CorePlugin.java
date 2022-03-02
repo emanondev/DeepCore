@@ -10,20 +10,23 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import emanondev.core.CounterAPI.ResetTime;
 import emanondev.core.gui.Gui;
 import emanondev.core.packetentity.PacketManager;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
+import emanondev.core.util.ConsoleLogger;
 import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.*;
-import javax.annotation.*;
 
-public abstract class CorePlugin extends JavaPlugin {
+public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger{
 
 	private LoggerManager loggerManager;
 
@@ -172,6 +175,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * <br>
 	 * 
 	 * Calls {@link #disable()}.<br>
+	 * Disable all enabled modules.<br>
 	 * Unregister all registered commands.<br>
 	 * close SQL connections.
 	 */
@@ -196,6 +200,10 @@ public abstract class CorePlugin extends JavaPlugin {
 			counterApiMap.get(reset).save();
 			logDone("Saved &acounterAPI " + reset.name().toLowerCase() + " &fcache");
 		}
+		enabledModules.forEach((k,v)->{
+			if (v==true)
+				modules.get(k).disable();
+		});
 		for (Command command : new HashSet<>(registeredCommands))
 			unregisterCommand(command);
 		if (this.packetManager != null) {
@@ -282,12 +290,25 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * 
 	 * @param listener
 	 *            Listener to register
+	 * @throws NullPointerException if listener is null
 	 */
-	public void registerListener(@Nonnull Listener listener) {
+	public void registerListener(Listener listener) {
+		if (listener==null)
+			throw new NullPointerException();
 		getServer().getPluginManager().registerEvents(listener, this);
 	}
 
-	public void unregisterListener(@Nonnull Listener listener) {
+	/**
+	 * Unregister the Listener.<br>
+	 * Shortcut for {@link org.bukkit.event.HandlerList HandlerList}.{@link org.bukkit.event.HandlerList#unregisterAll() unregisterAll()};
+	 * 
+	 * @param listener
+	 *            Listener to unregister
+	 * @throws NullPointerException if listener is null
+	 */
+	public void unregisterListener(Listener listener) {
+		if (listener==null)
+			throw new NullPointerException();
 		HandlerList.unregisterAll(listener);
 	}
 
@@ -309,7 +330,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * @see CoreCommand
 	 * @see #unregisterCommand(Command)
 	 */
-	public boolean registerCommand(@Nonnull Command command) {
+	public boolean registerCommand(@NotNull Command command) {
 		try {
 			Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
 			bukkitCommandMap.setAccessible(true);
@@ -370,7 +391,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * @param perm
 	 *            permission to register
 	 */
-	public void registerPermission(@Nonnull Permission perm) {
+	public void registerPermission(@NotNull Permission perm) {
 		registerPermission(perm, true);
 	}
 
@@ -383,7 +404,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * @param silent
 	 *            if false notify console of newly registered permission
 	 */
-	public void registerPermission(@Nonnull Permission perm, boolean silent) {
+	public void registerPermission(@NotNull Permission perm, boolean silent) {
 		if (perm == null)
 			throw new NullPointerException();
 		// boolean save = false;
@@ -416,7 +437,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 * @see #getConfig(String) getConfig("config.yml");
 	 * @return Plugin config file
 	 */
-	public @Nonnull YMLConfig getConfig() {
+	public @NotNull YMLConfig getConfig() {
 		return getConfig("config.yml");
 	}
 
@@ -430,7 +451,7 @@ public abstract class CorePlugin extends JavaPlugin {
 	 *            might contains folder separator for file inside folders
 	 * @return config file at specified path inside plugin folder.
 	 */
-	public @Nonnull YMLConfig getConfig(String fileName) {
+	public @NotNull YMLConfig getConfig(String fileName) {
 		fileName = YMLConfig.fixName(fileName);
 		if (configs.containsKey(fileName))
 			return configs.get(fileName);
@@ -447,65 +468,17 @@ public abstract class CorePlugin extends JavaPlugin {
 	 *            The target of language
 	 * @return Config file for sender laguage
 	 */
-	public @Nonnull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
+	public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
 
 		if (!useMultiLanguage)
 			return getConfig("language" + File.separator + defaultLocale);
-		if (!(sender instanceof Player)) {
+		if (!(sender instanceof Player))
 			return getConfig("language" + File.separator + defaultLocale);
-		}
+		
 		String locale = ((Player) sender).getLocale().split("_")[0];
 		if (languageListIsWhitelist != languagesList.contains(locale))
 			locale = defaultLocale;
 		return getConfig("language" + File.separator + locale);
-	}
-
-	/**
-	 * Gets text based on sender language Shortcut for
-	 * {@link CorePlugin#getLanguageConfig(CommandSender)
-	 * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
-	 * loadString(path, def, sender, true, args)}
-	 * 
-	 * @param sender
-	 *            Target of the message, also used for PAPI compability.
-	 * @param path
-	 *            Path to get the message.
-	 * @param def
-	 *            Default message
-	 * @param args
-	 *            Holders and Replacers in the format
-	 *            ["holder#1","replacer#1","holder#2","replacer#2"...]
-	 * @return Message based on sender language
-	 * @see #getLanguageConfig(CommandSender)
-	 */
-	@Deprecated
-	public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @Nonnull String path,
-			@Nullable String def, String... args) {
-		return getLanguageConfig(sender).loadMessage(path, def, true, args);
-	}
-
-	/**
-	 * Send to sender a text based on sender language.<br>
-	 * No message is send if text is null or empty<br>
-	 * Shortcut for
-	 * sender.sendMessage({@link #loadLanguageMessage(CommandSender, String, String, String...)})
-	 * 
-	 * @param sender
-	 *            Target of the message, also used for PAPI compability.
-	 * @param path
-	 *            Path to get the message.
-	 * @param def
-	 *            Default message
-	 * @param args
-	 *            Holders and Replacers in the format
-	 *            ["holder#1","replacer#1","holder#2","replacer#2"...]
-	 * @see #getLanguageConfig(CommandSender)
-	 */
-	@Deprecated
-	public void sendLanguageMessage(CommandSender sender, String path, String def, String... args) {
-		String msg = loadLanguageMessage(sender, path, def, args);
-		if (msg != null && !msg.isEmpty())
-			sender.sendMessage(msg);
 	}
 
 	public CooldownAPI getCooldownAPI() {
@@ -530,83 +503,6 @@ public abstract class CorePlugin extends JavaPlugin {
 				+ ChatColor.WHITE + this.getName() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
 	}
 
-	/**
-	 * logs on console message with plugin name and a green ✓ prefix
-	 * 
-	 * @param log Message
-	 */
-	public void logDone(String log) {
-		logDone(ChatColor.GREEN, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and a colored ✓ prefix
-	 * 
-	 * @param log Message
-	 * @param color Symbol color
-	 */
-	public void logDone(ChatColor color, String log) {
-		log(color + "✓  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and red ✗ prefix
-	 * 
-	 * @param log Message
-	 */
-	public void logProblem(String log) {
-		logProblem(ChatColor.RED, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ✗ prefix
-	 * 
-	 * @param log Message
-	 * @param color Symbol color
-	 */
-	public void logProblem(ChatColor color, String log) {
-		log(color + "✗  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and yellow signal prefix
-	 * 
-	 * @param log Message
-	 */
-	public void logIssue(String log) {
-		logIssue(ChatColor.YELLOW, log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored signal prefix
-	 * 
-	 * @param log Message
-	 * @param color Symbol color
-	 */
-	public void logIssue(ChatColor color, String log) {
-		log(color + "⚠  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ✧ prefix
-	 * 
-	 * @param log Message
-	 * @param color Symbol color
-	 */
-	public void logTetraStar(ChatColor color, String log) {
-		log(color + "✧  " + ChatColor.WHITE + log);
-	}
-
-	/**
-	 * logs on console message with plugin name and colored ☆ prefix
-	 * 
-	 * @param log Message
-	 * @param color Symbol color
-	 */
-	public void logPentaStar(ChatColor color, String log) {
-		log(color + "☆  " + ChatColor.WHITE + log);
-	}
-
 	public void logOnFile(String fileName, String text) {
 		getLoggerManager().logText(fileName, text);
 	}
@@ -617,21 +513,6 @@ public abstract class CorePlugin extends JavaPlugin {
 
 	public void logOnFile(String fileName, String[] text) {
 		getLoggerManager().logText(fileName, text);
-	}
-
-	/**
-	 * Gets the LoggerManager of this plugin.
-	 * 
-	 * @see #logOnFile(String, String) 
-	 * @see #logOnFile(String, List)
-	 * @see #logOnFile(String, String[])
-	 * @return plugin's LoggerManager.
-	 */
-	@Deprecated
-	public LoggerManager getLoggerManager() {
-		if (loggerManager == null)
-			loggerManager = new LoggerManager(this);
-		return loggerManager;
 	}
 
 	public SQLDatabase createConnection() throws ClassNotFoundException, SQLException {
@@ -693,5 +574,76 @@ public abstract class CorePlugin extends JavaPlugin {
 			this.logDone("Registered as &cdisabled &fmodule &e" + module.getID());
 			// HandlerList.unregisterAll(module);
 		}
+	}
+
+	/**
+	 * Gets text based on sender language Shortcut for
+	 * {@link CorePlugin#getLanguageConfig(CommandSender)
+	 * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
+	 * loadString(path, def, sender, true, args)}
+	 * 
+	 * @param sender
+	 *            Target of the message, also used for PAPI compability.
+	 * @param path
+	 *            Path to get the message.
+	 * @param def
+	 *            Default message
+	 * @param args
+	 *            Holders and Replacers in the format
+	 *            ["holder#1","replacer#1","holder#2","replacer#2"...]
+	 * @return Message based on sender language
+	 * @see #getLanguageConfig(CommandSender)
+	 */
+	@Deprecated
+	public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path,
+			@Nullable String def, String... args) {
+		return getLanguageConfig(sender).loadMessage(path, def, true, args);
+	}
+
+	/**
+	 * Send to sender a text based on sender language.<br>
+	 * No message is send if text is null or empty<br>
+	 * Shortcut for
+	 * sender.sendMessage({@link #loadLanguageMessage(CommandSender, String, String, String...)})
+	 * 
+	 * @param sender
+	 *            Target of the message, also used for PAPI compability.
+	 * @param path
+	 *            Path to get the message.
+	 * @param def
+	 *            Default message
+	 * @param args
+	 *            Holders and Replacers in the format
+	 *            ["holder#1","replacer#1","holder#2","replacer#2"...]
+	 * @see #getLanguageConfig(CommandSender)
+	 */
+	@Deprecated
+	public void sendLanguageMessage(CommandSender sender, String path, String def, String... args) {
+		String msg = loadLanguageMessage(sender, path, def, args);
+		if (msg != null && !msg.isEmpty())
+			sender.sendMessage(msg);
+	}
+
+	/**
+	 * Gets the LoggerManager of this plugin.
+	 * 
+	 * @see #logOnFile(String, String) 
+	 * @see #logOnFile(String, List)
+	 * @see #logOnFile(String, String[])
+	 * @return plugin's LoggerManager.
+	 */
+	@Deprecated
+	public LoggerManager getLoggerManager() {
+		if (loggerManager == null)
+			loggerManager = new LoggerManager(this);
+		return loggerManager;
+	}
+	
+	public Map<String,Module> getModules(){
+		return Collections.unmodifiableMap(modules);
+	}
+	
+	public boolean isActive(Module module) {
+		return enabledModules.containsKey(module.getID())?enabledModules.get(module.getID()):false;
 	}
 }

@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -18,7 +19,6 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
-import emanondev.core.CoreMain;
 import emanondev.core.MCVersion;
 
 public class PacketManager {
@@ -28,11 +28,11 @@ public class PacketManager {
 			throw new NullPointerException();
 		this.plugin = plugin;
 		WatchableCollection.setup();
+		if (!MCVersion.getCurrentVersion().isNewerOrEqualTo(MCVersion.V1_16))
+			throw new IllegalStateException("unsupported version");
 	}
 
-	private Plugin plugin = CoreMain.get();
-
-	private static MCVersion version = MCVersion.getCurrentVersion();
+	private final Plugin plugin;
 
 	private ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
@@ -74,7 +74,7 @@ public class PacketManager {
 	protected void spawnArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
 		PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
 		packet1.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
-		packet1.getIntegers().write(1, Integer.valueOf(version.isLegacy() ? 30 : 1));
+		packet1.getIntegers().write(1, Integer.valueOf(1));
 		packet1.getIntegers().write(2, Integer.valueOf((int) (entity.getVelocity().getX() * 8000.0D)));
 		packet1.getIntegers().write(3, Integer.valueOf((int) (entity.getVelocity().getY() * 8000.0D)));
 		packet1.getIntegers().write(4, Integer.valueOf((int) (entity.getVelocity().getZ() * 8000.0D)));
@@ -90,21 +90,16 @@ public class PacketManager {
 		packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 		PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
 		packet3.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
-		if (version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairs = new ArrayList<>();
-			pairs.add(new Pair<>(EnumWrappers.ItemSlot.MAINHAND, entity.getItemInMainHand()));
-			pairs.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, entity.getHelmet()));
-			packet3.getSlotStackPairLists().write(0, pairs);
-		} else {
-			packet3.getItemSlots().write(0, EnumWrappers.ItemSlot.MAINHAND);
-			packet3.getItemModifier().write(0, entity.getItemInMainHand());
+
+		List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairs = new ArrayList<>();
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack item = entity.getItem(slot);
+			if (item != null && !item.getType().isAir())
+				pairs.add(new Pair<>(equipmentSlotToWrapper(slot), item));
 		}
-		PacketContainer packet4 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
-		if (!version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			packet4.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
-			packet4.getItemSlots().write(0, EnumWrappers.ItemSlot.HEAD);
-			packet4.getItemModifier().write(0, entity.getHelmet());
-		}
+
+		packet3.getSlotStackPairLists().write(0, pairs);
+
 		if (!plugin.isEnabled())
 			return;
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -113,13 +108,29 @@ public class PacketManager {
 					protocolManager.sendServerPacket(player, packet1);
 					protocolManager.sendServerPacket(player, packet2);
 					protocolManager.sendServerPacket(player, packet3);
-					if (!version.isNewerOrEqualTo(MCVersion.V1_16))
-						protocolManager.sendServerPacket(player, packet4);
 				}
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		});
+	}
+
+	private final static EnumWrappers.ItemSlot equipmentSlotToWrapper(EquipmentSlot slot) {
+		switch (slot) {
+		case CHEST:
+			return EnumWrappers.ItemSlot.CHEST;
+		case FEET:
+			return EnumWrappers.ItemSlot.FEET;
+		case HAND:
+			return EnumWrappers.ItemSlot.MAINHAND;
+		case HEAD:
+			return EnumWrappers.ItemSlot.HEAD;
+		case LEGS:
+			return EnumWrappers.ItemSlot.LEGS;
+		case OFF_HAND:
+			return EnumWrappers.ItemSlot.OFFHAND;
+		}
+		throw new IllegalStateException("unable to check equipment slot");
 	}
 
 	protected void updateArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
@@ -136,21 +147,14 @@ public class PacketManager {
 		packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 		PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
 		packet3.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
-		if (version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairs = new ArrayList<>();
-			pairs.add(new Pair<>(EnumWrappers.ItemSlot.MAINHAND, entity.getItemInMainHand()));
-			pairs.add(new Pair<>(EnumWrappers.ItemSlot.HEAD, entity.getHelmet()));
-			packet3.getSlotStackPairLists().write(0, pairs);
-		} else {
-			packet3.getItemSlots().write(0, EnumWrappers.ItemSlot.MAINHAND);
-			packet3.getItemModifier().write(0, entity.getItemInMainHand());
+		List<Pair<EnumWrappers.ItemSlot, ItemStack>> pairs = new ArrayList<>();
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack item = entity.getItem(slot);
+			if (item != null && !item.getType().isAir())
+				pairs.add(new Pair<>(equipmentSlotToWrapper(slot), item));
 		}
-		PacketContainer packet4 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
-		if (!version.isNewerOrEqualTo(MCVersion.V1_16)) {
-			packet4.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
-			packet4.getItemSlots().write(0, EnumWrappers.ItemSlot.HEAD);
-			packet4.getItemModifier().write(0, entity.getHelmet());
-		}
+		packet3.getSlotStackPairLists().write(0, pairs);
+
 		if (!plugin.isEnabled())
 			return;
 		Bukkit.getScheduler().runTask(plugin, () -> {
@@ -159,8 +163,6 @@ public class PacketManager {
 					protocolManager.sendServerPacket(player, packet1);
 					protocolManager.sendServerPacket(player, packet2);
 					protocolManager.sendServerPacket(player, packet3);
-					if (!version.isNewerOrEqualTo(MCVersion.V1_16))
-						protocolManager.sendServerPacket(player, packet4);
 				}
 			} catch (InvocationTargetException e) {
 				e.printStackTrace();
@@ -210,13 +212,10 @@ public class PacketManager {
 		packet1.getIntegers().write(3, Integer.valueOf((int) (entity.getVelocity().getZ() * 8000.0D)));
 		packet1.getIntegers().write(4, Integer.valueOf((int) (entity.getLocation().getPitch() * 256.0F / 360.0F)));
 		packet1.getIntegers().write(5, Integer.valueOf((int) (entity.getLocation().getYaw() * 256.0F / 360.0F)));
-		if (version.isLegacy() || version.equals(MCVersion.V1_13) || version.equals(MCVersion.V1_13_1)) {
-			packet1.getIntegers().write(6, Integer.valueOf(2));
-			packet1.getIntegers().write(7, Integer.valueOf(1));
-		} else {
-			packet1.getEntityTypeModifier().write(0, entity.getType());
-			packet1.getIntegers().write(6, Integer.valueOf(1));
-		}
+		
+		packet1.getEntityTypeModifier().write(0, entity.getType());
+		packet1.getIntegers().write(6, Integer.valueOf(1));
+		
 		packet1.getUUIDs().write(0, entity.getUniqueId());
 		Location location = entity.getLocation();
 		packet1.getDoubles().write(0, Double.valueOf(location.getX()));
@@ -303,13 +302,10 @@ public class PacketManager {
 		packet1.getIntegers().write(3, Integer.valueOf(0));
 		packet1.getIntegers().write(4, Integer.valueOf((int) (entity.getPitch() * 256.0F / 360.0F)));
 		packet1.getIntegers().write(5, Integer.valueOf((int) (entity.getYaw() * 256.0F / 360.0F)));
-		if (version.isLegacy() || version.equals(MCVersion.V1_13) || version.equals(MCVersion.V1_13_1)) {
-			packet1.getIntegers().write(6, Integer.valueOf(33));
-			packet1.getIntegers().write(7, Integer.valueOf(getItemFrameData(entity)));
-		} else {
-			packet1.getEntityTypeModifier().write(0, entity.getType());
-			packet1.getIntegers().write(6, Integer.valueOf(getItemFrameData(entity)));
-		}
+		
+		packet1.getEntityTypeModifier().write(0, entity.getType());
+		packet1.getIntegers().write(6, Integer.valueOf(getItemFrameData(entity)));
+		
 		packet1.getUUIDs().write(0, entity.getUniqueId());
 		Location location = entity.getLocation();
 		packet1.getDoubles().write(0, Double.valueOf(location.getX()));
@@ -391,46 +387,3 @@ public class PacketManager {
 		packetEntities.add(p);
 	}
 }
-
-/*
- * {
- * 
- * private final Plugin plugin; public final ProtocolManager PROTOCOL_MANAGER =
- * ProtocolLibrary.getProtocolManager(); public final String VERSION =
- * Bukkit.getServer().getClass().getPackage().getName().substring(Bukkit.
- * getServer().getClass().getPackage().getName().lastIndexOf('.') + 1);
- * 
- * 
- * public PacketManager(Plugin plugin) { if (plugin==null) throw new
- * NullPointerException(); this.plugin = plugin; WatchableCollection.setup(); }
- * 
- * private Set<PacketEntity> packetEntities = Collections.newSetFromMap( new
- * WeakHashMap<PacketEntity, Boolean>());
- * 
- * 
- * public void sendHandMovement(List<Player> players, Player entity) {
- * PacketContainer packet1 =
- * PROTOCOL_MANAGER.createPacket(PacketType.Play.Server.ANIMATION);
- * packet1.getModifier().writeDefaults(); packet1.getIntegers().write(0,
- * entity.getEntityId()); packet1.getIntegers().write(1, 0);
- * 
- * if (!plugin.isEnabled()) { return; } Bukkit.getScheduler().runTask(plugin, ()
- * -> { try { for (Player player : players) {
- * PROTOCOL_MANAGER.sendServerPacket(player, packet1); } } catch
- * (InvocationTargetException e) { e.printStackTrace(); } }); }
- * 
- * public PacketItem getPacketItem(Location loc) { PacketItem p = new
- * PacketItem(loc,this); packetEntities.add(p); return p; }
- * 
- * public PacketItemFrame getPacketItemFrame(Location loc) { PacketItemFrame p =
- * new PacketItemFrame(loc,this); packetEntities.add(p); return p; }
- * 
- * public PacketArmorStand getPacketArmorStand(Location loc) { PacketArmorStand
- * p = new PacketArmorStand(loc,this); packetEntities.add(p); return p; } public
- * Plugin getPlugin() { return plugin; }
- * 
- * public void clearAll() { for (PacketEntity pEntity:packetEntities)
- * pEntity.remove(); }
- * 
- * }
- */

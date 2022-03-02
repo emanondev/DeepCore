@@ -1,10 +1,12 @@
 package emanondev.core.gui;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.ItemStack;
 
 import emanondev.core.CorePlugin;
+import emanondev.core.YMLSection;
 
 public interface GuiButton {
 
@@ -57,7 +59,9 @@ public interface GuiButton {
 	 * @param event - the event
 	 * @return true if should call getGui().inventoryUpdate();
 	 */
-	public boolean onDrag(InventoryDragEvent event);
+	public default boolean onDrag(InventoryDragEvent event) {
+		return false;
+	}
 
 	/**
 	 * This event is called when a player clicks a slot in an inventory.
@@ -113,6 +117,21 @@ public interface GuiButton {
 	
 	public default Player getTargetPlayer() {
 		return getGui().getTargetPlayer();
+	}
+	
+
+
+	/**
+	 * Returns language section for the command sender<br>
+	 * (load language config and go to subpattern 'command.[command id]')
+	 * @param who may be null
+	 * @return language section for the command sender
+	 */
+	public default YMLSection getLanguageSection(CommandSender who) {
+		return getPlugin().getLanguageConfig(who).loadSection("buttons");
+	}
+	public default YMLSection getLanguageSection() {
+		return getPlugin().getLanguageConfig(getTargetPlayer()).loadSection("buttons");
 	}
 
 }

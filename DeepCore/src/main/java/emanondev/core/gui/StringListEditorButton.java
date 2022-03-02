@@ -1,120 +1,231 @@
 package emanondev.core.gui;
 
 import java.util.*;
-import java.util.function.Function;
 
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+
 import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 
-public class StringListEditorButton extends EditorButton<List<String>> {
+public abstract class StringListEditorButton extends AGuiButton {
 
-	private List<String> list = null;
-	private int line = -1;
+	private Action action = Action.ADD_LINE;
+	private int line;
+	private String subTitle = "&9Line editor";
+	private ItemStack baseItem = new ItemBuilder(Material.PAPER).setGuiProperty().build();
 
-	public StringListEditorButton(Gui gui) {
-		super(gui);
-		this.setOnClick(new Function<InventoryClickEvent, Boolean>() {
+	public StringListEditorButton(Gui parent) {
+		super(parent);
+	}
 
-			@Override
-			public Boolean apply(InventoryClickEvent t) {
-				list = getValue();
-				if (list == null) {
-					list = new ArrayList<>();
-					line = -1;
-				} else {
-					list = new ArrayList<>(list);
-					line = 0;
-				}
-				////TODO unsupported
-				/*
-				AnvilInternalGui anvil = new AnvilInternalGui(StringListEditorButton.this.getGui().getPlugin(),
-						(Player) t.getWhoClicked(), "§9Editor Gui",
-						line == -1 ? "" : UtilsString.revertColors(list.get(line)), craftMainItem(), false,
-						new Consumer<InventoryClickEvent>() {
+	public void setLineEditorTitle(String value) {
+		subTitle = value;
+	}
 
-							@Override
-							public void accept(InventoryClickEvent t) {
-								if (t.getRawSlot() == 0) {
-									switch (t.getClick()) {
-									case LEFT: {
-										if (line == -1)
-											return;
-										line = (line + 1) % list.size();
-										anvil.getInventory().setItem(0, craftMainItem());
-										return;
-									}
-									case RIGHT: {
-										if (line == -1)
-											return;
-										line = (line - 1) % list.size();
-										anvil.getInventory().setItem(0, craftMainItem());
-										return;
-									}
-									case SHIFT_RIGHT: {
-										ItemMeta meta = t.getView().getTopInventory().getItem(2).getItemMeta();
-										// TODO
-										// StringListEditorButton.this
-										// .changeRequest(meta.hasDisplayName() ? meta.getDisplayName() : "");
-										t.getWhoClicked()
-												.openInventory(StringListEditorButton.this.getGui().getInventory());
-										return;
-									}
-									case SHIFT_LEFT: {
-										t.getWhoClicked()
-												.openInventory(StringListEditorButton.this.getGui().getInventory());
-										return;
-									}
-									default:
-										break;
-									}
-									return;
-								}
+	public void setBaseItem(ItemStack item) {
+		baseItem = item;
+	}
 
-								if (t.getRawSlot() == 2)
-									switch (t.getClick()) {
-									case LEFT: {
-										ItemMeta meta = t.getView().getTopInventory().getItem(2).getItemMeta();
-										// TODO
-										// StringListEditorButton.this
-										// .changeRequest(meta.hasDisplayName() ? meta.getDisplayName() : "");
-										t.getWhoClicked()
-												.openInventory(StringListEditorButton.this.getGui().getInventory());
-										return;
-									}
-									case SHIFT_LEFT:
-										t.getWhoClicked()
-												.openInventory(StringListEditorButton.this.getGui().getInventory());
-										return;
-									default:
-										break;
-									}
-							}
+	public abstract List<String> getValue();
 
-						});
-				anvil.getInventory().setItem(1,
-						new ItemBuilder(Material.ENCHANTED_BOOK).setGuiProperty()
-								.setDescription(Arrays.asList("&6Left Button:", " &3Left Click &7select line &fbelow",
-										" &3Right Click &7select line &fupside", " &3Shift Left Click &aadd &fnew line",
-										" &3Shift Right Click &cdelete &fcurrent line", "&6Right Button:",
-										" &3Left Click &7update line", " &3Right Click &7confirm changes",
-										" &3Shift Right Click &7ignore changes"), true)
-								.build());
-								*/
-				return true;
+	public abstract void onChange(List<String> list);
+
+	@Override
+	public boolean onClick(InventoryClickEvent event) {
+		switch (event.getClick()) {
+		case LEFT:
+			setLine(getLine() - 1);
+			return true;
+		case RIGHT:
+			setLine(getLine() + 1);
+			return true;
+		case MIDDLE:
+			applyAction();
+			return true;
+		case SHIFT_LEFT:
+			action = Action.values()[(action.ordinal() - 1 + Action.values().length) % Action.values().length];
+			return true;
+		case SHIFT_RIGHT:
+			action = Action.values()[(action.ordinal() + 1 + Action.values().length) % Action.values().length];
+			return true;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	private void setLine(int value) {
+		line = value;
+	}
+
+	private int getLine() {
+		List<String> value = getValue();
+		if (value == null) {
+			action = Action.ADD_LINE;
+			return 0;
+		}
+		int r = Math.min(value.size(), Math.max(0, line));
+		if (r == value.size())
+			action = Action.ADD_LINE;
+		if (r==0&& action==Action.MOVE_UP)
+			action = Action.MOVE_DOWN;
+		return r;
+	}
+
+	void applyAction() {
+		List<String> list = getValue();
+		if (list == null)
+			list = new ArrayList<>();
+		else
+			list = new ArrayList<>(list);
+		int line = getLine();
+		switch (action) {
+		case ADD_LINE:
+			try {
+				if (line >= list.size())
+					list.add("&f");
+				else
+					list.add(line, "&f");
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
+			this.onChange(list);
+			break;
+		case DELETE_LINE:
+			try {
+				list.remove(line);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			this.onChange(list);
+			break;
+		case EDIT_LINE:
+			final List<String> temp = list;
+			new TextEditorGui(subTitle, list.get(line), getTargetPlayer(), this.getGui(), getPlugin()) {
+
+				@Override
+				public void onTextConfirmed(String lineText) {
+					temp.set(line, lineText);
+					StringListEditorButton.this.onChange(temp);
+					StringListEditorButton.this.getGui().open(getTargetPlayer());
+				}
+
+			}.open(getTargetPlayer());
+			break;
+		case MOVE_DOWN:
+			try {
+				if (line + 1 >= list.size())
+					list.add(line, "");
+				list.add(line, list.remove(line));
+				setLine(line + 1);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			this.onChange(list);
+			break;
+		case MOVE_UP:
+			try {
+				if (line - 1 < 0) {
+					action = Action.MOVE_DOWN;
+					getGui().updateInventory();
+					return;
+				}
+				list.add(line - 1, list.remove(line));
+				setLine(line - 1);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			this.onChange(list);
+			break;
+		default:
+			throw new IllegalStateException();
+		}
+
+	}
+	
+	public ItemStack getBaseItem() {
+		return baseItem;
 	}
 
-	private ItemStack craftMainItem() {
-		ArrayList<String> description = new ArrayList<>();
-		description.add("");
-		description.add("&6Selected Line: &e" + (line == -1 ? "None" : String.valueOf(line)));
-		description.add("&6List:");
-		for (int i = 0; i < list.size(); i++)
-			description.add((i == line ? "&a⮚ &f" : "&f⮚ ") + list.get(i));
-		return new ItemBuilder(Material.TURTLE_HELMET).setGuiProperty().setDescription(description, true)
-				.setDisplayName(line == -1 ? "" : list.get(line).replace("§", "&")).build();
+	@Override
+	public ItemStack getItem() {
+		ItemStack item = getBaseItem();
+		if (item == null)
+			return null;
+		return new ItemBuilder(item).setDescription(getDescription()).build();
 	}
+
+	public List<String> getDescription() {
+		List<String> desc = new ArrayList<>();
+		List<String> tmp = getBaseDescription();
+		if (tmp!=null)
+			desc.addAll(tmp);
+		tmp = getValueDescription();
+		if (tmp!=null)
+			desc.addAll(tmp);
+		tmp = getInstructionsDescription();
+		if (tmp!=null)
+			desc.addAll(tmp);
+		return UtilsString.fix(desc, null, true, "%action_symbol%", action.symbol, "%action_description%",
+				action.desc, "%action_line%", actionLine());
+	}
+
+	public List<String> getBaseDescription() {
+		return Arrays.asList("&6&lText:");
+	}
+
+	public List<String> getValueDescription() {
+		List<String> val = getValue();
+		if (val == null)
+			val = new ArrayList<>();
+		else
+			val = new ArrayList<>(val);
+		val.add("");
+		int line = getLine();
+		for (int i = 0; i < val.size(); i++) {
+			if (i != line)
+				val.set(i, "   &f" + val.get(i));
+			else
+				val.set(i, "%action_symbol% &f" + val.get(i));
+		}
+		return val;
+	}
+
+	public List<String> getInstructionsDescription() {
+		return Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9Change line",
+						"&7[&fClick&7] &9Shift Left&b/&9Right &7> &9Change action",
+						"&7[&fClick&7] &9Middle &7> %action_symbol% &9%action_description%", "%action_line%");
+	}
+
+	private String actionLine() {
+		return new StringBuilder("")
+				.append(action == Action.ADD_LINE ? "&b[" + action.symbol + "&b] "
+						: "&8[" + Action.ADD_LINE.symbol + "&8] ")
+				.append(action == Action.EDIT_LINE ? "&b[" + action.symbol + "&b] "
+						: "&8[" + Action.EDIT_LINE.symbol + "&8] ")
+				.append(action == Action.DELETE_LINE ? "&b[" + action.symbol + "&b] "
+						: "&8[" + Action.DELETE_LINE.symbol + "&8] ")
+				.append(action == Action.MOVE_DOWN ? "&b[" + action.symbol + "&b] "
+						: "&8[" + Action.MOVE_DOWN.symbol + "&8] ")
+				.append(action == Action.MOVE_UP ? "&b[" + action.symbol + "&b] "
+						: "&8[" + Action.MOVE_UP.symbol + "&8]")
+				.toString();
+	}
+
+	private enum Action {
+		ADD_LINE("&a&l+", "Add Line"), EDIT_LINE("&9✐", "Edit line"), DELETE_LINE("&c&l✗", "Delete line"),
+		MOVE_DOWN("&e▽", "Move line downside"), MOVE_UP("&e△", "Move line upside");
+
+		private final String symbol;
+		private final String desc;
+
+		Action(String symbol, String desc) {
+			this.symbol = symbol;
+			this.desc = desc;
+		}
+
+	}
+
 }

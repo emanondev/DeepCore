@@ -6,21 +6,19 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Predicate;
 
 import de.myzelyam.api.vanish.VanishAPI;
 
-@Deprecated
 public class UtilsCommand {
 
 	UtilsCommand() {
@@ -32,7 +30,7 @@ public class UtilsCommand {
 	 *            argument to read
 	 * @return double value of the string or null
 	 */
-	public static @Nullable Double readDouble(@Nonnull String arg) {
+	public static @Nullable Double readDouble(@NotNull String arg) {
 		try {
 			return Double.valueOf(arg);
 		} catch (Exception e) {
@@ -45,7 +43,7 @@ public class UtilsCommand {
 	 *            argument to read
 	 * @return target player or null if player is offline
 	 */
-	public static @Nullable Player readPlayer(@Nonnull String arg) {
+	public static @Nullable Player readPlayer(@NotNull String arg) {
 		return Bukkit.getPlayer(arg);
 	}
 
@@ -54,7 +52,8 @@ public class UtilsCommand {
 	 *            argument to read
 	 * @return target player or null if player never joined the server
 	 */
-	public static @Nullable OfflinePlayer readOfflinePlayer(@Nonnull String arg) {
+	public static @Nullable OfflinePlayer readOfflinePlayer(@NotNull String arg) {
+		@SuppressWarnings("deprecation")
 		OfflinePlayer player = Bukkit.getOfflinePlayer(arg);
 		if (player.getLastPlayed() == 0)
 			return null;
@@ -67,7 +66,7 @@ public class UtilsCommand {
 	 *            argument to read
 	 * @return int value of the string or null
 	 */
-	public static @Nullable Integer readInt(@Nonnull String arg) {
+	public static @Nullable Integer readInt(@NotNull String arg) {
 		try {
 			return Integer.valueOf(arg);
 		} catch (Exception e) {
@@ -84,7 +83,7 @@ public class UtilsCommand {
 	 * @return a list of player names from online players for the given prefix
 	 *         filthering visible players id vanishAPI is active
 	 */
-	public static @Nonnull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix) {
+	public static @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix) {
 		return completePlayerNames(sender, prefix, Bukkit.getOnlinePlayers());
 	}
 
@@ -99,7 +98,7 @@ public class UtilsCommand {
 	 * @return a list of player names from the given collection for the given prefix
 	 *         filthering visible players id vanishAPI is active
 	 */
-	public static @Nonnull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
+	public static @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
 			@Nullable Collection<? extends Player> players) {
 		if (prefix != null)
 			prefix = prefix.toLowerCase();
@@ -120,8 +119,8 @@ public class UtilsCommand {
 		return list;
 	}
 
-	public static @Nonnull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
-			@Nonnull Function<K, String> eval, @Nullable Predicate<K> isValid) {
+	public static @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
+			@NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
 		List<String> results = new ArrayList<>();
 		if (prefix == null || prefix.isEmpty()) {
 			for (K val : values)
@@ -157,7 +156,7 @@ public class UtilsCommand {
 	 * @return a list of lowcased string from enums of class type matching prefix is
 	 *         true (ignoring caps)
 	 */
-	public static @Nonnull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @Nonnull Class<K> type) {
+	public static @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type) {
 		List<String> results = new ArrayList<>();
 		if (prefix == null || prefix.isEmpty()) {
 			for (Enum<K> e : type.getEnumConstants())
@@ -184,8 +183,8 @@ public class UtilsCommand {
 	 * @return a list of lowcased string from enums of class type matching prefix
 	 *         and predicate.apply() is true (ignoring caps)
 	 */
-	public static @Nonnull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @Nonnull Class<K> type,
-			@Nonnull Predicate<K> predicate) {
+	public static @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type,
+			@NotNull Predicate<K> predicate) {
 		List<String> results = new ArrayList<>();
 		if (prefix == null || prefix.isEmpty()) {
 			for (K e : type.getEnumConstants())
@@ -209,7 +208,7 @@ public class UtilsCommand {
 	 *            elements to match
 	 * @return a list of strings matching prefix
 	 */
-	public static @Nonnull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements) {
+	public static @NotNull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements) {
 		if (prefix == null || prefix.isEmpty())
 			return new ArrayList<>(elements);
 		prefix = prefix.toLowerCase();
@@ -230,7 +229,7 @@ public class UtilsCommand {
 	 *            elements to match
 	 * @return a list of strings matching prefix
 	 */
-	public static @Nonnull List<String> complete(@Nullable String prefix, @Nullable String[] elements) {
+	public static @NotNull List<String> complete(@Nullable String prefix, @Nullable String[] elements) {
 		if (prefix == null || prefix.isEmpty())
 			return Arrays.asList(elements);
 		prefix = prefix.toLowerCase();
@@ -251,7 +250,7 @@ public class UtilsCommand {
 	 *            the permission
 	 * @return true if permission is null or sender has permission
 	 */
-	public static boolean hasPermission(@Nonnull Permissible sender, @Nullable Permission permission) {
+	public static boolean hasPermission(@NotNull Permissible sender, @Nullable Permission permission) {
 		if (permission == null)
 			return true;
 		if (sender == null)
@@ -268,7 +267,7 @@ public class UtilsCommand {
 	 * @see #hasPermission(Permissible, Permission)
 	 */
 	@Deprecated
-	public static boolean hasPermission(@Nonnull Permissible sender, @Nullable String permission) {
+	public static boolean hasPermission(@NotNull Permissible sender, @Nullable String permission) {
 		if (permission == null)
 			return true;
 		if (sender == null)

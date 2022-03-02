@@ -4,14 +4,14 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Function;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -20,7 +20,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 @Deprecated
 public abstract class CoreComplexCommand extends CoreCommand implements ComplexCommandComponent {
 
-	public CoreComplexCommand(@Nonnull String id, @Nonnull CorePlugin plugin, @Nullable Permission permission,
+	public CoreComplexCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
 			@Nullable String defaultDescription, @Nullable List<String> defaultAliases) {
 		super(id, plugin, permission, defaultDescription, defaultAliases);
 	}

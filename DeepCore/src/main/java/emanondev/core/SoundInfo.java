@@ -2,13 +2,13 @@ package emanondev.core;
 
 import java.util.*;
 
-import javax.annotation.*;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SerializableAs(value = "SoundInfo")
 public class SoundInfo implements ConfigurationSerializable {
@@ -27,7 +27,7 @@ public class SoundInfo implements ConfigurationSerializable {
 	 * 
 	 * @param map Map containing the object fields
 	 */
-	public SoundInfo(@Nonnull Map<String, Object> map) {
+	public SoundInfo(@NotNull Map<String, Object> map) {
 		this(getStringSound((String) map.get("sound")), (double) map.getOrDefault("volume", 1D),
 				(double) map.getOrDefault("pitch", 1D), (boolean) map.getOrDefault("selfSound", false));
 	}
@@ -54,7 +54,7 @@ public class SoundInfo implements ConfigurationSerializable {
 		play(p.getLocation(), p);
 	}
 
-	public void play(@Nonnull Location loc, @Nullable Player p) {
+	public void play(@NotNull Location loc, @Nullable Player p) {
 		if (loc == null || sound == null)
 			return;
 		if (p == null)

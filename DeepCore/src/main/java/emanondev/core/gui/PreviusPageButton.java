@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
 
+@Deprecated
 public class PreviusPageButton extends AGuiButton implements PagedButton {
 	private ItemStack item;
 

@@ -1,9 +1,11 @@
 package emanondev.core;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,8 +14,8 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
-import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 public class UtilsWorld {
 	
@@ -64,13 +66,24 @@ public class UtilsWorld {
 		if (!unload(world,false,fallback))
 			return false;
 		try {
-			FileUtils.deleteDirectory(world.getWorldFolder());
+			deleteDirectoryRecursion(world.getWorldFolder().toPath());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
+	
+	private static void deleteDirectoryRecursion(Path path) throws IOException {
+		  if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+		    try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
+		      for (Path entry : entries) {
+		        deleteDirectoryRecursion(entry);
+		      }
+		    }
+		  }
+		  Files.delete(path);
+		}
 
 	private static Location getFallbackLocation(Location l, World w) {
 		if (l == null)

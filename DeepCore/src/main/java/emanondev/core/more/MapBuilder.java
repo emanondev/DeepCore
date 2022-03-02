@@ -5,8 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,6 +17,7 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.map.MapView.Scale;
 import org.bukkit.plugin.AuthorNagException;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * https://github.com/LagBug/MapBuilder/blob/master/README.md
@@ -60,7 +59,7 @@ public class MapBuilder {
      * @param image the buffered image to use
      * @return the instance of this class
      */
-    public MapBuilder setImage(@Nonnull BufferedImage image) {
+    public MapBuilder setImage(@NotNull BufferedImage image) {
         this.image = image;
         return this;
     }
@@ -74,7 +73,7 @@ public class MapBuilder {
      * @param text the string that will be displayed
      * @return the instance of this class
      */
-    public MapBuilder addText(@Nonnull int x, @Nonnull int y, @Nonnull MapFont font, @Nonnull String text) {
+    public MapBuilder addText(@NotNull int x, @NotNull int y, @NotNull MapFont font, @NotNull String text) {
         this.texts.add(new Text(x, y, font, text));
         return this;
     }
@@ -98,7 +97,7 @@ public class MapBuilder {
      * @return the instance of this class
      */
     @SuppressWarnings("deprecation")
-    public MapBuilder addCursor(@Nonnull int x, @Nonnull int y, @Nonnull CursorDirection direction, @Nonnull CursorType type) {
+    public MapBuilder addCursor(@NotNull int x, @NotNull int y, @NotNull CursorDirection direction, @NotNull CursorType type) {
         cursors.addCursor(x, y, (byte) direction.getId(), (byte) type.getId());
         return this;
     }
@@ -119,7 +118,7 @@ public class MapBuilder {
      * @param renderOnce the value to determine if it's going to be rendered once
      * @return the instance of this class
      */
-    public MapBuilder setRenderOnce(@Nonnull boolean renderOnce) {
+    public MapBuilder setRenderOnce(@NotNull boolean renderOnce) {
         this.renderOnce = renderOnce;
         return this;
     }
@@ -185,7 +184,7 @@ public class MapBuilder {
      * @param mapView the map to get the id
      * @return the instance of this class
      */
-    private short getMapId(@Nonnull MapView mapView) {
+    private short getMapId(@NotNull MapView mapView) {
         try {
             return (short) mapView.getId();
         } catch (NoSuchMethodError ex) {
@@ -210,7 +209,7 @@ public class MapBuilder {
 
         private final int id;
 
-        private CursorDirection(@Nonnull int id) {
+        private CursorDirection(@NotNull int id) {
             this.id = id;
         }
 
@@ -233,7 +232,7 @@ public class MapBuilder {
 
         private final int id;
 
-        private CursorType(@Nonnull int id) {
+        private CursorType(@NotNull int id) {
             this.id = id;
         }
 
@@ -258,7 +257,7 @@ class Text {
     private MapFont font;
     private String message;
 
-    public Text(@Nonnull int x, @Nonnull int y, @Nonnull MapFont font, @Nonnull String message) {
+    public Text(@NotNull int x, @NotNull int y, @NotNull MapFont font, @NotNull String message) {
         setX(x);
         setY(y);
         setFont(font);
@@ -279,7 +278,7 @@ class Text {
     *
     * @param x the x postion
     */
-    public void setX(@Nonnull int x) {
+    public void setX(@NotNull int x) {
         this.x = x;
     }
 
@@ -297,7 +296,7 @@ class Text {
      *
      * @param y the y position
      */
-    public void setY(@Nonnull int y) {
+    public void setY(@NotNull int y) {
         this.y = y;
     }
 
@@ -315,7 +314,7 @@ class Text {
      *
      * @param font the actual font
      */
-    public void setFont(@Nonnull MapFont font) {
+    public void setFont(@NotNull MapFont font) {
         this.font = font;
     }
 
@@ -333,7 +332,7 @@ class Text {
      *
      * @param message the actual text
      */
-    public void setMessage(@Nonnull String message) {
+    public void setMessage(@NotNull String message) {
         this.message = message;
     }
 }

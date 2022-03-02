@@ -3,10 +3,9 @@ package emanondev.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends CoreCommand {
 
@@ -19,7 +18,7 @@ public class ReloadCommand extends CoreCommand {
 	
 
 	@Override
-	public void onExecute(@Nonnull CommandSender sender,@Nonnull String alias,@Nonnull String[] args) {
+	public void onExecute(@NotNull CommandSender sender,@NotNull String alias,@NotNull String[] args) {
 		try{
 			getPlugin().onReload();
 			UtilsMessages.sendMessage(sender, getConfig().loadMessage("message.reload-success", "&2[&a"+getPlugin().getName()+"&2]&a reloaded",  true));

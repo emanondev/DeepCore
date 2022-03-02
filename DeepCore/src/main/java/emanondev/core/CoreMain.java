@@ -1,8 +1,8 @@
 package emanondev.core;
 
-import javax.annotation.*;
-
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.jetbrains.annotations.NotNull;
+
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.gui.GuiHandler;
 
@@ -14,7 +14,7 @@ public final class CoreMain extends CorePlugin {
 	 * 
 	 * @return the instance of the plugin
 	 */
-	public static @Nonnull CoreMain get() {
+	public static @NotNull CoreMain get() {
 		return inst;
 	}
 
@@ -50,6 +50,5 @@ public final class CoreMain extends CorePlugin {
 	public void disable() {
 		ConfigurationSerialization.unregisterClass(SoundInfo.class);
 		this.logDone("Unregistered &eSoundInfo &ffrom ConfigurationSerializables");
-
 	}
 }

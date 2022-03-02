@@ -3,8 +3,6 @@ package emanondev.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -23,6 +21,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemBuilder {
 	private ItemStack result;
@@ -31,6 +30,7 @@ public class ItemBuilder {
 	/**
 	 * Sets unbreakable.<br>
 	 * Sets all {@link ItemFlag}.
+	 * 
 	 * @return this for chaining.
 	 */
 	public ItemBuilder setGuiProperty() {
@@ -41,11 +41,11 @@ public class ItemBuilder {
 		return this;
 	}
 
-	public ItemBuilder(@Nonnull Material result) {
+	public ItemBuilder(@NotNull Material result) {
 		this(new ItemStack(result));
 	}
 
-	public ItemBuilder(@Nonnull ItemStack result) {
+	public ItemBuilder(@NotNull ItemStack result) {
 		this.result = new ItemStack(result);
 		this.resultMeta = this.result.getItemMeta();
 	}
@@ -92,6 +92,7 @@ public class ItemBuilder {
 
 	/**
 	 * Adds line to lore.
+	 * 
 	 * @param line Line to add.
 	 * @return this for chaining.
 	 */
@@ -109,6 +110,7 @@ public class ItemBuilder {
 
 	/**
 	 * Sets lore.
+	 * 
 	 * @param lore Lore to set.
 	 * @return this for chaining.
 	 */
@@ -119,37 +121,42 @@ public class ItemBuilder {
 
 	/**
 	 * Add enchantment.
+	 * 
 	 * @param enchantment Enchantment to set.
-	 * @param level Level to set.
+	 * @param level       Level to set.
 	 * @return this for chaining.
 	 */
 	public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
-		this.resultMeta.addEnchant(enchantment, level, true);
+		if (level == 0)
+			this.resultMeta.removeEnchant(enchantment);
+		else
+			this.resultMeta.addEnchant(enchantment, level, true);
 		return this;
 	}
 
 	/**
 	 * For both Potion and Leather Armor
+	 * 
 	 * @param color Applyed color.
 	 * @return this for chaining.
-	 * @throws IllegalStateException if this meta is not LeatherArmorMeta nor PotionMeta
+	 * @throws IllegalStateException if this meta is not LeatherArmorMeta nor
+	 *                               PotionMeta
 	 */
 	public ItemBuilder setColor(Color color) {
 		if (resultMeta instanceof LeatherArmorMeta) {
 			((LeatherArmorMeta) this.resultMeta).setColor(color);
 			return this;
-		}
-		else if (resultMeta instanceof PotionMeta) {
+		} else if (resultMeta instanceof PotionMeta) {
 			((PotionMeta) this.resultMeta).setColor(color);
 			return this;
-		}
-		else
+		} else
 			new IllegalStateException("meta is not LeatherArmorMeta nor PotionMeta").printStackTrace();
 		return this;
 	}
 
 	/**
 	 * Set author name
+	 * 
 	 * @param name Name of the Author.
 	 * @return this for chaining.
 	 * @throws IllegalStateException if this meta is not BookMeta
@@ -164,6 +171,7 @@ public class ItemBuilder {
 
 	/**
 	 * Set book title.
+	 * 
 	 * @param title Title of the book.
 	 * @return this for chaining.
 	 * @throws IllegalStateException if this meta is not BookMeta
@@ -178,6 +186,7 @@ public class ItemBuilder {
 
 	/**
 	 * Set book title.
+	 * 
 	 * @param page Index of the page to set.
 	 * @param text Text of the page.
 	 * @return this for chaining.
@@ -193,6 +202,7 @@ public class ItemBuilder {
 
 	/**
 	 * Add Potion effect.
+	 * 
 	 * @param effect Effect to add to Potion.
 	 * @return this for chaining.
 	 * @throws IllegalStateException if this meta is not PotionMeta
@@ -231,10 +241,10 @@ public class ItemBuilder {
 	}
 
 	public ItemBuilder setAmount(int amount) {
-		if (amount>0)
+		if (amount > 0)
 			this.result.setAmount(amount);
 		else
-			new IllegalStateException("invalid amount ("+amount+")").printStackTrace();
+			new IllegalStateException("invalid amount (" + amount + ")").printStackTrace();
 		return this;
 	}
 
@@ -246,6 +256,7 @@ public class ItemBuilder {
 
 	/**
 	 * Sets all {@link ItemFlag} on this
+	 * 
 	 * @return this for chaining.
 	 */
 	public ItemBuilder hideAllFlags() {
@@ -263,44 +274,50 @@ public class ItemBuilder {
 
 	/**
 	 * Update both title and lore with description
+	 * 
 	 * @param description Description text
-	 * @param holders Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+	 * @param holders     Additional placeholders to replace in the format
+	 *                    "holder1", "value1", "holder2", "value2"...
 	 * @return this for chaining.
 	 */
-	public ItemBuilder setDescription(List<String> description,String... holders) {
-		setDescription(description,true,null,holders);
+	public ItemBuilder setDescription(List<String> description, String... holders) {
+		setDescription(description, true, null, holders);
 		return this;
 	}
+
 	/**
 	 * Update both title and lore with description
+	 * 
 	 * @param description Text to set
-	 * @param color Whether or not translate color codes
-	 * @param holders Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+	 * @param color       Whether or not translate color codes
+	 * @param holders     Additional placeholders to replace in the format
+	 *                    "holder1", "value1", "holder2", "value2"...
 	 * @return this for chaining.
 	 */
-	public ItemBuilder setDescription(List<String> description,boolean color,String... holders) {
-		setDescription(description,color,null,holders);
+	public ItemBuilder setDescription(List<String> description, boolean color, String... holders) {
+		setDescription(description, color, null, holders);
 		return this;
 	}
+
 	/**
 	 * update both title and lore
+	 * 
 	 * @param description Text to set
-	 * @param color Whether or not translate color codes
-	 * @param player Player target for PlaceHolderAPI holders
-	 * @param holders Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+	 * @param color       Whether or not translate color codes
+	 * @param player      Player target for PlaceHolderAPI holders
+	 * @param holders     Additional placeholders to replace in the format
+	 *                    "holder1", "value1", "holder2", "value2"...
 	 * @return this for chaining.
 	 */
-	public ItemBuilder setDescription(List<String> description,boolean color,Player player,String... holders) {
+	public ItemBuilder setDescription(List<String> description, boolean color, Player player, String... holders) {
 		List<String> list = UtilsString.fix(description, player, color, holders);
-		if (list==null || list.isEmpty()) {
+		if (list == null || list.isEmpty()) {
 			this.resultMeta.setDisplayName(null);
 			this.resultMeta.setLore(null);
-		}
-		else if (list.size()==1) {
+		} else if (list.size() == 1) {
 			this.resultMeta.setDisplayName(list.get(0));
 			this.resultMeta.setLore(null);
-		}
-		else {
+		} else {
 			this.resultMeta.setDisplayName(list.remove(0));
 			this.resultMeta.setLore(list);
 		}

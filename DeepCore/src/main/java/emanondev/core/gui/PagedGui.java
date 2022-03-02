@@ -13,8 +13,6 @@ public interface PagedGui extends Gui {
 		return setPage(getPage()-1);
 	}
 	
-	public int getMaxPage();/* {
-		return getMaxSlot()/getInventorySize()+1;
-	}*/
+	public int getMaxPage();
 
 }

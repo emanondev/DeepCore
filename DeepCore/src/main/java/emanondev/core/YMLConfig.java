@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import javax.annotation.*;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.FireworkEffect.Builder;
@@ -21,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -49,8 +49,8 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	}
 
 	@Deprecated
-	@Nonnull
-	public YMLSection createSection(@Nonnull String path) {
+	@NotNull
+	public YMLSection createSection(@NotNull String path) {
 		Validate.notEmpty(path, "Cannot create section at empty path");
 		Configuration root = getRoot();
 		if (root == null) {
@@ -75,14 +75,15 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		String key = path.substring(i2);
 		if (section == this) {
 			YMLSection result = new YMLSubSection(this, key);
-			this.map.put(key, result);
+			this.set(key, result);
+			//this.map.put(key, result);//TODO i wanna die
 			return result;
 		}
 		return section.createSection(key);
 	}
 
-	@Nonnull
-	public YMLSection createSection(@Nonnull String path, @Nonnull Map<?, ?> map) {
+	@NotNull
+	public YMLSection createSection(@NotNull String path, @NotNull Map<?, ?> map) {
 		return (YMLSection) super.createSection(path, map);
 	}
 
@@ -118,7 +119,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @throws NullPointerException     if name is null
 	 * @throws IllegalArgumentException if name is empty
 	 */
-	public YMLConfig(@Nonnull JavaPlugin plugin, @Nonnull String name) {
+	public YMLConfig(@NotNull JavaPlugin plugin, @NotNull String name) {
 		this(plugin, new File(plugin.getDataFolder(), fixName(name)));
 		/*
 		 * Validate.notNull(plugin, "plugin is null"); this.plugin = plugin; name =
@@ -127,7 +128,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		 */
 	}
 
-	public YMLConfig(@Nonnull JavaPlugin plugin, @Nonnull File file) {
+	public YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file) {
 		Validate.notNull(plugin, "plugin is null");
 		Validate.notNull(plugin, "file is null");
 		if (file.isDirectory())
@@ -238,12 +239,12 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	}
 
 	@Override
-	public @Nonnull File getFile() {
+	public @NotNull File getFile() {
 		return file;
 	}
 
 	@Override
-	public @Nonnull Set<String> getKeys(@Nullable String path) {
+	public @NotNull Set<String> getKeys(@Nullable String path) {
 		if (path == null || path.isEmpty())
 			return getKeys(false);
 		ConfigurationSection section = this.getConfigurationSection(path);
@@ -299,7 +300,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	}
 
 	@SuppressWarnings("unchecked")
-	public @Nonnull List<String> getStringList(@Nonnull String path, @Nullable List<String> def) {
+	public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def) {
 		try {
 			return get(path, def, List.class);
 		} catch (Exception e) {
@@ -308,7 +309,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		}
 	}
 
-	public @Nullable FireworkEffect loadFireworkEffect(@Nonnull String path, @Nullable FireworkEffect def) {
+	public @Nullable FireworkEffect loadFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
 		try {
 			Type type = loadFireworkEffectType(path + ".type", def == null ? null : def.getType());
 			if (type == null)
@@ -326,7 +327,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		return def;
 	}
 
-	public @Nullable FireworkEffect getFireworkEffect(@Nonnull String path, @Nullable FireworkEffect def) {
+	public @Nullable FireworkEffect getFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
 		try {
 			Type type = getEnum(path + ".type", def == null ? null : def.getType(), FireworkEffect.Type.class);
 			if (type == null)
@@ -344,11 +345,11 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		return def;
 	}
 
-	public @Nonnull List<Color> loadColors(@Nonnull String path, @Nullable Collection<Color> def) {
+	public @NotNull List<Color> loadColors(@NotNull String path, @Nullable Collection<Color> def) {
 		return stringListToColorList(loadStringList(path, colorCollectionToStringList(def)));
 	}
 
-	public @Nonnull List<Color> getColors(@Nonnull String path, @Nullable Collection<Color> def) {
+	public @NotNull List<Color> getColors(@NotNull String path, @Nullable Collection<Color> def) {
 		return stringListToColorList(getStringList(path, colorCollectionToStringList(def)));
 	}
 
@@ -374,7 +375,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		return colors;
 	}
 
-	private @Nonnull List<String> colorsToStringList(Collection<Color> colors) {
+	private @NotNull List<String> colorsToStringList(Collection<Color> colors) {
 		ArrayList<String> list = new ArrayList<String>();
 		if (colors != null)
 			for (Color color : colors)
@@ -382,7 +383,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		return list;
 	}
 
-	public @Nullable Type loadFireworkEffectType(@Nonnull String path, @Nullable Type def) {
+	public @Nullable Type loadFireworkEffectType(@NotNull String path, @Nullable Type def) {
 		return this.loadEnum(path, def, Type.class);
 	}
 
@@ -398,7 +399,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @return int value or default
 	 */
 	@Deprecated
-	public @Nullable int loadInt(@Nonnull String path, @Nullable Integer def) {
+	public @Nullable int loadInt(@NotNull String path, @Nullable Integer def) {
 		Number val = load(path, def, Number.class);
 		return val == null ? 0 : val.intValue();
 	}
@@ -418,7 +419,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @see #load(String, Object, Class)
 	 */
 	@Deprecated
-	public @Nullable String loadString(@Nonnull String path, @Nullable String def, boolean color, String... args) {
+	public @Nullable String loadString(@NotNull String path, @Nullable String def, boolean color, String... args) {
 		return loadString(path, def, null, color, args);
 	}
 
@@ -437,7 +438,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @see #load(String, Object, Class)
 	 */
 	@Deprecated
-	public @Nullable String loadString(@Nonnull String path, @Nullable String def, @Nullable Player target,
+	public @Nullable String loadString(@NotNull String path, @Nullable String def, @Nullable Player target,
 			boolean color, String... args) {
 		if (args.length > 0) {
 			if (!this.contains(path + "_HOLDERS")) {
@@ -474,7 +475,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @deprecated use
 	 *             {@link YMLSection#loadMessage(String, String, boolean, CommandSender, String...)}
 	 */
-	public @Nullable String getString(@Nonnull String path, @Nullable String def, @Nullable Player target,
+	public @Nullable String getString(@NotNull String path, @Nullable String def, @Nullable Player target,
 			boolean color, String... args) {
 		if (args.length > 0 && this.contains(path))
 			if (!this.contains(path + "_HOLDERS")) {
@@ -503,7 +504,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @deprecated use
 	 *             {@link YMLSection#loadMessage(String, String, boolean, CommandSender, String...)}
 	 */
-	public @Nullable String getString(@Nonnull String path, @Nullable String def, boolean color, String... args) {
+	public @Nullable String getString(@NotNull String path, @Nullable String def, boolean color, String... args) {
 		return this.getString(path, def, null, color, args);
 	}
 
@@ -517,7 +518,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @deprecated use
 	 *             {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
 	 */
-	public @Nonnull List<String> loadStringList(@Nonnull String path, @Nullable List<String> def, boolean color) {
+	public @NotNull List<String> loadStringList(@NotNull String path, @Nullable List<String> def, boolean color) {
 		return loadStringList(path, def, null, color);
 	}
 
@@ -534,7 +535,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 *             {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
 	 */
 	@SuppressWarnings("unchecked")
-	public @Nonnull List<String> loadStringList(@Nonnull String path, @Nullable List<String> def,
+	public @NotNull List<String> loadStringList(@NotNull String path, @Nullable List<String> def,
 			@Nullable Player target, boolean color, String... args) {
 		if (args.length > 0) {
 			if (!this.contains(path + "_HOLDERS")) {
@@ -562,7 +563,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 * @deprecated use
 	 *             {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
 	 */
-	public @Nonnull List<String> getStringList(@Nonnull String path, @Nullable List<String> def, boolean color) {
+	public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def, boolean color) {
 		return getStringList(path, def, null, color);
 	}
 
@@ -579,7 +580,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 *             {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
 	 */
 	@SuppressWarnings("unchecked")
-	public @Nonnull List<String> getStringList(@Nonnull String path, @Nullable List<String> def,
+	public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def,
 			@Nullable Player target, boolean color, String... args) {
 		if (args.length > 0) {
 			if (!this.contains(path + "_HOLDERS")) {
@@ -597,7 +598,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 		}
 	}
 
-	public @Nullable ItemStack loadItemStack(@Nonnull String path, @Nullable ItemStack def) {
+	public @Nullable ItemStack loadItemStack(@NotNull String path, @Nullable ItemStack def) {
 		return load(path, def, ItemStack.class);
 	}
 
@@ -618,7 +619,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 *             String...)
 	 */
 	@Deprecated
-	public @Nullable ComponentBuilder loadSimpleComponentBuilder(@Nonnull String path, @Nullable String defMessage,
+	public @Nullable ComponentBuilder loadSimpleComponentBuilder(@NotNull String path, @Nullable String defMessage,
 			@Nullable String defHover, @Nullable String defClickSuggest, @Nullable CommandSender target, boolean color,
 			String... holders) {
 		Player p = (target instanceof Player) ? null : ((Player) target);
@@ -660,7 +661,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 	 *             String...)
 	 */
 
-	public @Nullable BaseComponent[] loadSimpleBaseComponent(@Nonnull String path, @Nullable String defMessage,
+	public @Nullable BaseComponent[] loadSimpleBaseComponent(@NotNull String path, @Nullable String defMessage,
 			@Nullable String defHover, @Nullable String defClickSuggest, @Nullable Player p, boolean color,
 			String... holders) {
 		ComponentBuilder comp = loadSimpleComponentBuilder(path, defMessage, defHover, defClickSuggest, p, color,

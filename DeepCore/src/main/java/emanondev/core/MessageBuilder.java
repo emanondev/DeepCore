@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -20,14 +19,26 @@ public class MessageBuilder {
 
 	private final ComponentBuilder base;
 	private final CommandSender target;
-	private final YMLConfig langConfig;
+	private final YMLSection langSection;
 	private final Player papiDefTarget;
 
-	public MessageBuilder(@Nonnull CorePlugin plugin, @Nullable CommandSender languageTarget) {
-		if (plugin == null)// || languageTarget == null)
+	public MessageBuilder(@NotNull CorePlugin plugin, @Nullable CommandSender languageTarget) {
+		this(plugin.getLanguageConfig(languageTarget), languageTarget);
+	}
+
+	public MessageBuilder(@NotNull CoreCommand command, @Nullable CommandSender languageTarget) {
+		this(command.getLanguageSection(languageTarget), languageTarget);
+	}
+
+	public MessageBuilder(@NotNull Module module, @Nullable CommandSender languageTarget) {
+		this(module.getLanguageSection(languageTarget), languageTarget);
+	}
+
+	public MessageBuilder(YMLSection section, @Nullable CommandSender languageTarget) {
+		if (section == null)// || languageTarget == null)
 			throw new NullPointerException();
 		this.target = languageTarget;
-		this.langConfig = plugin.getLanguageConfig(target);
+		this.langSection = section;
 		base = new ComponentBuilder();
 		papiDefTarget = (target != null && (target instanceof Player)) ? (Player) target : null;
 	}
@@ -194,7 +205,7 @@ public class MessageBuilder {
 	 *                {holder1,replacer1,holder2,replacer2,...}
 	 * @return this for chaining
 	 */
-	public MessageBuilder addCommand(String command, @Nonnull ClickEvent.Action action, String... holders) {
+	public MessageBuilder addCommand(String command, @NotNull ClickEvent.Action action, String... holders) {
 		if (command != null && action != null)
 			base.event(new ClickEvent(action, UtilsString.fix(command, null, false, holders)));
 		return this;
@@ -230,7 +241,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder addTextTranslation(String path, List<String> def, Player papiTarget, boolean color,
 			String... holders) {
-		return addText(langConfig.loadMultiMessage(path, null, false, null, holders), papiTarget, color);
+		return addText(langSection.loadMultiMessage(path, def, false, null, holders), papiTarget, color);
 	}
 
 	/**
@@ -263,7 +274,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder addTextTranslation(String path, String def, Player papiTarget, boolean color,
 			String... holders) {
-		return addText(langConfig.loadMessage(path, def, false, null, holders), papiTarget, color);
+		return addText(langSection.loadMessage(path, def, false, null, holders), papiTarget, color);
 	}
 
 	/**
@@ -296,7 +307,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder addHoverTranslation(String path, List<String> def, Player papiTarget, boolean color,
 			String... holders) {
-		return addHover(langConfig.loadMultiMessage(path, null, false, null, holders), papiTarget, color);
+		return addHover(langSection.loadMultiMessage(path, null, false, null, holders), papiTarget, color);
 	}
 
 	/**
@@ -329,7 +340,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder addHoverTranslation(String path, String def, Player papiTarget, boolean color,
 			String... holders) {
-		return addHover(langConfig.loadMessage(path, def, false, null, holders), papiTarget, color);
+		return addHover(langSection.loadMessage(path, def, false, null, holders), papiTarget, color);
 	}
 
 	/**
@@ -342,7 +353,7 @@ public class MessageBuilder {
 	 * @return this for chaining
 	 */
 	public MessageBuilder addRunCommandConfigurable(String path, String def, String... holders) {
-		return addRunCommand(langConfig.loadMessage(path, def, false, null, holders));
+		return addRunCommand(langSection.loadMessage(path, def, false, null, holders));
 	}
 
 	/**
@@ -355,7 +366,7 @@ public class MessageBuilder {
 	 * @return this for chaining
 	 */
 	public MessageBuilder addSuggestCommandConfigurable(String path, String def, String... holders) {
-		return addSuggestCommand(langConfig.loadMessage(path, def, false, null, holders));
+		return addSuggestCommand(langSection.loadMessage(path, def, false, null, holders));
 	}
 
 	/**
@@ -509,7 +520,7 @@ public class MessageBuilder {
 	 */
 	public MessageBuilder addFullComponentTranslation(String path, List<String> defText, List<String> defHover,
 			String defAction, ClickEvent.Action defClickAction, Player papiTarget, boolean color, String... holders) {
-		ComponentBuilder comp = langConfig.loadComponentMessage(path, defText, defHover, defAction, defClickAction,
+		ComponentBuilder comp = langSection.loadComponentMessage(path, defText, defHover, defAction, defClickAction,
 				color, papiTarget == null ? papiDefTarget : papiTarget, holders);
 		if (comp != null)
 			base.append(comp.create());
@@ -546,18 +557,8 @@ public class MessageBuilder {
 	@Deprecated
 	public MessageBuilder setTarget(@Nullable CommandSender p) {
 		// setLanguageTarget(p);
-		// this.langConfig = plugin.getLanguageConfig(target);
+		// this.langSection = plugin.getLanguageConfig(target);
 		return this;
-	}
-
-	@Deprecated
-	public MessageBuilder addText(String text) {
-		return addText(text, null, true);
-	}
-
-	@Deprecated
-	public MessageBuilder addText(List<String> text) {
-		return addText(String.join("\n", text));
 	}
 
 	@Deprecated
@@ -592,14 +593,14 @@ public class MessageBuilder {
 
 	@Deprecated
 	public MessageBuilder addTranslatedText(String path, String def, boolean color, Player p, String... holders) {
-		base.append(langConfig.loadMessage(path, def, color,
+		base.append(langSection.loadMessage(path, def, color,
 				p != null ? p : (this.target instanceof Player ? (Player) target : null), holders));
 		return this;
 	}
 
 	@Deprecated
 	public MessageBuilder addTranslatedText(String path, List<String> def, boolean color, Player p, String... holders) {
-		base.append(String.join("\n", langConfig.loadMultiMessage(path, def, color,
+		base.append(String.join("\n", langSection.loadMultiMessage(path, def, color,
 				p != null ? p : (this.target instanceof Player ? (Player) target : null), holders)));
 		return this;
 	}
@@ -636,7 +637,7 @@ public class MessageBuilder {
 
 	@Deprecated
 	public MessageBuilder addTranslatedHover(String path, String def, boolean color, Player p, String... holders) {
-		base.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(langConfig.loadMessage(path, def, color,
+		base.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(langSection.loadMessage(path, def, color,
 				p != null ? p : (this.target instanceof Player ? (Player) target : null), holders))));
 		return this;
 	}
@@ -645,7 +646,7 @@ public class MessageBuilder {
 	public MessageBuilder addTranslatedHover(String path, List<String> def, boolean color, Player p,
 			String... holders) {
 		base.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-				new Text(String.join("\n", langConfig.loadMultiMessage(path, def, color,
+				new Text(String.join("\n", langSection.loadMultiMessage(path, def, color,
 						p != null ? p : (this.target instanceof Player ? (Player) target : null), holders)))));
 		return this;
 	}
@@ -682,7 +683,7 @@ public class MessageBuilder {
 
 	@Deprecated
 	public MessageBuilder addTranslatedCommand(String path, String def, boolean color, Player p, String... holders) {
-		base.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, langConfig.loadMessage(path, def, color,
+		base.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, langSection.loadMessage(path, def, color,
 				p != null ? p : (this.target instanceof Player ? (Player) target : null), holders)));
 		return this;
 	}
@@ -690,7 +691,7 @@ public class MessageBuilder {
 	@Deprecated
 	public MessageBuilder addTranslatedCommand(String path, List<String> def, boolean color, Player p,
 			String... holders) {
-		base.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.join("\n", langConfig.loadMultiMessage(path,
+		base.event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, String.join("\n", langSection.loadMultiMessage(path,
 				def, color, p != null ? p : (this.target instanceof Player ? (Player) target : null), holders))));
 		return this;
 	}
@@ -727,7 +728,7 @@ public class MessageBuilder {
 
 	@Deprecated
 	public MessageBuilder addTranslatedSuggestion(String path, String def, boolean color, Player p, String... holders) {
-		base.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, langConfig.loadMessage(path, def, color,
+		base.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, langSection.loadMessage(path, def, color,
 				p != null ? p : (this.target instanceof Player ? (Player) target : null), holders)));
 		return this;
 	}
@@ -735,8 +736,9 @@ public class MessageBuilder {
 	@Deprecated
 	public MessageBuilder addTranslatedSuggestion(String path, List<String> def, boolean color, Player p,
 			String... holders) {
-		base.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.join("\n", langConfig.loadMultiMessage(path,
-				def, color, p != null ? p : (this.target instanceof Player ? (Player) target : null), holders))));
+		base.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
+				String.join("\n", langSection.loadMultiMessage(path, def, color,
+						p != null ? p : (this.target instanceof Player ? (Player) target : null), holders))));
 		return this;
 	}
 
@@ -820,7 +822,7 @@ public class MessageBuilder {
 	public MessageBuilder addTranslatedComponent(String path, List<String> defText, String defAction,
 			List<String> defHover, ClickEvent.Action defClickAction, boolean color, Player p, FormatRetention retention,
 			String... holders) {
-		ComponentBuilder comp = langConfig.loadComponentMessage(path, defText, defHover, defAction, defClickAction,
+		ComponentBuilder comp = langSection.loadComponentMessage(path, defText, defHover, defAction, defClickAction,
 				color, p != null ? p : ((target instanceof Player) ? ((Player) target) : null), holders);
 		if (comp != null)
 			if (retention == null)

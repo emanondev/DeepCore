@@ -4,30 +4,51 @@ import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-
 import emanondev.core.CorePlugin;
 
 public class MapGui extends ChestGui {
 
+	/**
+	 * 
+	 * @param title
+	 * @param rows
+	 * @param p
+	 * @param previusHolder
+	 * @param plugin
+	 */
 	public MapGui(String title, int rows, Player p, Gui previusHolder, CorePlugin plugin) {
 		super(title, rows, p, previusHolder, plugin);
 	}
+	/**
+	 * 
+	 * @param title
+	 * @param rows
+	 * @param p
+	 * @param previusHolder
+	 * @param plugin
+	 * @param timerUpdate
+	 */
+	public MapGui(String title, int rows, Player p, Gui previusHolder, CorePlugin plugin,boolean timerUpdate) {
+		super(title, rows, p, previusHolder, plugin,timerUpdate);
+	}
 
+	/**
+	 * will replace with array GuiButton[rows*9]
+	 */
+	@Deprecated
 	protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<Integer, GuiButton>();
 
 	public void putGuiButton(int pos, GuiButton button) {
 		if (pos < 0)
 			throw new IllegalArgumentException();
-		if (button != null)
+		if (button != null) {
 			buttonsMap.put(pos, button);
-		else
-			buttonsMap.remove(pos);
-
-		if (button != null)
 			getInventory().setItem(pos, button.getItem());
-		else
+		}
+		else {
+			buttonsMap.remove(pos);
 			getInventory().setItem(pos, null);
+		}
 	}
 
 	@Override
@@ -36,11 +57,6 @@ public class MapGui extends ChestGui {
 			if (buttonsMap.get(event.getRawSlot()) != null)
 				if (buttonsMap.get(event.getRawSlot()).onClick(event))
 					updateInventory();
-	}
-
-	@Override
-	public void onDrag(InventoryDragEvent event) {
-		// TODO
 	}
 
 	@Override
@@ -55,33 +71,20 @@ public class MapGui extends ChestGui {
 
 	@Override
 	public void addButton(GuiButton button) {
+		if (button==null)
+			throw new NullPointerException();
 		for (int i = 0; i < getInventory().getSize(); i++)
 			if (buttonsMap.get(i) == null) {
 				putGuiButton(i, button);
 				return;
 			}
+		throw new IndexOutOfBoundsException("Gui is full");
 	}
 
 	@Override
 	public void updateInventory() {
 		for (int i = 0; i < getInventory().getSize(); i++)
-			if (buttonsMap.get(i) == null)
-				getInventory().setItem(i, null);
-			else
-				getInventory().setItem(i, buttonsMap.get(i).getItem());
+			getInventory().setItem(i,buttonsMap.get(i) == null?null: buttonsMap.get(i).getItem());
 	}
-
-	/*
-	 * @Override public void onSlotClick(Player clicker, int slot, ClickType click)
-	 * { if (slot>=0 && slot < getInventorySize()) if (buttonsMap.get(slot)!=null)
-	 * buttonsMap.get(slot).onClick(clicker, click);
-	 * 
-	 * }
-	 * 
-	 * @Override public boolean updateInventory() { boolean result = false; for(int
-	 * i = 0; i < getInventorySize(); i++) if (buttonsMap.get(i)!=null) if
-	 * (buttonsMap.get(i).update()) { getInventory().setItem(i,
-	 * buttonsMap.get(i).getItem()); result = true; } return result; }
-	 */
 
 }

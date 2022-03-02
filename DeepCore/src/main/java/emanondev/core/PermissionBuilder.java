@@ -41,6 +41,9 @@ public class PermissionBuilder {
 	public static PermissionBuilder ofCommand(Plugin plugin,String commandName) {
 		return new PermissionBuilder(plugin.getName()+".command."+commandName);
 	}
+	public static PermissionBuilder asSubPermission(Permission perm,String subName) {
+		return new PermissionBuilder(perm.getName()+"."+subName);
+	}
 
 	public static PermissionBuilder ofModule(Plugin plugin,String moduleId,String subname) {
 		return new PermissionBuilder(plugin.getName()+".module."+moduleId+"."+subname);

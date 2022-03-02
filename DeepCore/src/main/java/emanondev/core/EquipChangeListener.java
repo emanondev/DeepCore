@@ -46,8 +46,8 @@ import emanondev.core.events.EquipmentChangeEvent.EquipMethod;
 
 class EquipChangeListener implements Listener{
 	private final HashMap<Player, EnumMap<EquipmentSlot, ItemStack>> equips = new HashMap<>();
-	private static final long timerCheckFrequencyTicks = 20; // at least 20;
-	private static final int maxCheckedPlayerPerTick = 3;
+	private static final long timerCheckFrequencyTicks = 40; // at least 20;
+	private static final int maxCheckedPlayerPerTick = 6;//not too low to avoid Thread switch overprice
 	private TimerCheckTask timerTask = null;
 	private final HashSet<Player> clickDrop = new HashSet<>();
 	private final CoreMain plugin;
@@ -76,8 +76,10 @@ class EquipChangeListener implements Listener{
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void event(PlayerJoinEvent event) {
+		if (event.getPlayer().hasMetadata("BOT"))
+			return;
 		EnumMap<EquipmentSlot, ItemStack> map = new EnumMap<>(EquipmentSlot.class);
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			ItemStack item = UtilsInventory.getEquip(event.getPlayer(), slot);
@@ -95,7 +97,7 @@ class EquipChangeListener implements Listener{
 	private void event(final InventoryClickEvent event) {
 		if (!(event.getWhoClicked() instanceof Player))
 			return;
-		if (event.getWhoClicked().hasMetadata("NPC"))
+		if (event.getWhoClicked().hasMetadata("NPC")||event.getWhoClicked().hasMetadata("BOT"))
 			return;
 		Player p = (Player) event.getWhoClicked();
 		EquipmentSlot clickedSlot = getEquipmentSlotAtPosition(event.getRawSlot(), p, event.getView());
@@ -209,7 +211,7 @@ class EquipChangeListener implements Listener{
 			return;
 		if (e.useItemInHand() == Result.DENY)
 			return;
-		if (e.getPlayer().hasMetadata("NPC"))
+		if (e.getPlayer().hasMetadata("NPC")||e.getPlayer().hasMetadata("BOT"))
 			return;
 		EquipmentSlot type = guessRightClickSlotType(e.getItem());
 		switch (e.getAction()) {
@@ -242,7 +244,7 @@ class EquipChangeListener implements Listener{
 	private void event(InventoryDragEvent event) {
 		if (!(event.getWhoClicked() instanceof Player))
 			return;
-		if (event.getWhoClicked().hasMetadata("NPC"))
+		if (event.getWhoClicked().hasMetadata("NPC")||event.getWhoClicked().hasMetadata("BOT"))
 			return;
 		Player p = (Player) event.getWhoClicked();
 		for (EquipmentSlot type : EquipmentSlot.values()) {
@@ -258,7 +260,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	private void event(PlayerSwapHandItemsEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		if (UtilsInventory.isSimilarIgnoreDamage(event.getMainHandItem(), event.getOffHandItem()))
 			return;
@@ -270,7 +272,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler
 	private void event(PlayerItemBreakEvent e) {
-		if (e.getPlayer().hasMetadata("NPC"))
+		if (e.getPlayer().hasMetadata("NPC")||e.getPlayer().hasMetadata("BOT"))
 			return;
 		ArrayList<EquipmentSlot> slots = new ArrayList<>();
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -288,7 +290,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler
 	private void event(PlayerDeathEvent event) {
-		if (event.getEntity().hasMetadata("NPC"))
+		if (event.getEntity().hasMetadata("NPC")||event.getEntity().hasMetadata("BOT"))
 			return;
 		for (EquipmentSlot type : EquipmentSlot.values()) {
 			ItemStack item = UtilsInventory.getEquip(event.getEntity(), type);
@@ -299,7 +301,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	private void event(PlayerItemConsumeEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		if (event.getItem().getAmount() != 1)
 			return;
@@ -319,7 +321,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
 	private void event(PlayerDropItemEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		if (clickDrop.remove(event.getPlayer()) == true)
 			return;
@@ -332,7 +334,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	private void event(PlayerInteractEntityEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		ItemStack handItem = UtilsInventory.getEquip(event.getPlayer(), event.getHand());
 		if (UtilsInventory.isAirOrNull(handItem) || handItem.getAmount() > 1
@@ -364,7 +366,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	private void event(PlayerArmorStandManipulateEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		if (UtilsInventory.isSimilarIgnoreDamage(event.getArmorStandItem(), event.getPlayerItem()))
 			return;
@@ -374,7 +376,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler
 	private void event(PlayerItemHeldEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		ItemStack i1 = event.getPlayer().getInventory().getItem(event.getPreviousSlot());
 		ItemStack i2 = event.getPlayer().getInventory().getItem(event.getNewSlot());
@@ -387,7 +389,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler
 	private void event(PlayerRespawnEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		for (EquipmentSlot type : EquipmentSlot.values()) {
 			ItemStack item = UtilsInventory.getEquip(event.getPlayer(), type);
@@ -400,7 +402,7 @@ class EquipChangeListener implements Listener{
 	private void event(BlockDispenseArmorEvent event) {
 		if (!(event.getTargetEntity() instanceof Player))
 			return;
-		if (event.getTargetEntity().hasMetadata("NPC"))
+		if (event.getTargetEntity().hasMetadata("NPC")||event.getTargetEntity().hasMetadata("BOT"))
 			return;
 		EquipmentSlot slot = guessDispenserSlotType(event.getItem());
 		if (slot == null)
@@ -412,7 +414,7 @@ class EquipChangeListener implements Listener{
 	private void event(EntityPickupItemEvent event) {
 		if (!(event.getEntity() instanceof Player))
 			return;
-		if (event.getEntity().hasMetadata("NPC"))
+		if (event.getEntity().hasMetadata("NPC")||event.getEntity().hasMetadata("BOT"))
 			return;
 		Player p = (Player) event.getEntity();
 
@@ -426,7 +428,7 @@ class EquipChangeListener implements Listener{
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	private void event(PlayerTeleportEvent event) {
-		if (event.getPlayer().hasMetadata("NPC"))
+		if (event.getPlayer().hasMetadata("NPC")||event.getPlayer().hasMetadata("BOT"))
 			return;
 		new SlotCheck(event.getPlayer(), EquipMethod.PLUGIN_WORLD_CHANGE, EquipmentSlot.values()).runTaskLater(plugin,
 				1L);
@@ -556,6 +558,8 @@ class EquipChangeListener implements Listener{
 					if (!p.isOnline())
 						continue;
 					if (!equips.containsKey(p)) {
+						if (p.hasMetadata("BOT"))
+							continue;
 						new IllegalStateException().printStackTrace();
 						continue;
 					}

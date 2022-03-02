@@ -2,8 +2,6 @@ package emanondev.core;
 
 import java.util.HashMap;
 
-import javax.annotation.*;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,6 +11,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 public class UtilsInventory {
 	
@@ -80,8 +79,8 @@ public class UtilsInventory {
 	 * @throws NullPointerException if mode is null
 	 * @throws IllegalArgumentException if amount is negative
 	 */
-	public static int giveAmount(@Nonnull HumanEntity player, @Nonnull ItemStack item, @Nonnegative final int amount,
-			@Nonnull final ExcessManage mode) {
+	public static int giveAmount(@NotNull HumanEntity player, @NotNull ItemStack item, final int amount,
+			@NotNull final ExcessManage mode) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(mode, "mode is null");
 		Validate.notNull(item, "item is null");
@@ -140,8 +139,8 @@ public class UtilsInventory {
 	 * @throws NullPointerException if mode is null
 	 * @throws IllegalArgumentException if amount is negative
 	 */
-	public static int removeAmount(@Nonnull HumanEntity player, @Nonnull ItemStack item, @Nonnegative final int amount,
-			@Nonnull final LackManage mode) {
+	public static int removeAmount(@NotNull HumanEntity player, @NotNull ItemStack item, final int amount,
+			@NotNull final LackManage mode) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(mode, "mode is null");
 		Validate.notNull(item, "item is null");

@@ -5,13 +5,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 public class YMLSubSection extends MemorySection implements YMLSection {
 
@@ -19,7 +18,7 @@ public class YMLSubSection extends MemorySection implements YMLSection {
 		super();
 	}
 
-	protected YMLSubSection(@Nonnull YMLSection parent, @Nonnull String path) {
+	protected YMLSubSection(@NotNull YMLSection parent, @NotNull String path) {
 		super(parent, path);
 	}
 
@@ -44,8 +43,8 @@ public class YMLSubSection extends MemorySection implements YMLSection {
 	}
 
 	@SuppressWarnings("deprecation")
-	@Nonnull
-	public YMLSection createSection(@Nonnull String path) {
+	@NotNull
+	public YMLSection createSection(@NotNull String path) {
 		Validate.notEmpty(path, "Cannot create section at empty path");
 		Configuration root = getRoot();
 		if (root == null) {
@@ -70,14 +69,15 @@ public class YMLSubSection extends MemorySection implements YMLSection {
 		String key = path.substring(i2);
 		if (section == this) {
 			YMLSection result = new YMLSubSection(this, key);
-			this.map.put(key, result);
+			this.set(key, result);
+			//this.map.put(key, result); //TODO i wanna die
 			return result;
 		}
 		return section.createSection(key);
 	}
 
-	@Nonnull
-	public YMLSection createSection(@Nonnull String path, @Nonnull Map<?, ?> map) {
+	@NotNull
+	public YMLSection createSection(@NotNull String path, @NotNull Map<?, ?> map) {
 		return (YMLSection) super.createSection(path, map);
 	}
 

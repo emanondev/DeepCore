@@ -3,10 +3,10 @@ package emanondev.core;
 import org.bukkit.Bukkit;
 
 public enum MCVersion {
-	UNKNOWN("unknown",100),
-	V1_17("1.17", 15), V1_16_4("1.16.4", 14), V1_16_2("1.16.2", 13), V1_16("1.16", 12), V1_15("1.15", 11),
-	V1_14("1.14", 10), V1_13_1("1.13.1", 9), V1_13("1.13", 8), V1_12("1.12", 7), V1_11("1.11", 6), V1_10("1.10", 5),
-	V1_9_4("1.9.4", 4), V1_9("1.9", 3), V1_8_4("1.8.4", 2), V1_8_3("1.8.3", 1), V1_8("1.8", 0), V1_7("1.7", -1);
+	UNKNOWN("unknown", 100), V1_17("1.17", 15), V1_16_4("1.16.4", 14), V1_16_2("1.16.2", 13), V1_16("1.16", 12),
+	V1_15("1.15", 11), V1_14("1.14", 10), V1_13_1("1.13.1", 9), V1_13("1.13", 8), V1_12("1.12", 7), V1_11("1.11", 6),
+	V1_10("1.10", 5), V1_9_4("1.9.4", 4), V1_9("1.9", 3), V1_8_4("1.8.4", 2), V1_8_3("1.8.3", 1), V1_8("1.8", 0),
+	V1_7("1.7", -1);
 
 	private String name;
 
@@ -16,9 +16,9 @@ public enum MCVersion {
 		this.name = name;
 		this.shortNum = shortNum;
 	}
-	
+
 	private static MCVersion version = fromPackageName(Bukkit.getServer().getClass().getPackage().getName());
-	
+
 	public static MCVersion getCurrentVersion() {
 		return version;
 	}
@@ -76,16 +76,16 @@ public enum MCVersion {
 	public boolean isOlderThan(MCVersion version) {
 		return (compareWith(version) < 0);
 	}
-	
+
 	public int getMetaVersion() {
 		if (this.isNewerOrEqualTo(V1_15))
-	        return 3;
+			return 3;
 		if (this.isNewerOrEqualTo(V1_14))
-	        return 2;
+			return 2;
 		if (this.isNewerOrEqualTo(V1_13))
-	        return 1;
+			return 1;
 		if (this.isNewerOrEqualTo(V1_11))
-	        return 0;
+			return 0;
 		return -1;
 	}
 
@@ -116,6 +116,29 @@ public enum MCVersion {
 
 	public boolean isOld() {
 		return isOlderOrEqualTo(V1_8_4);
+	}
+
+	public static boolean isCraftBukkit() {
+		return !hasSpigotAPI();
+	}
+
+	public static boolean hasSpigotAPI() {
+		try {
+			if (Class.forName("org.spigotmc.SpigotConfig") != null)
+				return true;
+			return true;
+		} catch (ClassNotFoundException e) {
+		}
+		return false;
+	}
+
+	public static boolean hasPaperAPI() {
+		try {
+			if (Class.forName("com.destroystokyo.paper.VersionHistoryManager.VersionData") != null)
+				return true;
+		} catch (ClassNotFoundException e) {
+		}
+		return false;
 	}
 
 }
