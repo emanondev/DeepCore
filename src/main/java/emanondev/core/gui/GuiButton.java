@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 import emanondev.core.CorePlugin;
 import emanondev.core.YMLSection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface GuiButton {
 
@@ -59,7 +61,7 @@ public interface GuiButton {
 	 * @param event - the event
 	 * @return true if should call getGui().inventoryUpdate();
 	 */
-	default boolean onDrag(InventoryDragEvent event) {
+	default boolean onDrag(@NotNull InventoryDragEvent event) {
 		return false;
 	}
 
@@ -105,17 +107,17 @@ public interface GuiButton {
 	 * @param event - the event
 	 * @return true if should call getGui().inventoryUpdate();
 	 */
-	boolean onClick(InventoryClickEvent event);
+	boolean onClick(@NotNull InventoryClickEvent event);
 	
 	ItemStack getItem();
 	
-	default CorePlugin getPlugin() {
+	@NotNull default CorePlugin getPlugin() {
 		return getGui().getPlugin();
 	}
 	
-	Gui getGui();
+	@NotNull Gui getGui();
 	
-	default Player getTargetPlayer() {
+	@Nullable default Player getTargetPlayer() {
 		return getGui().getTargetPlayer();
 	}
 	
@@ -127,10 +129,10 @@ public interface GuiButton {
 	 * @param who may be null
 	 * @return language section for the command sender
 	 */
-	default YMLSection getLanguageSection(CommandSender who) {
+	@NotNull default YMLSection getLanguageSection(CommandSender who) {
 		return getPlugin().getLanguageConfig(who).loadSection("buttons");
 	}
-	default YMLSection getLanguageSection() {
+	@NotNull default YMLSection getLanguageSection() {
 		return getPlugin().getLanguageConfig(getTargetPlayer()).loadSection("buttons");
 	}
 

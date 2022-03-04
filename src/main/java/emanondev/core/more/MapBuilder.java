@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * https://github.com/LagBug/MapBuilder/blob/master/README.md
- * @author utente
  *
+ * @author utente
  */
 public class MapBuilder {
 
@@ -31,7 +31,7 @@ public class MapBuilder {
     private BufferedImage image;
     private List<Text> texts;
     private MapCursorCollection cursors;
-    
+
     private boolean rendered;
     private boolean renderOnce;
     private boolean isOnePointFourteen;
@@ -56,6 +56,7 @@ public class MapBuilder {
     /**
      * Set an image to be used
      * example ImageIO.read(new URL("https://site.com/image.png")
+     *
      * @param image the buffered image to use
      * @return the instance of this class
      */
@@ -67,8 +68,8 @@ public class MapBuilder {
     /**
      * Set and image to be used
      *
-     * @param x the coordinates to add the text
-     * @param y the coordinates to add the text
+     * @param x    the coordinates to add the text
+     * @param y    the coordinates to add the text
      * @param font the font to be used
      * @param text the string that will be displayed
      * @return the instance of this class
@@ -90,10 +91,10 @@ public class MapBuilder {
     /**
      * Adds a cursor to the map
      *
-     * @param x the coordinates to add the cursor
-     * @param y the coordinates to add the cursor
+     * @param x         the coordinates to add the cursor
+     * @param y         the coordinates to add the cursor
      * @param direction the direction to display the cursor
-     * @param type the type of the cursor
+     * @param type      the type of the cursor
      * @return the instance of this class
      */
     @SuppressWarnings("deprecation")
@@ -131,16 +132,16 @@ public class MapBuilder {
     @SuppressWarnings("deprecation")
     public ItemStack build() {
         ItemStack item = null;
-        
+
         try {
-        	item = new ItemStack(isOnePointFourteen ? Material.MAP : Material.valueOf("MAP")); 
+            item = new ItemStack(isOnePointFourteen ? Material.MAP : Material.valueOf("MAP"));
         } catch (AuthorNagException ex) {
-        	Bukkit.getConsoleSender().sendMessage("Could not get material for the current spigot version. This won't be shown again until server restats");
-        	ex.printStackTrace();
+            Bukkit.getConsoleSender().sendMessage("Could not get material for the current spigot version. This won't be shown again until server restats");
+            ex.printStackTrace();
         }
-                
+
         map = Bukkit.createMap(Bukkit.getWorlds().get(0));
-        
+
         map.setScale(Scale.NORMAL);
         map.getRenderers().forEach(map::removeRenderer);
         map.addRenderer(new MapRenderer() {
@@ -149,20 +150,20 @@ public class MapBuilder {
                 if (rendered && renderOnce) {
                     return;
                 }
-                
+
                 if (player != null && player.isOnline()) {
                     if (image != null) {
                         mapCanvas.drawImage(0, 0, image);
                     }
-                    
+
                     if (!texts.isEmpty()) {
-                    	texts.forEach(text -> mapCanvas.drawText(text.getX(), text.getY(), text.getFont(), text.getMessage()));	
+                        texts.forEach(text -> mapCanvas.drawText(text.getX(), text.getY(), text.getFont(), text.getMessage()));
                     }
-                    
+
                     if (cursors.size() > 0) {
-                    	mapCanvas.setCursors(cursors);	
+                        mapCanvas.setCursors(cursors);
                     }
-                    
+
                     rendered = true;
                 }
             }
@@ -216,7 +217,7 @@ public class MapBuilder {
         /**
          * Returns the actual integer to use
          *
-         * @return the integer of the specified enum type 
+         * @return the integer of the specified enum type
          */
         public int getId() {
             return this.id;
@@ -239,7 +240,7 @@ public class MapBuilder {
         /**
          * Returns the actual integer to use
          *
-         * @return the integer of the specified enum type 
+         * @return the integer of the specified enum type
          */
         public int getId() {
             return this.id;
@@ -251,7 +252,7 @@ public class MapBuilder {
  * A storage class to save text information to later be used in order to write in maps
  */
 class Text {
-	
+
     private int x;
     private int y;
     private MapFont font;
@@ -274,10 +275,10 @@ class Text {
     }
 
     /**
-    * Sets the x position of the text to display it
-    *
-    * @param x the x postion
-    */
+     * Sets the x position of the text to display it
+     *
+     * @param x the x postion
+     */
     public void setX(@NotNull int x) {
         this.x = x;
     }

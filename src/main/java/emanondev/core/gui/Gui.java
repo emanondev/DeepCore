@@ -10,6 +10,7 @@ import org.bukkit.inventory.InventoryHolder;
 import emanondev.core.CorePlugin;
 import emanondev.core.YMLSection;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface Gui extends InventoryHolder {
 	
@@ -20,7 +21,7 @@ public interface Gui extends InventoryHolder {
 	 * @param who may be null
 	 * @return language section for the command sender
 	 */
-	default YMLSection getLanguageSection(CommandSender who) {
+	@NotNull default YMLSection getLanguageSection(CommandSender who) {
 		return getPlugin().getLanguageConfig(who).loadSection("guis");
 	}
 
@@ -33,7 +34,7 @@ public interface Gui extends InventoryHolder {
 	 * @return parent Gui or null
 	 */
 	@Deprecated
-	default Gui getPreviusGui(){
+	@Nullable default Gui getPreviusGui(){
 		return getPreviousGui();
 	}
 
@@ -41,7 +42,7 @@ public interface Gui extends InventoryHolder {
 	 *
 	 * @return parent Gui or null
 	 */
-	Gui getPreviousGui();
+	@Nullable Gui getPreviousGui();
 
 	void onClose(InventoryCloseEvent event);
 
@@ -86,7 +87,7 @@ public interface Gui extends InventoryHolder {
 	 * "https://hub.spigotmc.org/javadocs/spigot/org/bukkit/scheduler/BukkitScheduler.html#runTask-org.bukkit.plugin.Plugin-java.lang.Runnable-"><code>BukkitScheduler.runTask(Plugin, Runnable)</code></a>,
 	 * which would execute the task on the next tick, would work as well.
 	 */
-	void onClick(InventoryClickEvent event);
+	void onClick(@NotNull InventoryClickEvent event);
 
 	/**
 	 * This event is called when the player drags an item in their cursor across the
@@ -134,13 +135,13 @@ public interface Gui extends InventoryHolder {
 	 * 
 	 * @param event - the event
 	 */
-	default void onDrag(InventoryDragEvent event) {
+	default void onDrag(@NotNull InventoryDragEvent event) {
 	}
 
 	/**
 	 * @param event - the event
 	 */
-	default void onOpen(InventoryOpenEvent event) {
+	default void onOpen(@NotNull InventoryOpenEvent event) {
 		if (isUpdateOnOpen())
 			this.updateInventory();
 	}
@@ -149,11 +150,11 @@ public interface Gui extends InventoryHolder {
 	 * @param slot - slot position
 	 * @return button at slot position or null
 	 */
-	GuiButton getButton(int slot);
+	@Nullable GuiButton getButton(int slot);
 
-	void setButton(int slot, GuiButton button);
+	void setButton(int slot, @Nullable GuiButton button);
 
-	void addButton(GuiButton button);
+	void addButton(@NotNull GuiButton button);
 
 	/**
 	 * Update the slots of the inventory
@@ -174,7 +175,7 @@ public interface Gui extends InventoryHolder {
 	 * 
 	 * @return target player or null
 	 */
-	Player getTargetPlayer();
+	@Nullable Player getTargetPlayer();
 
 	/**
 	 * Sets whenever the inventory should be updated when a player open it

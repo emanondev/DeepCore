@@ -56,7 +56,9 @@ public abstract class AnvilGui implements TextGui {
     }
 
     @Override
-    public @NotNull Inventory getInventory() { return inv; }
+    public @NotNull Inventory getInventory() {
+        return inv;
+    }
 
     @Override
     public final Player getTargetPlayer() {

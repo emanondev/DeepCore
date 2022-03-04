@@ -13,21 +13,21 @@ import emanondev.core.CoreMain;
 
 public class NameChangeHandler {
 
-	public NameChangeHandler() {
-		ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-		protocolManager.addPacketListener(
-				new PacketAdapter(CoreMain.get(), ListenerPriority.NORMAL, PacketType.Play.Client.ITEM_NAME) {
-					@Override
-					public void onPacketReceiving(PacketEvent event) {
-						if (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof TextGui gui))
-							return;
-						new BukkitRunnable() { //need to be sync
-							public void run() {
-								gui.onTextChange(event.getPacket().getStrings().read(0));
-							}
-						}.runTask(getPlugin());
-					}
-				});
-	}
+    public NameChangeHandler() {
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager.addPacketListener(
+                new PacketAdapter(CoreMain.get(), ListenerPriority.NORMAL, PacketType.Play.Client.ITEM_NAME) {
+                    @Override
+                    public void onPacketReceiving(PacketEvent event) {
+                        if (!(event.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof TextGui gui))
+                            return;
+                        new BukkitRunnable() { //need to be sync
+                            public void run() {
+                                gui.onTextChange(event.getPacket().getStrings().read(0));
+                            }
+                        }.runTask(getPlugin());
+                    }
+                });
+    }
 
 }
