@@ -19,13 +19,11 @@ public abstract class Module implements Listener, ConsoleLogger {
     private final String description;
 
     @Deprecated
-    public Module(String id, CorePlugin plugin) {
+    public Module(@NotNull String id,@NotNull CorePlugin plugin) {
         this(id, plugin, null);
     }
 
-    public Module(String id, CorePlugin plugin, String description) {
-        if (id == null || plugin == null)
-            throw new NullPointerException();
+    public Module(@NotNull String id,@NotNull CorePlugin plugin, String description) {
         if (!UtilsString.isValidID(id))
             throw new IllegalArgumentException("invalid module id");
         this.id = id;
@@ -34,14 +32,26 @@ public abstract class Module implements Listener, ConsoleLogger {
         getPlugin().getConfig("modules.yml").loadString(this.getID() + ".description", this.description);
     }
 
+    /**
+     * Returns module description
+     * @return module description
+     */
     public final String getDescription() {
         return this.description;
     }
 
+    /**
+     * Returns module identifier
+     * @return module identifier
+     */
     public final String getID() {
         return this.id;
     }
 
+    /**
+     * Returns module plugin
+     * @return module plugin
+     */
     public final CorePlugin getPlugin() {
         return this.plugin;
     }

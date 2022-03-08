@@ -7,6 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PermissionBuilder {
 
@@ -21,43 +24,8 @@ public class PermissionBuilder {
      * @param plugin  plugin responsible for this permission
      * @param subName permission subName
      */
-    public PermissionBuilder(Plugin plugin, String subName) {
+    public PermissionBuilder(@NotNull Plugin plugin,@NotNull  String subName) {
         this(plugin.getName() + "." + subName);
-    }
-
-    /**
-     * Build a permission with name plugin.getName()+".command."+command.getID()+"."+subName.
-     *
-     * @param command
-     * @param subName
-     * @return
-     */
-    public static PermissionBuilder ofCommand(CoreCommand command, String subName) {
-        return new PermissionBuilder(command.getPlugin().getName() + ".command." + command.getID() + "." + subName);
-    }
-
-    public static PermissionBuilder ofCommand(Plugin plugin, String commandName, String subName) {
-        return new PermissionBuilder(plugin.getName() + ".command." + commandName + "." + subName);
-    }
-
-    public static PermissionBuilder ofCommand(Plugin plugin, String commandName) {
-        return new PermissionBuilder(plugin.getName() + ".command." + commandName);
-    }
-
-    public static PermissionBuilder asSubPermission(Permission perm, String subName) {
-        return new PermissionBuilder(perm.getName() + "." + subName);
-    }
-
-    public static PermissionBuilder ofModule(Plugin plugin, String moduleId, String subName) {
-        return new PermissionBuilder(plugin.getName() + ".module." + moduleId + "." + subName);
-    }
-
-    public static PermissionBuilder ofModule(Module module, String subName) {
-        return new PermissionBuilder(module.getPlugin().getName() + ".module." + module.getID() + "." + subName);
-    }
-
-    public static PermissionBuilder ofPlugin(Plugin plugin, String subName) {
-        return new PermissionBuilder(plugin.getName() + "." + subName);
     }
 
     /**
@@ -65,21 +33,58 @@ public class PermissionBuilder {
      *
      * @param name permission name
      */
-    public PermissionBuilder(String name) {
+    public PermissionBuilder(@NotNull String name) {
         setName(name);
     }
 
+    /**
+     * Build a permission with name plugin.getName()+".command."+command.getID()+"."+subName.
+     *
+     * @param command
+     * @param subName
+     * @return a permission builder
+     */
+    public static PermissionBuilder ofCommand(@NotNull CoreCommand command, @NotNull String subName) {
+        return new PermissionBuilder(command.getPlugin().getName() + ".command." + command.getID() + "." + subName);
+    }
 
-    public PermissionBuilder(Permission perm) {
+    public static PermissionBuilder ofCommand(@NotNull Plugin plugin, @NotNull String commandName, @NotNull String subName) {
+        return new PermissionBuilder(plugin.getName() + ".command." + commandName + "." + subName);
+    }
+
+    public static PermissionBuilder ofCommand(@NotNull Plugin plugin, @NotNull String commandName) {
+        return new PermissionBuilder(plugin.getName() + ".command." + commandName);
+    }
+
+    public static PermissionBuilder asSubPermission(@NotNull Permission perm, @NotNull String subName) {
+        return new PermissionBuilder(perm.getName() + "." + subName);
+    }
+
+    public static PermissionBuilder ofModule(@NotNull Plugin plugin, @NotNull String moduleId, @NotNull String subName) {
+        return new PermissionBuilder(plugin.getName() + ".module." + moduleId + "." + subName);
+    }
+
+    public static PermissionBuilder ofModule(@NotNull Module module, @NotNull String subName) {
+        return new PermissionBuilder(module.getPlugin().getName() + ".module." + module.getID() + "." + subName);
+    }
+
+    public static PermissionBuilder ofPlugin(@NotNull Plugin plugin, @NotNull String subName) {
+        return new PermissionBuilder(plugin.getName() + "." + subName);
+    }
+
+
+    /**
+     *
+     * @param perm base permission
+     */
+    public PermissionBuilder(@NotNull Permission perm) {
         setName(perm.getName());
         setDescription(perm.getDescription());
         setAccess(perm.getDefault());
         children.putAll(perm.getChildren());
     }
 
-    private void setName(String name) {
-        if (name == null)
-            throw new NullPointerException();
+    private void setName(@NotNull String name) {
         if (name.isEmpty() || name.contains(" ") || name.startsWith(".") || name.endsWith("."))
             throw new IllegalArgumentException(name + " is invalid permission name");
         this.name = name.toLowerCase();
@@ -92,7 +97,8 @@ public class PermissionBuilder {
      * @param def type
      * @return this for chaining.
      */
-    public PermissionBuilder setAccess(PermissionDefault def) {
+    @Contract("_ -> this")
+    public PermissionBuilder setAccess(@Nullable PermissionDefault def) {
         if (def == null)
             def = PermissionDefault.OP;
         this.def = def;
@@ -103,11 +109,9 @@ public class PermissionBuilder {
      * @param description permission description
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public PermissionBuilder setDescription(String description) {
-        if (description != null)
-            this.description = ChatColor.translateAlternateColorCodes('&', description);
-        else
-            this.description = null;
+        this.description = description == null ? null : ChatColor.translateAlternateColorCodes('&', description);
         return this;
     }
 
@@ -120,6 +124,7 @@ public class PermissionBuilder {
      * @see #addChild(Permission, boolean)
      */
     @Deprecated
+    @Contract("_, _ -> this")
     public PermissionBuilder addChild(String name, boolean value) {
         children.put(name.toLowerCase(), value);
         return this;
@@ -132,6 +137,7 @@ public class PermissionBuilder {
      * @param value value of child permission
      * @return this for chaining.
      */
+    @Contract("_, _ -> this")
     public PermissionBuilder addChild(Permission perm, boolean value) {
         children.put(perm.getName(), value);
         return this;
@@ -142,6 +148,7 @@ public class PermissionBuilder {
      *
      * @return permission obtained from this
      */
+    @Contract(" -> new")
     public Permission build() {
         return new Permission(name.toLowerCase(), description, def, children);
     }
@@ -152,7 +159,8 @@ public class PermissionBuilder {
      * @param plugin which plugin register this permission
      * @return permission obtained from this
      */
-    public Permission buildAndRegister(CorePlugin plugin) {
+    @Contract("_ -> new")
+    public Permission buildAndRegister(@NotNull CorePlugin plugin) {
         return buildAndRegister(plugin, true);
     }
 
@@ -163,7 +171,8 @@ public class PermissionBuilder {
      * @param silent if false notify console of newly generated permission
      * @return permission obtained from this
      */
-    public Permission buildAndRegister(CorePlugin plugin, boolean silent) {
+    @Contract("_, _ -> new")
+    public Permission buildAndRegister(@NotNull CorePlugin plugin, boolean silent) {
         Permission perm = new Permission(name.toLowerCase(), description, def, children);
         plugin.registerPermission(perm, silent);
         return perm;

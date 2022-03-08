@@ -123,7 +123,6 @@ public class LoggerManager {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return;
         }
     }
 

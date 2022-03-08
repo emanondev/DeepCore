@@ -34,14 +34,13 @@ public class SoundInfo implements ConfigurationSerializable {
     }
 
     private static Sound getStringSound(String obj) {
-        Sound sound = null;
         try {
             if (obj == null || obj.isEmpty())
-                return sound;
-            sound = Sound.valueOf(obj);
+                return null;
+            return Sound.valueOf(obj);
         } catch (Exception ignored) {
         }
-        return sound;
+        return null;
     }
 
     public SoundInfo(@Nullable Sound sound, double volume, double pitch, boolean selfSound) {
