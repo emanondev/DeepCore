@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class TimeEditorButton extends AGuiButton {
 
@@ -80,7 +81,7 @@ public abstract class TimeEditorButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
             case LEFT: {
                 Long old = getValue();

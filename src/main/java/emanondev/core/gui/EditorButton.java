@@ -5,6 +5,7 @@ import java.util.function.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 
 @Deprecated
@@ -40,12 +41,12 @@ public class EditorButton<T> implements GuiButton {
 	}
 	
 	@Override
-	public boolean onDrag(InventoryDragEvent event) {
+	public boolean onDrag(@NotNull InventoryDragEvent event) {
 		return false;
 	}
 
 	@Override
-	public boolean onClick(InventoryClickEvent event) {
+	public boolean onClick(@NotNull InventoryClickEvent event) {
 		if (onClick==null)
 			return false;
 		return onClick.apply(event);
@@ -68,7 +69,7 @@ public class EditorButton<T> implements GuiButton {
 	}
 
 	@Override
-	public Gui getGui() {
+	public @NotNull Gui getGui() {
 		return gui;
 	}
 

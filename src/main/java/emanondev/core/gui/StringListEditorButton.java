@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class StringListEditorButton extends AGuiButton {
 
@@ -33,7 +34,7 @@ public abstract class StringListEditorButton extends AGuiButton {
     public abstract void onChange(List<String> list);
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
             case LEFT:
                 setLine(getLine() - 1);

@@ -4,6 +4,7 @@ import java.util.function.*;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class FButton extends AGuiButton {
 
@@ -22,7 +23,7 @@ public class FButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         return onClick != null && onClick.apply(event);
     }
 

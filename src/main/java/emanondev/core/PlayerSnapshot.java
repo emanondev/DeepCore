@@ -805,10 +805,17 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     public Object getDefault(FieldType type) {
         switch (type) {
             case ABSORBITION:
+            case EXPERIENCE:
+            case FIRETICKS:
+            case LEVEL:
                 return 0;
             case AIR:
+            case HEALTH:
+            case FOODLEVEL:
                 return 20;
             case ALLOWFLIGHT:
+            case GOD:
+            case FLYING:
                 return false;
             case ARMOR:
                 return Collections.nCopies(5, (ItemStack) null);
@@ -817,33 +824,16 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case ENDERCHEST:
                 return Collections.nCopies(9 * 3, (ItemStack) null);
             case EXHAUSTION:
-                return 1;
-            case EXPERIENCE:
-                return 0;
-            case FIRETICKS:
-                return 0;
-            case FLYING:
-                return false;
+            case WALKSPEED:
             case FLYSPEED:
-                return 1;
-            case FOODLEVEL:
-                return 20;
-            case GAMEMODE:
-                return GameMode.SURVIVAL;
-            case GOD:
-                return false;
-            case HEALTH:
-                return 20;
-            case INVENTORY:
-                return Collections.nCopies(9 * 4, (ItemStack) null);
-            case LEVEL:
-                return 0;
-            case LOCATION:
-                return null;// TODO fallback?
             case SATURATION:
                 return 1;
-            case WALKSPEED:
-                return 1;
+            case GAMEMODE:
+                return GameMode.SURVIVAL;
+            case INVENTORY:
+                return Collections.nCopies(9 * 4, (ItemStack) null);
+            case LOCATION:
+                return null;// TODO fallback?
         }
         throw new IllegalStateException();
     }

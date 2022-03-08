@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 
 import emanondev.core.CorePlugin;
 import emanondev.core.ItemBuilder;
+import org.jetbrains.annotations.NotNull;
 
 @Deprecated
 public abstract class PagedChestGui extends ChestGui implements PagedGui {
@@ -122,7 +123,7 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
 	}
 
 	@Override
-	public void onClick(InventoryClickEvent event) {
+	public void onClick(@NotNull InventoryClickEvent event) {
 		if (event.getClickedInventory() != getInventory())
 			return;
 		GuiButton b = getButton(event.getSlot());
@@ -132,7 +133,7 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
 	}
 
 	@Override
-	public void onDrag(InventoryDragEvent event) {
+	public void onDrag(@NotNull InventoryDragEvent event) {
 	}
 
 	@Override
@@ -155,7 +156,7 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
 	}
 
 	@Override
-	public void addButton(GuiButton button) {
+	public void addButton(@NotNull GuiButton button) {
 		buttons.add(button);
 	}
 

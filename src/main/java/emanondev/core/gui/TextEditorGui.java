@@ -71,7 +71,7 @@ public abstract class TextEditorGui extends AnvilGui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (!event.getClickedInventory().equals(getInventory()))
             return;
         switch (event.getSlot()) {
@@ -116,7 +116,7 @@ public abstract class TextEditorGui extends AnvilGui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
 

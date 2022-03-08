@@ -191,7 +191,7 @@ public class MessageBuilder {
      *                {holder1,replacer1,holder2,replacer2,...}
      * @return this for chaining
      */
-    public MessageBuilder addCommand(String command, @NotNull ClickEvent.Action action, String... holders) {
+    public MessageBuilder addCommand(@Nullable String command, @Nullable ClickEvent.Action action, String... holders) {
         if (command != null && action != null)
             base.event(new ClickEvent(action, UtilsString.fix(command, null, false, holders)));
         return this;
@@ -526,7 +526,7 @@ public class MessageBuilder {
      * Invalid (target shouldn't change)
      *
      * @param p target
-     * @return
+     * @return this
      */
     @Deprecated
     public MessageBuilder setTarget(@Nullable CommandSender p) {

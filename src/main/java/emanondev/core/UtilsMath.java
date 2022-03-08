@@ -1,9 +1,9 @@
 package emanondev.core;
 
-public class UtilsMath {
+public final class UtilsMath {
 
-    UtilsMath() {
-        throw new UnsupportedOperationException();
+    private UtilsMath() {
+        throw new AssertionError();
     }
 
     /**

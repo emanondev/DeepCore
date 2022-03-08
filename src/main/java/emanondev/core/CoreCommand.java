@@ -122,7 +122,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                 tempAliases.add(alias.toLowerCase());
         }
         this.setAliases(tempAliases);
-        this.setDescription(config.loadMessage("info.description", defaultDescription, true));
+        this.setDescription(config.loadMessage("info.description", defaultDescription==null?"":defaultDescription, true));
         this.setUsage(config.loadMessage("info.usage", "&cUsage: /" + getName(), true));
         if (permission != null) {
             // plugin.registerPermission(permission);
@@ -187,7 +187,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     @Override
     public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args,
                                                    @Nullable Location location) {
-        if (sender == null || alias == null || args == null)
+        if (args == null)
             throw new NullPointerException();
         List<String> val = onComplete(sender, alias, args, location);
         return val == null ? new ArrayList<>() : val;
@@ -207,7 +207,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     @Override
     public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
                                                    @NotNull String[] args) {
-        Validate.isTrue(sender != null && alias != null && args != null);
+        Validate.isTrue(args != null);
         return onComplete(sender, alias, args, null);
     }
 
@@ -233,8 +233,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable Permission permission) {
         if (permission == null)
             return true;
-        if (sender == null)
-            throw new NullPointerException();
         return sender.hasPermission(permission);
     }
 
@@ -248,8 +246,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable String permission) {
         if (permission == null)
             return true;
-        if (sender == null)
-            throw new NullPointerException();
         return sender.hasPermission(permission);
     }
 

@@ -61,7 +61,7 @@ public class StringListEditorFButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
             case LEFT:
                 setLine(getLine() - 1);

@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ public class ItemBuilder {
      *
      * @return this for chaining.
      */
+    @Contract(" -> this")
     public ItemBuilder setGuiProperty() {
         setUnbreakable(true);
         hideAllFlags();
@@ -54,6 +56,7 @@ public class ItemBuilder {
     /**
      * @return created ItemStack.
      */
+    @Contract(" -> new")
     public ItemStack build() {
         this.result.setItemMeta(this.resultMeta);
         return this.result;
@@ -63,6 +66,7 @@ public class ItemBuilder {
      * @param value Should this be unbreakable?
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public ItemBuilder setUnbreakable(boolean value) {
         this.resultMeta.setUnbreakable(value);
         return this;
@@ -72,6 +76,7 @@ public class ItemBuilder {
      * @param flag Adds the flag to this
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public ItemBuilder addFlag(ItemFlag flag) {
         this.resultMeta.addItemFlags(flag);
         return this;
@@ -81,6 +86,7 @@ public class ItemBuilder {
      * @param displayName Set displayName of this
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public ItemBuilder setDisplayName(String displayName) {
 
         this.resultMeta.setDisplayName(displayName);
@@ -93,6 +99,7 @@ public class ItemBuilder {
      * @param line Line to add.
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public ItemBuilder addLore(String line) {
         if (line == null)
             return this;
@@ -108,6 +115,7 @@ public class ItemBuilder {
      * @param lore Lore to set.
      * @return this for chaining.
      */
+    @Contract("_ -> this")
     public ItemBuilder setLore(@Nullable List<String> lore) {
         this.resultMeta.setLore(lore);
         return this;
@@ -120,6 +128,7 @@ public class ItemBuilder {
      * @param level       Level to set.
      * @return this for chaining.
      */
+    @Contract("_, _ -> this")
     public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
         if (level == 0)
             this.resultMeta.removeEnchant(enchantment);
@@ -136,6 +145,7 @@ public class ItemBuilder {
      * @throws IllegalStateException if this meta is not LeatherArmorMeta nor
      *                               PotionMeta
      */
+    @Contract("_ -> this")
     public ItemBuilder setColor(Color color) {
         if (resultMeta instanceof LeatherArmorMeta) {
             ((LeatherArmorMeta) this.resultMeta).setColor(color);
@@ -155,6 +165,7 @@ public class ItemBuilder {
      * @return this for chaining.
      * @throws IllegalStateException if this meta is not BookMeta
      */
+    @Contract("_ -> this")
     public ItemBuilder setAuthor(String name) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setAuthor(name);
@@ -170,6 +181,7 @@ public class ItemBuilder {
      * @return this for chaining.
      * @throws IllegalStateException if this meta is not BookMeta
      */
+    @Contract("_ -> this")
     public ItemBuilder setTitle(String title) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setTitle(title);
@@ -186,6 +198,7 @@ public class ItemBuilder {
      * @return this for chaining.
      * @throws IllegalStateException if this meta is not BookMeta
      */
+    @Contract("_, _ -> this")
     public ItemBuilder setPage(int page, String text) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setPage(page, text);
@@ -201,6 +214,7 @@ public class ItemBuilder {
      * @return this for chaining.
      * @throws IllegalStateException if this meta is not PotionMeta
      */
+    @Contract("_ -> this")
     public ItemBuilder addPotionEffect(PotionEffect effect) {
         if (this.resultMeta instanceof PotionMeta)
             ((PotionMeta) this.resultMeta).addCustomEffect(effect, true);
@@ -210,6 +224,7 @@ public class ItemBuilder {
     }
 
     @SuppressWarnings("deprecation")
+    @Contract("_ -> this")
     public ItemBuilder setSkullOwner(String name) {
         if (this.resultMeta instanceof SkullMeta)
             ((SkullMeta) this.resultMeta).setOwner(name);
@@ -218,6 +233,7 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract("_ -> this")
     public ItemBuilder setSkullOwner(OfflinePlayer player) {
         if (this.resultMeta instanceof SkullMeta)
             ((SkullMeta) this.resultMeta).setOwningPlayer(player);
@@ -226,6 +242,7 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract("_ -> this")
     public ItemBuilder setDamage(int dmg) {
         if (this.resultMeta instanceof Damageable)
             ((Damageable) this.resultMeta).setDamage(dmg);
@@ -234,6 +251,7 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract("_ -> this")
     public ItemBuilder setAmount(int amount) {
         if (amount > 0)
             this.result.setAmount(amount);
@@ -242,6 +260,7 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract(" -> new")
     public ItemBuilder clone() {
         ItemBuilder copy = new ItemBuilder(this.result);
         copy.resultMeta = this.resultMeta.clone();
@@ -253,11 +272,13 @@ public class ItemBuilder {
      *
      * @return this for chaining.
      */
+    @Contract(" -> this")
     public ItemBuilder hideAllFlags() {
         this.resultMeta.addItemFlags(ItemFlag.values());
         return this;
     }
 
+    @Contract("_, _ -> this")
     public ItemBuilder addPattern(DyeColor color, PatternType patternType) {
         if (this.resultMeta instanceof BannerMeta)
             ((BannerMeta) this.resultMeta).addPattern(new Pattern(color, patternType));
@@ -274,6 +295,7 @@ public class ItemBuilder {
      *                    "holder1", "value1", "holder2", "value2"...
      * @return this for chaining.
      */
+    @Contract("_, _ -> this")
     public ItemBuilder setDescription(List<String> description, String... holders) {
         setDescription(description, true, null, holders);
         return this;
@@ -288,6 +310,7 @@ public class ItemBuilder {
      *                    "holder1", "value1", "holder2", "value2"...
      * @return this for chaining.
      */
+    @Contract("_, _, _ -> this")
     public ItemBuilder setDescription(List<String> description, boolean color, String... holders) {
         setDescription(description, color, null, holders);
         return this;
@@ -303,6 +326,7 @@ public class ItemBuilder {
      *                    "holder1", "value1", "holder2", "value2"...
      * @return this for chaining.
      */
+    @Contract("_, _, _, _ -> this")
     public ItemBuilder setDescription(List<String> description, boolean color, Player player, String... holders) {
         List<String> list = UtilsString.fix(description, player, color, holders);
         if (list == null || list.isEmpty()) {

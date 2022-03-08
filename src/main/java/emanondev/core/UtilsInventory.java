@@ -13,10 +13,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
-public class UtilsInventory {
+public final class UtilsInventory {
 
-    UtilsInventory() {
-        throw new UnsupportedOperationException();
+    private UtilsInventory() {
+        throw new AssertionError();
     }
 
     /**

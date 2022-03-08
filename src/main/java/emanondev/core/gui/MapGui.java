@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import emanondev.core.CorePlugin;
+import org.jetbrains.annotations.NotNull;
 
 public class MapGui extends ChestGui {
 
@@ -50,7 +51,7 @@ public class MapGui extends ChestGui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
             if (buttonsMap.get(event.getRawSlot()) != null)
                 if (buttonsMap.get(event.getRawSlot()).onClick(event))
@@ -68,7 +69,7 @@ public class MapGui extends ChestGui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         if (button == null)
             throw new NullPointerException();
         for (int i = 0; i < getInventory().getSize(); i++)

@@ -65,7 +65,7 @@ class EquipChangeListener implements Listener {
             EnumMap<EquipmentSlot, ItemStack> map = new EnumMap<>(EquipmentSlot.class);
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack item = p.getInventory().getItem(slot);
-                map.put(slot, item == null ? null : new ItemStack(item));
+                map.put(slot, new ItemStack(item));
             }
             equips.put(p, map);
         }
@@ -81,7 +81,7 @@ class EquipChangeListener implements Listener {
         EnumMap<EquipmentSlot, ItemStack> map = new EnumMap<>(EquipmentSlot.class);
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack item = event.getPlayer().getInventory().getItem(slot);
-            map.put(slot, item == null ? null : new ItemStack(item));
+            map.put(slot, new ItemStack(item));
         }
         equips.put(event.getPlayer(), map);
     }
@@ -297,9 +297,9 @@ class EquipChangeListener implements Listener {
         if (event.getItem().getAmount() != 1)
             return;
         List<EquipmentSlot> slots = new ArrayList<>(1);
-        if (event.getItem().equals(UtilsInventory.getEquip(event.getPlayer(), EquipmentSlot.HAND)))
+        if (event.getItem().equals(event.getPlayer().getInventory().getItem(EquipmentSlot.HAND)))
             slots.add(EquipmentSlot.HAND);
-        if (event.getItem().equals(UtilsInventory.getEquip(event.getPlayer(), EquipmentSlot.OFF_HAND)))
+        if (event.getItem().equals(event.getPlayer().getInventory().getItem(EquipmentSlot.OFF_HAND)))
             slots.add(EquipmentSlot.OFF_HAND);
         if (slots.size() == 1)
             onEquipChange(event.getPlayer(), EquipMethod.CONSUME, slots.get(0), event.getItem(),

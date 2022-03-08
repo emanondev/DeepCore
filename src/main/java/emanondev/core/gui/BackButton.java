@@ -5,6 +5,7 @@ import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class BackButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         if (getGui().getPreviousGui() != null) {
             getGui().getPreviousGui().open(event.getWhoClicked());
             return false;

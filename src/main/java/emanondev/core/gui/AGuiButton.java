@@ -20,7 +20,7 @@ public abstract class AGuiButton implements GuiButton {
         this.parent = parent;
     }
 
-    public Gui getGui() {
+    public @NotNull Gui getGui() {
         return parent;
     }
 

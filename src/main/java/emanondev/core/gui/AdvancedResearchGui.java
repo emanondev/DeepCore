@@ -134,7 +134,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     @Override
-    public void onOpen(InventoryOpenEvent event) {
+    public void onOpen(@NotNull InventoryOpenEvent event) {
         if (!event.getPlayer().equals(this.getTargetPlayer())) {
             event.setCancelled(true);
             return;
@@ -207,7 +207,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         InventoryView view = getView();
         if (view == null)
             return;
@@ -247,7 +247,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
 
@@ -391,7 +391,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
             return val;
         }
 
-        public Gui getGui() {
+        public @NotNull Gui getGui() {
             return AdvancedResearchGui.this;
         }
 
@@ -400,7 +400,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         }
 
         @Override
-        public boolean onClick(InventoryClickEvent event) {
+        public boolean onClick(@NotNull InventoryClickEvent event) {
             return AdvancedResearchGui.this.onElementClick(event, getValue());
         }
 

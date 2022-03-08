@@ -13,6 +13,7 @@ import org.bukkit.util.Consumer;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import org.jetbrains.annotations.NotNull;
 
 public class NumberEditorFButton<T extends Number> extends AGuiButton {
 
@@ -94,7 +95,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
             case LEFT: {
                 T old = getValue();

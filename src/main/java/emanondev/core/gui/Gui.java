@@ -180,7 +180,7 @@ public interface Gui extends InventoryHolder {
 	/**
 	 * Sets whenever the inventory should be updated when a player open it
 	 * 
-	 * @param value
+	 * @param value whenever the inventory should be updated when a player open it or not
 	 */
 	void setUpdateOnOpen(boolean value);
 

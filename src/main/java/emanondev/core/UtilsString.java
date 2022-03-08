@@ -10,16 +10,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 
-public class UtilsString {
+public final class UtilsString {
 
-    UtilsString() {
-        throw new UnsupportedOperationException();
+    private UtilsString() {
+        throw new AssertionError();
     }
 
     /**
@@ -92,6 +93,7 @@ public class UtilsString {
      *                   "to replace#1","replacer#1","to replace#2","replacer#2"....
      * @return a new list with fixed text, or null if list was null
      */
+    @Contract("!null, _, _, _ -> !null")
     public static @Nullable ArrayList<String> fix(@Nullable List<String> list, @Nullable Player papiTarget,
                                                   boolean color, String... holders) {
         if (list == null)
@@ -115,6 +117,7 @@ public class UtilsString {
      *                    2"....
      * @return new item with display name and lore used for desc
      */
+    @Contract("null, _, _, _, _ -> null")
     public static ItemStack setDescription(@Nullable ItemStack item, @Nullable List<String> description,
                                            @Nullable Player player, boolean color, String... holders) {
         if (item == null || item.getType() == Material.AIR)
@@ -125,12 +128,12 @@ public class UtilsString {
         return itemCopy;
     }
 
+    @Contract("!null, _, _, _ -> !null")
     public static String fix(@Nullable String text, @Nullable Player papiTarget, boolean color, String... holders) {
         if (text == null)
             return null;
 
         // holders
-
         Validate.isTrue(holders == null || holders.length % 2 == 0, "holder without replacer");
         if (holders != null && holders.length > 0)
             for (int i = 0; i < holders.length; i += 2)
@@ -151,6 +154,7 @@ public class UtilsString {
      * @param text Text to revert
      * @return a string with original colors and formats but with &amp; instead of §
      */
+    @Contract("!null -> !null")
     public static @Nullable String revertColors(@Nullable String text) {
         if (text == null)
             return null;
@@ -161,6 +165,7 @@ public class UtilsString {
      * @param text Text to clear
      * @return a string with no colors and no formats
      */
+    @Contract("!null -> !null")
     public static @Nullable String clearColors(@Nullable String text) {
         if (text == null)
             return null;
@@ -303,30 +308,29 @@ public class UtilsString {
     private static final DecimalFormat forced2Digit = new DecimalFormat("0.00");
     private static final DecimalFormat forcedIntDigit = new DecimalFormat("0");
 
-    public static String formatForced2Digit(Number num) {
+    public static @NotNull String formatForced2Digit(@NotNull Number num) {
         return forced2Digit.format(num);
     }
 
-    public static String formatForcedInt(Number num) {
+    public static @NotNull String formatForcedInt(@NotNull Number num) {
         return forcedIntDigit.format(num);
     }
 
-    public static String formatForced1Digit(Number num) {
+    public static @NotNull String formatForced1Digit(@NotNull Number num) {
         return forced1Digit.format(num);
     }
 
-    public static String formatOptional1Digit(Number num) {
+    public static @NotNull String formatOptional1Digit(@NotNull Number num) {
         return optional1Digit.format(num);
     }
 
-    public static String formatOptional10Digit(Number num) {
+    public static @NotNull String formatOptional10Digit(@NotNull Number num) {
         return optional10Digit.format(num);
     }
 
     public static @NotNull String formatOptional2Digit(@NotNull Number num) {
         return optional2Digit.format(num);
     }
-
 
     public static @NotNull List<String> textLineSplitter(@Nullable String text) {
         return textLineSplitter(text, 50);

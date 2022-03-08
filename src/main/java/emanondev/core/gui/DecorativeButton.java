@@ -3,6 +3,7 @@ package emanondev.core.gui;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class DecorativeButton extends AGuiButton {
 
@@ -14,12 +15,12 @@ public class DecorativeButton extends AGuiButton {
     }
 
     @Override
-    public boolean onDrag(InventoryDragEvent event) {
+    public boolean onDrag(@NotNull InventoryDragEvent event) {
         return false;
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         return false;
     }
 

@@ -31,7 +31,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     private String name;
 
     @Deprecated
-    public YMLSection getConfigurationSection(String path) {
+    public YMLSection getConfigurationSection(@NotNull String path) {
         return (YMLSection) super.getConfigurationSection(path);
     }
 
@@ -291,7 +291,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     @Override
-    public void setNoDirty(String path, Object value) {
+    public void setNoDirty(@NotNull String path, Object value) {
         super.set(path, value);
     }
 

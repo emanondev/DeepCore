@@ -5,6 +5,7 @@ import java.util.function.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class FunctionButton extends AGuiButton {
 
@@ -22,12 +23,12 @@ public class FunctionButton extends AGuiButton {
     }
 
     @Override
-    public boolean onDrag(InventoryDragEvent event) {
+    public boolean onDrag(@NotNull InventoryDragEvent event) {
         return onDrag != null && onDrag.apply(event);
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         return onClick != null && onClick.apply(event);
     }
 

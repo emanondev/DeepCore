@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
 import emanondev.core.ItemBuilder;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemEditorFButton extends AGuiButton {
 
@@ -31,7 +32,7 @@ public class ItemEditorFButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         if (event.getClick() != ClickType.LEFT)
             return false;
         new ItemGui().open(getTargetPlayer());
@@ -49,7 +50,7 @@ public class ItemEditorFButton extends AGuiButton {
                     .build(), (e) -> false));
         }
 
-        public void onClick(InventoryClickEvent event) {
+        public void onClick(@NotNull InventoryClickEvent event) {
             if (event.getClickedInventory() == this.getInventory()) {
                 super.onClick(event);
                 return;

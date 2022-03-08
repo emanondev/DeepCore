@@ -50,7 +50,7 @@ public class TextEditorFButton extends AGuiButton {
     }
 
     @Override
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         new TextEditorGui(getTitle(), getValue(), (Player) event.getWhoClicked(), getGui(), getPlugin()) {
 
             @Override

@@ -11,14 +11,14 @@ import org.jetbrains.annotations.Nullable;
 public abstract class ConfirmationGui extends ChestGui {
 
     /**
-     * @param title          may be null
-     * @param p              may be null
+     * @param title          the title of the gui
+     * @param player         target player
      * @param previousHolder may be null
-     * @param plugin
+     * @param plugin         plugin
      */
-    public ConfirmationGui(@Nullable String title,@Nullable Player p,@Nullable Gui previousHolder,
-						   @NotNull CorePlugin plugin) {
-        super(title, 1, p, previousHolder, plugin);
+    public ConfirmationGui(@Nullable String title, @Nullable Player player, @Nullable Gui previousHolder,
+                           @NotNull CorePlugin plugin) {
+        super(title, 1, player, previousHolder, plugin);
         ItemStack item = getConfirmationItem(false);
         for (int i = 0; i < 3; i++)
             this.getInventory().setItem(i, item);
@@ -28,7 +28,7 @@ public abstract class ConfirmationGui extends ChestGui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getSlot() >= 0 && event.getSlot() < 3)
             onConfirmation(false);
         else if (event.getSlot() >= 6 && event.getSlot() < 9)
@@ -48,7 +48,7 @@ public abstract class ConfirmationGui extends ChestGui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
 

@@ -70,7 +70,7 @@ public class ResearchFButton<T> extends AGuiButton {
         return getItem.get();
     }
 
-    public boolean onClick(InventoryClickEvent event) {
+    public boolean onClick(@NotNull InventoryClickEvent event) {
         return onClick == null ? defaultOnClick(event) : onClick.apply(event);
     }
 

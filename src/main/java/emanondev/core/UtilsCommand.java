@@ -19,10 +19,10 @@ import com.google.common.base.Predicate;
 
 import de.myzelyam.api.vanish.VanishAPI;
 
-public class UtilsCommand {
+public final class UtilsCommand {
 
-    UtilsCommand() {
-        throw new UnsupportedOperationException();
+    private UtilsCommand() {
+        throw new AssertionError();
     }
 
     /**
@@ -211,7 +211,7 @@ public class UtilsCommand {
         if (elements == null)
             return results;
         for (String e : elements)
-            if (e.toLowerCase().startsWith(prefix))
+            if (e!=null && e.toLowerCase().startsWith(prefix))
                 results.add(e);
         return results;
     }

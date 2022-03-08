@@ -14,6 +14,7 @@ import emanondev.core.UtilsMessages;
 import emanondev.core.UtilsString;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.jetbrains.annotations.Nullable;
 
 
 public abstract class ChestGui implements Gui {
@@ -47,11 +48,9 @@ public abstract class ChestGui implements Gui {
      * @param plugin         the plugin responsible for this gui
      * @param isTimerUpdated update the inventory each seconds as long as it has at least a player
      */
-    public ChestGui(String title, int rows, Player player, Gui previousHolder, @NotNull CorePlugin plugin, boolean isTimerUpdated) {
+    public ChestGui(String title, int rows, Player player, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, boolean isTimerUpdated) {
         if (rows < 1 || rows > 9)
             throw new IllegalArgumentException("invalid rows size '" + rows + "'");
-        if (plugin == null)
-            throw new NullPointerException();
         this.previousHolder = previousHolder;
         this.player = player;
         this.inv = Bukkit.createInventory(this, rows * 9, UtilsString.fix(title, player, true));
@@ -83,18 +82,10 @@ public abstract class ChestGui implements Gui {
     public void onClose(InventoryCloseEvent event) {
     }
 
-    /**
-     * Sets whenever the inventory should be updated when a player open it
-     *
-     * @param value
-     */
     public void setUpdateOnOpen(boolean value) {
         this.updateOnOpen = value;
     }
 
-    /**
-     * @return true if the inventory is updated when a player open it
-     */
     public boolean isUpdateOnOpen() {
         return this.updateOnOpen;
     }

@@ -8,6 +8,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
 import emanondev.core.CorePlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
 
@@ -100,7 +102,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
             updateControlButtons();
     }
 
-    public void onOpen(InventoryOpenEvent event) {
+    public void onOpen(@NotNull InventoryOpenEvent event) {
         if (isUpdateOnOpen())
             this.reloadInventory();
     }
@@ -161,7 +163,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getClickedInventory() != getInventory())
             return;
         GuiButton b;
@@ -179,6 +181,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
     }
 
     @Override
+    @Nullable
     public GuiButton getButton(int slot) {
         return activeButtons.size() > slot ? activeButtons.get(slot) : null;
     }
@@ -195,7 +198,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
 
@@ -304,7 +307,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
             return val;
         }
 
-        public Gui getGui() {
+        public @NotNull Gui getGui() {
             return PagedListGui.this;
         }
 

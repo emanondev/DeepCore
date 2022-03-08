@@ -71,7 +71,7 @@ public class LoggerManager {
     private BukkitTask task = null;
 
     private void reloadLoggers() {
-        loggers.values().forEach((logger) -> logger.reload());
+        loggers.values().forEach(Logger::reload);
     }
 
     private final WeakHashMap<String, Logger> loggers = new WeakHashMap<>();

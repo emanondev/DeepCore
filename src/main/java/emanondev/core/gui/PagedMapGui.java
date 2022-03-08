@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 
 import emanondev.core.CorePlugin;
+import org.jetbrains.annotations.NotNull;
 
 public class PagedMapGui extends ChestGui implements PagedGui {
 
@@ -130,7 +131,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
             controlButtons[backGuiSlot] = backB;
     }
 
-    public void onOpen(InventoryOpenEvent event) {
+    public void onOpen(@NotNull InventoryOpenEvent event) {
         if (isUpdateOnOpen())
             this.reloadInventory();
     }
@@ -182,7 +183,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getClickedInventory() != getInventory())
             return;
         GuiButton b;
@@ -220,7 +221,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         for (int i = 0; i < Short.MAX_VALUE; i++) {
             if (buttons.containsKey(i))
                 continue;

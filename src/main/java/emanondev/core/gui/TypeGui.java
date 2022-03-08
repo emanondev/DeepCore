@@ -48,8 +48,6 @@ public class TypeGui implements Gui {
      */
     public TypeGui(@Nullable String title, @NotNull InventoryType type, @Nullable Player p,
                    @Nullable Gui previousHolder, @NotNull CorePlugin plugin, boolean isTimerUpdated) {
-        if (plugin == null || type == null)
-            throw new NullPointerException();
         this.previousHolder = previousHolder;
         this.player = p;
         this.type = type;
@@ -104,7 +102,7 @@ public class TypeGui implements Gui {
     }
 
     @Override
-    public void onClick(InventoryClickEvent event) {
+    public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
             if (buttons[event.getRawSlot()] != null && buttons[event.getRawSlot()].onClick(event))
                 updateInventory();
@@ -121,7 +119,7 @@ public class TypeGui implements Gui {
     }
 
     @Override
-    public void addButton(GuiButton button) {
+    public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
 

@@ -39,7 +39,7 @@ public class SoundInfo implements ConfigurationSerializable {
             if (obj == null || obj.isEmpty())
                 return sound;
             sound = Sound.valueOf(obj);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return sound;
     }
@@ -56,7 +56,7 @@ public class SoundInfo implements ConfigurationSerializable {
     }
 
     public void play(@NotNull Location loc, @Nullable Player p) {
-        if (loc == null || sound == null)
+        if (sound == null)
             return;
         if (p == null)
             loc.getWorld().playSound(loc, sound, volume, pitch);
@@ -103,7 +103,7 @@ public class SoundInfo implements ConfigurationSerializable {
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public @NotNull Map<String, Object> serialize() {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         map.put("sound", sound == null ? "" : sound.toString());
         map.put("volume", volume);

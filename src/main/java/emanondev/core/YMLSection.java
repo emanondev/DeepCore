@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +67,7 @@ public interface YMLSection extends ConfigurationSection {
     /**
      * Save the config object in RAM to the file.<br>
      * Overwrites any changes that the configurator has made to the file unless
-     * {@link #reload()} has been called since. Save Asynchronusly if possible.
+     * {@link #reload()} has been called since. Save asynchronously if possible.
      */
     void saveAsync();
 
@@ -97,7 +98,7 @@ public interface YMLSection extends ConfigurationSection {
      * @return object or default
      */
     @SuppressWarnings("unchecked")
-    default <T> T load(String path, T def, Class<T> clazz) {
+    default <T> T load(@NotNull String path, T def, Class<T> clazz) {
         Object value = get(path);
         if (value == null) {
             if (def == null)
@@ -140,7 +141,7 @@ public interface YMLSection extends ConfigurationSection {
      * @return object or default
      */
     @SuppressWarnings("unchecked")
-    default <T> T get(String path, T def, Class<T> clazz) {
+    default <T> T get(@NotNull String path, T def, Class<T> clazz) {
         Object value = get(path);
         if (value == null) {
             return def;
@@ -213,6 +214,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Boolean loadBoolean(@NotNull String path, @Nullable Boolean def) {
         return load(path, def, Boolean.class);
     }
@@ -226,21 +228,24 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Integer loadInteger(@NotNull String path, @Nullable Integer def) {
         Number val = load(path, def, Number.class);
         return val == null ? null : val.intValue();
     }
 
+    @Contract("_, !null -> !null")
     default @Nullable Integer getInteger(@NotNull String path, @Nullable Integer def) {
         Number val = get(path, def, Number.class);
         return val == null ? null : val.intValue();
     }
 
-
+    @Contract("_, !null -> !null")
     default @Nullable PlayerSnapshot loadPlayerSnapshot(@NotNull String path, @Nullable PlayerSnapshot def) {
         return load(path, def, PlayerSnapshot.class);
     }
 
+    @Contract("_, !null -> !null")
     default @Nullable PlayerSnapshot getPlayerSnapshot(@NotNull String path, @Nullable PlayerSnapshot def) {
         return get(path, def, PlayerSnapshot.class);
     }
@@ -254,16 +259,19 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Long loadLong(@NotNull String path, @Nullable Long def) {
         Number val = load(path, def, Number.class);
         return val == null ? null : val.longValue();
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def,
                                          @Nullable CommandSender target, String... holders) {
         return loadMessage(path, def, true, target, holders);
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def,
                                          @Nullable CommandSender target, String... holders) {
         return loadMessage(path, def, true, target, holders);
@@ -282,29 +290,35 @@ public interface YMLSection extends ConfigurationSection {
         return loadMessage(path, defMessage, defHover, defClick, action, true, target, holders);
     }
 
+    @Contract("_, !null, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def, String... holders) {
         return loadMessage(path, def, true, null, holders);
     }
 
+    @Contract("_, !null, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, String... holders) {
         return loadMessage(path, def, true, null, holders);
     }
 
+    @Contract("_, !null, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, String... holders) {
         return loadComponentMessage(path, defMessage, defHover, defClick, null, true, null, holders);
     }
 
+    @Contract("_, !null, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable String defMessage,
                                                    @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action, String... holders) {
         return loadComponentMessage(path, defMessage, defHover, defClick, action, true, null, holders);
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
                                          String... holders) {
         return loadMessage(path, def, color, null, holders);
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
                                          String... holders) {
         return loadMessage(path, def, color, null, holders);
@@ -323,17 +337,20 @@ public interface YMLSection extends ConfigurationSection {
         return loadComponentMessage(path, defMessage, defHover, defClick, action, color, null, holders);
     }
 
+    @Contract("_, !null, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, boolean color, String... holders) {
         return loadComponentMessage(path, defMessage, defHover, defClick, null, color, null, holders);
     }
 
+    @Contract("_, !null, _, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action, boolean color,
                                                             String... holders) {
         return loadComponentMessage(path, defMessage, defHover, defClick, action, color, null, holders);
     }
 
+    @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
         if (holders.length > 0) {
@@ -350,6 +367,7 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     @SuppressWarnings("unchecked")
+    @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
         if (holders.length > 0) {
@@ -372,22 +390,26 @@ public interface YMLSection extends ConfigurationSection {
         }
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     boolean color, String... holders) {
         return loadMultiMessage(path, def, color, null, holders);
     }
 
+    @Contract("_, !null, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     @Nullable CommandSender target, String... holders) {
         return loadMultiMessage(path, def, true, target, holders);
     }
 
+    @Contract("_, !null, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     String... holders) {
         return loadMultiMessage(path, def, true, null, holders);
     }
 
     @SuppressWarnings("unchecked")
+    @Contract("_, !null, _, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     boolean color, @Nullable CommandSender target, String... holders) {
         if (holders.length > 0) {
@@ -440,19 +462,21 @@ public interface YMLSection extends ConfigurationSection {
         action = loadEnum(path + ".click_action", action == null ? ClickEvent.Action.SUGGEST_COMMAND : action,
                 ClickEvent.Action.class);
         ComponentBuilder comp = new ComponentBuilder(message);
-        if (hover != null && !hover.isEmpty())
+        if (!hover.isEmpty())
             comp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hover).create()));
-        if (click != null && !click.isEmpty())
+        if (!click.isEmpty())
             comp.event(new ClickEvent(action, click));
         return comp;
     }
 
+    @Contract("_, !null, _, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, boolean color, @Nullable CommandSender target,
                                                             String... holders) {
         return loadComponentMessage(path, defMessage, defHover, defClick, null, color, target, holders);
     }
 
+    @Contract("_, !null, _, _, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, @Nullable ClickEvent.Action action, boolean color,
                                                             @Nullable CommandSender target, String... holders) {
@@ -468,7 +492,7 @@ public interface YMLSection extends ConfigurationSection {
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders);
         if (message == null || message.isEmpty())
-            return null;
+            return new ComponentBuilder();
 
         String hover = UtilsString.fix(loadString(path + ".hover", defHover == null ? "" : defHover),
                 target instanceof Player ? ((Player) target) : null, color, holders);
@@ -477,9 +501,9 @@ public interface YMLSection extends ConfigurationSection {
         action = loadEnum(path + ".click_action", action == null ? ClickEvent.Action.SUGGEST_COMMAND : action,
                 ClickEvent.Action.class);
         ComponentBuilder comp = new ComponentBuilder(message);
-        if (hover != null && !hover.isEmpty())
+        if (!hover.isEmpty())
             comp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
-        if (click != null && !click.isEmpty())
+        if (!click.isEmpty())
             comp.event(new ClickEvent(action, click));
         return comp;
     }
@@ -490,7 +514,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param defHover   Default hover message
      * @param defClick   Default click suggestion
      * @param action     Default click action type
-     * @param color      Whether or not translate color codes
+     * @param color      Whether translate color codes or not
      * @param target     Player target for PlaceHolderAPI holders
      * @param holders    Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      * @return null if message is null or empty
@@ -510,7 +534,7 @@ public interface YMLSection extends ConfigurationSection {
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders));
-        if (message == null || message.isEmpty())
+        if (message.isEmpty())
             return null;
 
         String hover = String.join("\n",
@@ -523,12 +547,13 @@ public interface YMLSection extends ConfigurationSection {
         ComponentBuilder comp = new ComponentBuilder(message);
         if (!hover.isEmpty())
             comp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
-        if (click != null && !click.isEmpty())
+        if (!click.isEmpty())
             comp.event(new ClickEvent(action, click));
         return comp;
     }
 
 
+    @Contract("_, !null, _, _, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                             @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
                                                             boolean color, @Nullable CommandSender target, String... holders) {
@@ -543,8 +568,8 @@ public interface YMLSection extends ConfigurationSection {
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders));
-        if (message == null || message.isEmpty())
-            return null;
+        if (message.isEmpty())
+            return new ComponentBuilder();
 
         String hover = String.join("\n",
                 UtilsString.fix(loadStringList(path + ".hover", defHover == null ? new ArrayList<>() : defHover),
@@ -554,9 +579,9 @@ public interface YMLSection extends ConfigurationSection {
         action = loadEnum(path + ".click_action", action == null ? ClickEvent.Action.SUGGEST_COMMAND : action,
                 ClickEvent.Action.class);
         ComponentBuilder comp = new ComponentBuilder(message);
-        if (hover != null && !hover.isEmpty())
+        if (!hover.isEmpty())
             comp.event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
-        if (click != null && !click.isEmpty())
+        if (!click.isEmpty())
             comp.event(new ClickEvent(action, click));
         return comp;
     }
@@ -570,7 +595,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default ItemStack loadItemStack(String path, ItemStack def) {
+    @Contract("_, !null -> !null")
+    default ItemStack loadItemStack(@NotNull String path, ItemStack def) {
         return load(path, def, ItemStack.class);
     }
 
@@ -583,10 +609,12 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable String loadString(@NotNull String path, @Nullable String def) {
         return load(path, def, String.class);
     }
 
+    @Contract("_, !null -> !null")
     default @Nullable String getString(@NotNull String path, @Nullable String def) {
         return get(path, def, String.class);
     }
@@ -644,15 +672,16 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
-     * assumes that enum costants are all uppercased
+     * assumes that enum constants are all uppercase
      *
      * @param <T>   the class of the enum
      * @param path  Path of the Object
      * @param clazz the class of the enum
      * @param def   Default Object
-     * @return if path lead to a string attemps return the matching Enum value, if
+     * @return if path lead to a string attempts return the matching Enum value, if
      * the string is empty return def
      */
+    @Contract("_, !null, _ -> !null")
     default @Nullable <T extends Enum<T>> T loadEnum(@NotNull String path, @Nullable T def,
                                                      @NotNull Class<T> clazz) {
         String value = loadString(path, def == null ? null : def.name());
@@ -673,6 +702,7 @@ public interface YMLSection extends ConfigurationSection {
         return def;
     }
 
+    @Contract("_, !null, _ -> !null")
     default @Nullable <T extends Enum<T>> T getEnum(@NotNull String path, @Nullable T def,
                                                     @NotNull Class<T> clazz) {
         String value = getString(path, def == null ? null : def.name());
@@ -694,7 +724,7 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
-     * assumes that enum costants are all uppercased null enum values contained in
+     * assumes that enum constants are all uppercase null enum values contained in
      * def might be lost
      *
      * @param <T>   the class of the enum
@@ -715,7 +745,7 @@ public interface YMLSection extends ConfigurationSection {
                 from.add(enumValue.name());
         }
         from = loadStringList(path, from);
-        if (from == null || from.isEmpty())
+        if (from.isEmpty())
             return destination;
         for (String value : from) {
             T val;
@@ -742,7 +772,7 @@ public interface YMLSection extends ConfigurationSection {
 
 
     /**
-     * assumes that enum costants are all uppercased null enum values contained in
+     * assumes that enum constants are all uppercase null enum values contained in
      * def might be lost
      *
      * @param <T>   the class of the enum
@@ -763,7 +793,7 @@ public interface YMLSection extends ConfigurationSection {
                 from.add(enumValue.name());
         }
         from = getStringList(path, from);
-        if (from == null || from.isEmpty())
+        if (from.isEmpty())
             return destination;
         for (String value : from) {
             T val;
@@ -773,7 +803,7 @@ public interface YMLSection extends ConfigurationSection {
                 val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
-                    val = (T) Enum.valueOf(clazz, value.toUpperCase());
+                    val = Enum.valueOf(clazz, value.toUpperCase());
                 } catch (IllegalArgumentException e2) {
                     e2.printStackTrace();
                     new IllegalArgumentException("Value has wrong type or wrong value at '" + path + ":' on file "
@@ -800,17 +830,17 @@ public interface YMLSection extends ConfigurationSection {
                 from.add(enumValue.name());
         }
         from = loadStringList(path, from);
-        if (from == null || from.isEmpty())
+        if (from.isEmpty())
             return destination;
         for (String value : from) {
             T val;
             try {
                 if (value == null || value.isEmpty())
                     val = null;
-                val = (T) Enum.valueOf(clazz, value);
+                val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
-                    val = (T) Enum.valueOf(clazz, value.toUpperCase());
+                    val = Enum.valueOf(clazz, value.toUpperCase());
                 } catch (IllegalArgumentException e2) {
                     e2.printStackTrace();
                     new IllegalArgumentException("Value has wrong type or wrong value at '" + path + ":' on file "
@@ -836,6 +866,7 @@ public interface YMLSection extends ConfigurationSection {
      * @return object or default
      */
     @SuppressWarnings("unchecked")
+    @Contract("_, !null -> !null")
     default @Nullable <T> Map<String, T> loadMap(@NotNull String path, @Nullable Map<String, T> def) {
         try {
             if (!this.contains(path)) {
@@ -874,10 +905,12 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Sound loadSound(@NotNull String path, @Nullable Sound def) {
         return loadEnum(path, def, Sound.class);
     }
 
+    @Contract("_, !null -> !null")
     default @Nullable Sound getSound(@NotNull String path, @Nullable Sound def) {
         return getEnum(path, def, Sound.class);
     }
@@ -891,6 +924,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Material loadMaterial(@NotNull String path, @Nullable Material def) {
         return loadEnum(path, def, Material.class);
     }
@@ -904,12 +938,12 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default @Nullable List<Material> loadMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
+    default @NotNull List<Material> loadMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
         return loadEnumList(path, def, Material.class);
     }
 
 
-    default @Nullable List<Material> getMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
+    default @NotNull List<Material> getMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
         return getEnumList(path, def, Material.class);
     }
 
@@ -922,8 +956,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default @Nullable EnumSet<Material> loadMaterialSet(@NotNull String path,
-                                                        @Nullable Collection<Material> def) {
+    default @NotNull EnumSet<Material> loadMaterialSet(@NotNull String path,
+                                                       @Nullable Collection<Material> def) {
         return loadEnumSet(path, def, Material.class);
     }
 
@@ -936,6 +970,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable EntityType loadEntityType(@NotNull String path, @Nullable EntityType def) {
         return loadEnum(path, def, EntityType.class);
     }
@@ -949,8 +984,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default @Nullable List<EntityType> loadEntityTypeList(@NotNull String path,
-                                                          @Nullable Collection<EntityType> def) {
+    default @NotNull List<EntityType> loadEntityTypeList(@NotNull String path,
+                                                         @Nullable Collection<EntityType> def) {
         return loadEnumList(path, def, EntityType.class);
     }
 
@@ -963,8 +998,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default @Nullable EnumSet<EntityType> loadEntityTypeSet(@NotNull String path,
-                                                            @Nullable Collection<EntityType> def) {
+    default @NotNull EnumSet<EntityType> loadEntityTypeSet(@NotNull String path,
+                                                           @Nullable Collection<EntityType> def) {
         return loadEnumSet(path, def, EntityType.class);
     }
 
@@ -981,11 +1016,12 @@ public interface YMLSection extends ConfigurationSection {
         return loadEnumSet(path, def == null ? null : Arrays.asList(def), ItemFlag.class).toArray(new ItemFlag[0]);
     }
 
-    default BoundingBox getBoundingBox(String path) {
+    default @Nullable BoundingBox getBoundingBox(@NotNull String path) {
         return getBoundingBox(path, null);
     }
 
-    default BoundingBox getBoundingBox(String path, BoundingBox def) {
+    @Contract("_, !null -> !null")
+    default BoundingBox getBoundingBox(@NotNull String path, BoundingBox def) {
         return get(path, def, BoundingBox.class).clone();
     }
 
@@ -998,7 +1034,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    default BoundingBox loadBoundingBox(String path, BoundingBox def) {
+    @Contract("_, !null -> !null")
+    default BoundingBox loadBoundingBox(@NotNull String path, BoundingBox def) {
         return load(path, def, BoundingBox.class).clone();
     }
 
@@ -1013,6 +1050,7 @@ public interface YMLSection extends ConfigurationSection {
      * @see #loadSection(String, Map)
      */
     @Deprecated
+    @NotNull
     YMLSection createSection(@NotNull String path);
 
     /**
@@ -1027,6 +1065,7 @@ public interface YMLSection extends ConfigurationSection {
      * @see #loadSection(String, Map)
      */
     @Deprecated
+    @NotNull
     YMLSection createSection(@NotNull String path, @NotNull Map<?, ?> map);
 
     /**
@@ -1073,20 +1112,20 @@ public interface YMLSection extends ConfigurationSection {
      * @return YMLSection at specified path or a new generated section
      */
     @NotNull
-    default YMLSection loadSection(String path) {
+    default YMLSection loadSection(@NotNull String path) {
         return loadSection(path, null);
     }
 
     @NotNull
-    default YMLSection loadSection(String path, Map<String, Object> def) {
+    default YMLSection loadSection(@NotNull String path, Map<String, Object> def) {
         if (this.isConfigurationSection(path))
             return getConfigurationSection(path);
         return def == null ? createSection(path) : createSection(path, def);
     }
 
-    void setNoDirty(String path, Object value);
+    void setNoDirty(@NotNull String path, Object value);
 
-    default <T extends Enum<T>> void setEnumsAsStringList(String path, Collection<T> enumValues) {
+    default <T extends Enum<T>> void setEnumsAsStringList(@NotNull String path, Collection<T> enumValues) {
         if (enumValues == null) {
             set(path, null);
             return;
@@ -1097,11 +1136,12 @@ public interface YMLSection extends ConfigurationSection {
         set(path, list);
     }
 
-    default <T extends Enum<T>> void setEnumAsString(String path, T enumValue) {
+    default <T extends Enum<T>> void setEnumAsString(@NotNull String path, T enumValue) {
         set(path, enumValue == null ? null : enumValue.name());
     }
 
-    default List<Integer> getIntegerList(String path, List<Integer> def) {
+    @NotNull
+    default List<Integer> getIntegerList(@NotNull String path, List<Integer> def) {
         List<Integer> val = getIntegerList(path);
         if (val.isEmpty() && def != null)
             return def;

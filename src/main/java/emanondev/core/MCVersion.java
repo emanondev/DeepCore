@@ -124,8 +124,7 @@ public enum MCVersion {
 
     public static boolean hasSpigotAPI() {
         try {
-            if (Class.forName("org.spigotmc.SpigotConfig") != null)
-                return true;
+            Class.forName("org.spigotmc.SpigotConfig");
             return true;
         } catch (ClassNotFoundException e) {
         }
@@ -134,8 +133,8 @@ public enum MCVersion {
 
     public static boolean hasPaperAPI() {
         try {
-            if (Class.forName("com.destroystokyo.paper.VersionHistoryManager.VersionData") != null)
-                return true;
+            Class.forName("com.destroystokyo.paper.VersionHistoryManager.VersionData");
+            return true;
         } catch (ClassNotFoundException e) {
         }
         return false;

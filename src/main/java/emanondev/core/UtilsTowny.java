@@ -9,7 +9,11 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.*;
 
-public class UtilsTowny {
+public final class UtilsTowny {
+
+    private UtilsTowny() {
+        throw new AssertionError();
+    }
 
     @SuppressWarnings("deprecation")
     public static @Nullable Resident getResident(Player p) {

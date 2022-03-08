@@ -38,7 +38,7 @@ public class YMLSubSection extends MemorySection implements YMLSection {
     }
 
     @Override
-    public void setNoDirty(String path, Object value) {
+    public void setNoDirty(@NotNull String path, Object value) {
         super.set(path, value);
     }
 

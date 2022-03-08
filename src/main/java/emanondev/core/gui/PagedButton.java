@@ -1,7 +1,9 @@
 package emanondev.core.gui;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface PagedButton extends GuiButton {
-    PagedGui getGui();
+    @NotNull PagedGui getGui();
 
     /**
      * @return current page

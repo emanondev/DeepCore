@@ -3,10 +3,10 @@ package emanondev.core;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
-public class UtilsExp {
+public final class UtilsExp {
 
-    UtilsExp() {
-        throw new UnsupportedOperationException();
+    private UtilsExp() {
+        throw new AssertionError();
     }
 
     // Calculate amount of EXP needed to level up

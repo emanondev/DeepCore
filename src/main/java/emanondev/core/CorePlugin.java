@@ -397,9 +397,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param silent if false notify console of newly registered permission
      */
     public void registerPermission(@NotNull Permission perm, boolean silent) {
-        if (perm == null)
-            throw new NullPointerException();
-        // boolean save = false;
         YMLConfig config = getConfig("permissions");
         config.options().pathSeparator('|');
         if (!perm.getDescription().isEmpty())

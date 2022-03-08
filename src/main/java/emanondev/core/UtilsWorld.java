@@ -17,10 +17,10 @@ import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-public class UtilsWorld {
+public final class UtilsWorld {
 
-    UtilsWorld() {
-        throw new UnsupportedOperationException();
+    private UtilsWorld() {
+        throw new AssertionError();
     }
 
     /**
