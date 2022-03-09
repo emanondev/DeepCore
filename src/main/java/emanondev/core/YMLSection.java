@@ -98,6 +98,7 @@ public interface YMLSection extends ConfigurationSection {
      * @return object or default
      */
     @SuppressWarnings("unchecked")
+    @Contract("_, !null, _ -> !null")
     default <T> T load(@NotNull String path, T def, Class<T> clazz) {
         Object value = get(path);
         if (value == null) {
@@ -141,6 +142,7 @@ public interface YMLSection extends ConfigurationSection {
      * @return object or default
      */
     @SuppressWarnings("unchecked")
+    @Contract("_, !null, _ -> !null")
     default <T> T get(@NotNull String path, T def, Class<T> clazz) {
         Object value = get(path);
         if (value == null) {
@@ -170,10 +172,12 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable SoundInfo loadSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
         return load(path, def, SoundInfo.class);
     }
 
+    @Contract("_, !null -> !null")
     default @Nullable SoundInfo getSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
         return get(path, def, SoundInfo.class);
     }
@@ -187,6 +191,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Double loadDouble(@NotNull String path, @Nullable Double def) {
         Number val = load(path, def, Number.class);
         return val == null ? null : val.doubleValue();
@@ -201,6 +206,7 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
+    @Contract("_, !null -> !null")
     default @Nullable Boolean getBoolean(@NotNull String path, @Nullable Boolean def) {
         return get(path, def, Boolean.class);
     }

@@ -150,7 +150,6 @@ public abstract class PacketEntity {
             }
         }
         handleUpdatePackets(players);
-
         cache = this.cacheCode();
         return this;
     }
