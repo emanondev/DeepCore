@@ -11,7 +11,7 @@ public class ReloadCommand extends CoreCommand {
 
     public ReloadCommand(CorePlugin plugin) {
         super(plugin.getName() + "reload", plugin,
-                new PermissionBuilder(plugin.getName() + ".reload").setDescription("Allows to reload " + plugin.getName()).build(),
+                PermissionBuilder.ofCommand(plugin,"reload").setDescription("Allows to reload " + plugin.getName()).build(),
                 "reload " + plugin.getName(), null);
         getPlugin().registerPermission(getCommandPermission());
     }
