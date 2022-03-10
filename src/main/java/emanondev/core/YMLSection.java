@@ -1,17 +1,9 @@
 package emanondev.core;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
@@ -26,10 +18,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import java.io.File;
+import java.util.*;
 
 public interface YMLSection extends ConfigurationSection {
 
@@ -106,13 +96,11 @@ public interface YMLSection extends ConfigurationSection {
                 return null;
             else {
                 set(path, def);
-                // saveAsync();
                 return def;
             }
         }
         if (!clazz.isInstance(value)) {
             set(path, def);
-            // saveAsync();
             return def;
         }
         return (T) value;
@@ -359,13 +347,11 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         return UtilsString.fix(load(path, def, String.class), target instanceof Player ? ((Player) target) : null,
@@ -376,13 +362,11 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         try {
@@ -418,14 +402,13 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
+
         try {
             return UtilsString.fix(load(path, def, List.class), target instanceof Player ? ((Player) target) : null,
                     color, holders);
@@ -447,13 +430,11 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable String defMessage,
                                                    @Nullable String defHover, @Nullable String defClick, @Nullable ClickEvent.Action action, boolean color,
                                                    @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + ".USABLE_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + ".USABLE_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
@@ -486,13 +467,11 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, @Nullable ClickEvent.Action action, boolean color,
                                                             @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + ".USABLE_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + ".USABLE_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
@@ -529,13 +508,11 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                    @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
                                                    boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + ".USABLE_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + ".USABLE_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
@@ -563,13 +540,11 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                             @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
                                                             boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0) {
-            if (!this.contains(path + ".USABLE_HOLDERS")) {
-                StringBuilder build = new StringBuilder();
-                for (int i = 0; i < holders.length; i += 2)
-                    build.append(holders[i]).append(" ");
-                this.set(path + ".USABLE_HOLDERS", build.substring(0, build.length() - 1));
-            }
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
         }
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
