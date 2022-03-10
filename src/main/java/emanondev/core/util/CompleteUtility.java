@@ -1,28 +1,24 @@
 package emanondev.core.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import de.myzelyam.api.vanish.VanishAPI;
+import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import de.myzelyam.api.vanish.VanishAPI;
-import emanondev.core.Hooks;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface CompleteUtility {
 
     /**
      * @param sender sender
-     * @param prefix prefix to match, case insensitive
+     * @param prefix prefix to match, case-insensitive
      * @return a list of player names from online players for the given prefix
-     * filthering visible players if vanishAPI is active
+     * filtering visible players if vanishAPI is active
      */
     default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix) {
         return completePlayerNames(sender, prefix, Bukkit.getOnlinePlayers());
@@ -30,15 +26,15 @@ public interface CompleteUtility {
 
     /**
      * @param sender  the sender
-     * @param prefix  prefix to match, case insensitive
+     * @param prefix  prefix to match, case-insensitive
      * @param players which player names are considered?
      * @return a list of player names from the given collection for the given prefix
-     * filthering visible players id vanishAPI is active
+     * filtering visible players if vanishAPI is active
      */
     default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
                                                       @Nullable Collection<? extends Player> players) {
         if (players == null)
-            return new ArrayList<>();
+            return Collections.emptyList();
         if (prefix != null)
             prefix = prefix.toLowerCase();
         else
@@ -56,15 +52,28 @@ public interface CompleteUtility {
         return list;
     }
 
+    /**
+     * @param prefix prefix to match, case-insensitive
+     * @param values values to match
+     * @param eval   how to evaluate values as strings
+     * @return list of strings matching prefix
+     */
     default @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
                                                @NotNull Function<K, String> eval) {
         return complete(prefix, values, eval, null);
     }
 
+    /**
+     * @param prefix  prefix to match, case-insensitive
+     * @param values  values to match
+     * @param eval    how to evaluate values as strings
+     * @param isValid filter on values
+     * @return list of strings matching prefix
+     */
     default @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
                                                @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
         if (values == null)
-            return new ArrayList<>();
+            return Collections.emptyList();
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (K val : values)
@@ -95,9 +104,9 @@ public interface CompleteUtility {
 
     /**
      * @param <K>    the class of the enum
-     * @param prefix prefix to match, case insensitive
+     * @param prefix prefix to match, case-insensitive
      * @param type   class of enums
-     * @return a list of lowcased string from enums of class type matching prefix is
+     * @return a list of low-cased string from enums of class type matching prefix is
      * true (ignoring caps)
      */
     default @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type) {
@@ -116,10 +125,10 @@ public interface CompleteUtility {
 
     /**
      * @param <K>       the class of the enum
-     * @param prefix    prefix to match, case insensitive
+     * @param prefix    prefix to match, case-insensitive
      * @param type      class of enums
-     * @param predicate filther
-     * @return a list of lowcased string from enums of class type matching prefix
+     * @param predicate filter
+     * @return a list of low-cased string from enums of class type matching prefix
      * and predicate.apply() is true (ignoring caps)
      */
     default @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type,
@@ -140,13 +149,13 @@ public interface CompleteUtility {
     }
 
     /**
-     * @param prefix   prefix to match, case insensitive
+     * @param prefix   prefix to match, case-insensitive
      * @param elements elements to match
      * @return a list of strings matching prefix
      */
     default @NotNull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements) {
         if (elements == null)
-            return new ArrayList<>();
+            return Collections.emptyList();
         if (prefix == null || prefix.isEmpty())
             return new ArrayList<>(elements);
         prefix = prefix.toLowerCase();
@@ -158,7 +167,7 @@ public interface CompleteUtility {
     }
 
     /**
-     * @param prefix    prefix to match, case insensitive
+     * @param prefix    prefix to match, case-insensitive
      * @param elements  elements to match
      * @param predicate function to choose if elements should be selected or discarded
      * @return a list of strings matching prefix
@@ -166,7 +175,7 @@ public interface CompleteUtility {
     default @NotNull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements,
                                            @NotNull Predicate<String> predicate) {
         if (elements == null)
-            return new ArrayList<>();
+            return Collections.emptyList();
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (String e : elements)
@@ -182,7 +191,7 @@ public interface CompleteUtility {
     }
 
     /**
-     * @param prefix   prefix to match, case insensitive
+     * @param prefix   prefix to match, case-insensitive
      * @param elements elements to match
      * @return a list of strings matching prefix
      */
@@ -199,13 +208,14 @@ public interface CompleteUtility {
         return results;
     }
 
+    /**
+     * @param prefix  prefix to match, case-insensitive
+     * @return a list of boolean strings matching prefix
+     */
     default @NotNull List<String> completeBoolean(@Nullable String prefix) {
+        if (prefix == null || prefix.isEmpty())
+            return List.of("false","true");
         List<String> results = new ArrayList<>();
-        if (prefix == null || prefix.isEmpty()) {
-            results.add("false");
-            results.add("true");
-            return results;
-        }
         prefix = prefix.toLowerCase();
         if ("true".startsWith(prefix))
             results.add("true");

@@ -32,8 +32,7 @@ public class WorldEditUtility {
     public static Clipboard load(File dest) {
         ClipboardFormat format = ClipboardFormats.findByFile(dest);
         try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
-            Clipboard clipboard = reader.read();
-            return clipboard;
+            return reader.read();
         } catch (Exception e) {
             e.printStackTrace();
         }
