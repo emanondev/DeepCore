@@ -1,5 +1,12 @@
 package emanondev.core;
 
+import emanondev.core.CounterAPI.ResetTime;
+import emanondev.core.gui.Gui;
+import emanondev.core.packetentity.PacketManager;
+import emanondev.core.sql.SQLDatabase;
+import emanondev.core.sql.SQLType;
+import emanondev.core.util.ConsoleLogger;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
@@ -12,14 +19,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import emanondev.core.CounterAPI.ResetTime;
-import emanondev.core.gui.Gui;
-import emanondev.core.packetentity.PacketManager;
-import emanondev.core.sql.SQLDatabase;
-import emanondev.core.sql.SQLType;
-import emanondev.core.util.ConsoleLogger;
-import net.md_5.bungee.api.ChatColor;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -41,8 +40,11 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
     private final EnumMap<CounterAPI.ResetTime, CounterAPI> counterApiMap = new EnumMap<>(
             CounterAPI.ResetTime.class);
+    private final EnumMap<CounterAPI.ResetTime, CounterAPI> persistentCounterApiMap = new EnumMap<>(
+            CounterAPI.ResetTime.class);
 
     private CooldownAPI cooldownApi = null;
+    private CooldownAPI persistentCooldownApi = null;
 
     private final Set<String> registeredPermissions = new HashSet<>();
 
@@ -66,19 +68,15 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
         setupLanguageConfig();
 
-        /*
-         * // Field bukkitCommandMap; try { // bukkitCommandMap = //
-         * Bukkit.getServer().getClass().getDeclaredField("commandMap"); //
-         * bukkitCommandMap.setAccessible(true); // commandMap = (CommandMap)
-         * bukkitCommandMap.get(Bukkit.getServer()); } catch (Exception e) {
-         * e.printStackTrace(); this.onDisable(); return; }
-         */
         if (registerReloadCommand())
             registerCommand(new ReloadCommand(this));
         enable();
         logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
+    /**
+     * @return Unmodifiable set of commands registered by this
+     */
     public Set<Command> getRegisteredCommands() {
         return Collections.unmodifiableSet(registeredCommands);
     }
@@ -234,10 +232,10 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     /**
-     * Should generate a reload command for this plugin?<br>
+     * Generate a reload command for this plugin?<br>
      * <p>
      * If true on enable a command "/{pluginname}reload" is registered<br>
-     * with permission "{pluginname}.reload" to use, by default for OP only.
+     * with permission "{pluginname}.command.reload" to use, by default for OP only.
      *
      * @return true if you wish to auto generate a reload command for this plugin
      * @see ReloadCommand
@@ -260,7 +258,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     /**
      * Enable the plugin. <br>
      * Called by {@link #onEnable()}.<br>
-     * Should register Permissions.<br>
+     * Should register Permissions here.<br>
      * Register Commands and Listeners here.<br>
      * May call {@link #onReload()}.<br>
      *
@@ -290,9 +288,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param listener Listener to register
      * @throws NullPointerException if listener is null
      */
-    public void registerListener(Listener listener) {
-        if (listener == null)
-            throw new NullPointerException();
+    public void registerListener(@NotNull Listener listener) {
         getServer().getPluginManager().registerEvents(listener, this);
     }
 
@@ -303,19 +299,18 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param listener Listener to unregister
      * @throws NullPointerException if listener is null
      */
-    public void unregisterListener(Listener listener) {
-        if (listener == null)
-            throw new NullPointerException();
+    public void unregisterListener(@NotNull Listener listener) {
         HandlerList.unregisterAll(listener);
     }
 
-    private static Object getPrivateField(Object object, String field, Class<?> clazz)
+    @SuppressWarnings("unchecked")
+    private static HashMap<String, Command> getKnownCommands(Object object)
             throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field objectField = clazz.getDeclaredField(field);
+        Field objectField = SimpleCommandMap.class.getDeclaredField("knownCommands");
         objectField.setAccessible(true);
         Object result = objectField.get(object);
         objectField.setAccessible(false);
-        return result;
+        return (HashMap<String, Command>) result;
     }
 
     /**
@@ -352,14 +347,13 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param command Command to unregister
      * @see #registerCommand(Command)
      */
-    @SuppressWarnings("unchecked")
-    public void unregisterCommand(Command command) {
+    public void unregisterCommand(@NotNull Command command) {
         try {
             Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
             CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            HashMap<String, Command> knownCommands = (HashMap<String, Command>) getPrivateField(commandMap,
-                    "knownCommands", SimpleCommandMap.class);
+            HashMap<String, Command> knownCommands = getKnownCommands(commandMap
+            );
             List<String> keys = new ArrayList<>();
             for (String key : knownCommands.keySet())
                 if (knownCommands.get(key).equals(command))
@@ -394,7 +388,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * Adds it to permissions.yml file (read only).
      *
      * @param perm   permission to register
-     * @param silent if false notify console of newly registered permission
+     * @param silent false to notify console of newly registered permission
      */
     public void registerPermission(@NotNull Permission perm, boolean silent) {
         YMLConfig config = getConfig("permissions");
@@ -434,12 +428,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * Gets config file.<br>
      * Also keep tracks of the file and reload it on {@link #onReload()} method
      * calls.<br>
-     * Append ".yml" to file name if not present.
+     * Note: If you wish to not keep the file on memory or to not auto reload the file
+     * on {@link #onReload()} method use {@link YMLConfig} constructor.<br>
+     * Auto-append ".yml" to file name if not present.
      *
      * @param fileName might contains folder separator for file inside folders
      * @return config file at specified path inside plugin folder.
      */
-    public @NotNull YMLConfig getConfig(String fileName) {
+    public @NotNull YMLConfig getConfig(@NotNull String fileName) {
         fileName = YMLConfig.fixName(fileName);
         if (configs.containsKey(fileName))
             return configs.get(fileName);
@@ -450,34 +446,57 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
     /**
      * Gets a Config file based on sender language, or default language if sender is
-     * console on null
+     * not a player
      *
      * @param sender The target of language
      * @return Config file for sender language
      */
     public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
-
-        if (!useMultiLanguage)
-            return getConfig("language" + File.separator + defaultLocale);
-        if (!(sender instanceof Player))
-            return getConfig("language" + File.separator + defaultLocale);
+        if (!useMultiLanguage || !(sender instanceof Player))
+            return getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale));
 
         String locale = ((Player) sender).getLocale().split("_")[0];
         if (languageListIsWhitelist != languagesList.contains(locale))
             locale = defaultLocale;
-        return getConfig("language" + File.separator + locale);
+        String fileName = YMLConfig.fixName("language" + File.separator + locale);
+        if (configs.containsKey(fileName))
+            return configs.get(fileName);
+        YMLConfig config = getConfig(fileName);
+        //if (config.getKeys(false).isEmpty())
+        //    config.
+        config.setDefaults(getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale)));
+        return config;
     }
 
     public CooldownAPI getCooldownAPI() {
-        if (cooldownApi == null)
-            cooldownApi = new CooldownAPI(this);
-        return cooldownApi;
+        return getCooldownAPI(true);
+    }
+
+    public CooldownAPI getCooldownAPI(boolean persistent) {
+        if (!persistent) {
+            if (cooldownApi == null)
+                cooldownApi = new CooldownAPI(null, false);
+            return cooldownApi;
+        }
+        if (persistentCooldownApi == null)
+            persistentCooldownApi = new CooldownAPI(this, true);
+        return persistentCooldownApi;
     }
 
     public CounterAPI getCounterAPI(CounterAPI.ResetTime reset) {
         if (!counterApiMap.containsKey(reset))
             counterApiMap.put(reset, new CounterAPI(this, reset));
         return counterApiMap.get(reset);
+    }
+    public CounterAPI getCounterAPI(CounterAPI.ResetTime reset,boolean persistent) {
+        if (!persistent) {
+            if (!counterApiMap.containsKey(reset))
+                counterApiMap.put(reset, new CounterAPI(null, reset,false));
+            return counterApiMap.get(reset);
+        }
+        if (!persistentCounterApiMap.containsKey(reset))
+            persistentCounterApiMap.put(reset, new CounterAPI(this, reset,true));
+        return persistentCounterApiMap.get(reset);
     }
 
     /**

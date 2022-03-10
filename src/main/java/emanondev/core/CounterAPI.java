@@ -1,11 +1,13 @@
 package emanondev.core;
 
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.UUID;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 
 public class CounterAPI {
 
@@ -45,36 +47,41 @@ public class CounterAPI {
     private final YMLConfig conf;
     private final ResetTime reset;
 
-    CounterAPI(CorePlugin plugin, ResetTime reset) {
-        if (reset == null)
-            throw new NullPointerException();
+    CounterAPI(@NotNull CorePlugin plugin, @NotNull ResetTime reset) {
+        this(plugin, reset, true);
+    }
+
+    @Contract("null, _, true -> fail")
+    CounterAPI(CorePlugin plugin, @NotNull ResetTime reset, boolean persistent) {
         this.reset = reset;
         this.id = reset.getId();
-        conf = plugin.getConfig("counterData.yml");
-        for (String uuid : conf.getKeys(reset.name() + "." + this.id)) {
-            HashMap<String, Long> map = new HashMap<>();
-            for (String counterId : conf.getKeys(reset.name() + "." + this.id + "." + uuid))
-                try {
-                    long value = conf.getLong(reset.name() + "." + this.id + "." + uuid + "." + counterId, 0L);
-                    map.put(counterId, value);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            counters.put(UUID.fromString(uuid), map);
-        }
+        conf = persistent ? plugin.getConfig("counterData.yml") : null;
+        if (conf != null)
+            for (String uuid : conf.getKeys(reset.name() + "." + this.id)) {
+                HashMap<String, Long> map = new HashMap<>();
+                for (String counterId : conf.getKeys(reset.name() + "." + this.id + "." + uuid))
+                    try {
+                        long value = conf.getLong(reset.name() + "." + this.id + "." + uuid + "." + counterId, 0L);
+                        map.put(counterId, value);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                counters.put(UUID.fromString(uuid), map);
+            }
     }
 
     void save() {
-        conf.set(reset.name(), null, false);
-        if (id != reset.getId())
-            return;
-        for (UUID player : counters.keySet()) {
-            HashMap<String, Long> values = counters.get(player);
-            for (String id : values.keySet())
-                if (values.get(id) > 0)
-                    conf.set(reset.name() + "." + this.id + "." + player.toString() + "." + id, values.get(id), false);
+        if (conf != null) {
+            conf.set(reset.name(), null, false);
+            if (id != reset.getId())
+                return;
+            for (UUID player : counters.keySet()) {
+                HashMap<String, Long> values = counters.get(player);
+                for (String id : values.keySet())
+                    if (values.get(id) > 0)
+                        conf.set(reset.name() + "." + this.id + "." + player.toString() + "." + id, values.get(id), false);
+            }
         }
-        conf.save();
     }
 
     //private int day = Calendar.DAY_OF_YEAR;

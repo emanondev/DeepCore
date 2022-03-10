@@ -1,41 +1,57 @@
 package emanondev.core;
 
-import java.util.*;
-
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.UUID;
 
 public class CooldownAPI {
 
     private final YMLConfig conf;
 
-    CooldownAPI(CorePlugin plugin) {
+    CooldownAPI(@NotNull CorePlugin plugin) {
+        this(plugin, true);
+    }
+
+    @Contract("null, true -> fail")
+    CooldownAPI(CorePlugin plugin, boolean persistent) {
+        this(plugin,persistent,"cooldownData.yml");
+    }
+
+    @Contract("_, true, null -> fail; null, true, _ -> fail")
+    CooldownAPI(CorePlugin plugin, boolean persistent,String fileName) {
         long now = System.currentTimeMillis();
-        conf = plugin.getConfig("cooldownData.yml");
-        for (String id : conf.getKeys("users")) {
-            HashMap<String, Long> map = new HashMap<>();
-            cooldowns.put(UUID.fromString(id), map);
-            for (String cooldownId : conf.getKeys("users." + id))
-                try {
-                    long value = conf.getLong("users." + id + "." + cooldownId, 0L);
-                    if (value > now)
-                        map.put(cooldownId, value);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-        }
+        conf = persistent ? plugin.getConfig(fileName) : null;
+        if (conf!=null)
+            for (String id : conf.getKeys("users")) {
+                HashMap<String, Long> map = new HashMap<>();
+                cooldowns.put(UUID.fromString(id), map);
+                for (String cooldownId : conf.getKeys("users." + id))
+                    try {
+                        long value = conf.getLong("users." + id + "." + cooldownId, 0L);
+                        if (value > now)
+                            map.put(cooldownId, value);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+            }
     }
 
     void save() {
-        long now = System.currentTimeMillis();
-        conf.set("users", null, false);
-        for (UUID uuid : cooldowns.keySet()) {
-            HashMap<String, Long> values = cooldowns.get(uuid);
-            for (String id : values.keySet())
-                if (values.get(id) > now)
-                    conf.set("users." + uuid.toString() + "." + id, values.get(id), false);
+        if (conf!=null) {
+            long now = System.currentTimeMillis();
+            conf.set("users", null, false);
+            for (UUID uuid : cooldowns.keySet()) {
+                HashMap<String, Long> values = cooldowns.get(uuid);
+                for (String id : values.keySet())
+                    if (values.get(id) > now)
+                        conf.set("users." + uuid.toString() + "." + id, values.get(id), false);
+            }
+            conf.save();
         }
-        conf.save();
     }
 
     private final HashMap<UUID, HashMap<String, Long>> cooldowns = new HashMap<>();
