@@ -70,7 +70,6 @@ public class YMLSubSection extends MemorySection implements YMLSection {
         if (section == this) {
             YMLSection result = new YMLSubSection(this, key);
             this.set(key, result);
-            //this.map.put(key, result); //TODO i wanna die
             return result;
         }
         return section.createSection(key);
@@ -113,7 +112,7 @@ public class YMLSubSection extends MemorySection implements YMLSection {
 
     @Override
     public @NotNull Set<String> getKeys(@NotNull String path) {
-        if (path == null || path.isEmpty())
+        if (path.isEmpty())
             return getKeys(false);
         ConfigurationSection section = this.getConfigurationSection(path);
         if (section == null)
@@ -142,47 +141,4 @@ public class YMLSubSection extends MemorySection implements YMLSection {
         return (YMLSection) super.getDefaultSection();
     }
 
-    /*
-     * private final YMLConfig parent; private final String subPath;
-     *
-     *
-     * YMLSubSection(ConfigurationSection section) { if (section==null) throw new
-     * NullPointerException(); this.section = section; }
-     *
-     * public YMLSubSection(YMLConfig parent,String path) { if (path==null ||
-     * parent==null) throw new NullPointerException(); if (path.isEmpty()) throw new
-     * IllegalArgumentException(); this.parent = parent; this.subPath = path; }
-     *
-     * @Override public String getFileName() { return parent.getFileName(); }
-     *
-     * @Override public JavaPlugin getPlugin() { return parent.getPlugin(); }
-     *
-     * @Override public boolean reload() { return parent.reload(); }
-     *
-     * @Override public void save() { parent.save(); }
-     *
-     * @Override public void saveAsync() { parent.saveAsync(); }
-     *
-     * @Override public File getFile() { return parent.getFile(); }
-     *
-     * @Override public Set<String> getKeys(String path) { if (path==null ||
-     * path.isEmpty()) return parent.getKeys(subPath); return
-     * parent.getKeys(subPath+"."+path); }
-     *
-     * @Override public boolean isDirty() { return parent.isDirty(); }
-     *
-     * @Override public void set(String path, Object value) { if (path==null ||
-     * path.isEmpty()) throw new IllegalArgumentException();
-     * parent.set(subPath+"."+path,value); }
-     *
-     * @Override public Object get(String path) { if (path==null || path.isEmpty())
-     * throw new IllegalArgumentException(); return parent.get(subPath+"."+path); }
-     *
-     * @Override public boolean contains(String path) { if (path==null ||
-     * path.isEmpty()) throw new IllegalArgumentException(); return
-     * parent.contains(subPath+"."+path); }
-     *
-     * @Override public YMLSection getSubSection(String path) { if (path==null ||
-     * path.isEmpty()) return this; return parent.getSubSection(subPath+"."+path); }
-     */
 }

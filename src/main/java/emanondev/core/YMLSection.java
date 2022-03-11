@@ -352,6 +352,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         return UtilsString.fix(load(path, def, String.class), target instanceof Player ? ((Player) target) : null,
@@ -367,6 +368,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         try {
@@ -407,6 +409,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         try {
@@ -435,6 +438,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
@@ -472,6 +476,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
@@ -513,6 +518,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
@@ -545,6 +551,7 @@ public interface YMLSection extends ConfigurationSection {
             for (int i = 0; i < holders.length; i += 2)
                 build.append(holders[i]).append(" ");
             this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
         }
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),

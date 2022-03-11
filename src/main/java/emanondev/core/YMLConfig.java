@@ -174,20 +174,19 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         }
         boolean existed = file.exists();
         if (!file.exists()) {
-
-            if (!file.getParentFile().exists()) { // Create parent folders if they don't exist
+            if (!file.getParentFile().exists())  // Create parent folders if they don't exist
                 file.getParentFile().mkdirs();
-            }
-            if (plugin.getResource(name) != null) {
+
+            if (plugin.getResource(name) != null)
                 plugin.saveResource(name, true); // Save the one from the JAR if possible
-            } else {
+            else
                 try {
                     file.createNewFile();
                 } // Create a blank file if there's not one to copy from the JAR
                 catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
+
         }
         try {
             this.load(file);
