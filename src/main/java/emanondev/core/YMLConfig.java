@@ -1,15 +1,17 @@
 package emanondev.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.apache.commons.lang.Validate;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.FireworkEffect.Builder;
 import org.bukkit.FireworkEffect.Type;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,13 +24,17 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class YMLConfig extends YamlConfiguration implements YMLSection {
-    private JavaPlugin plugin;
-    private File file;
-    private String name;
+    private final JavaPlugin plugin;
+    private final File file;
+    private final String name;
 
     @Deprecated
     public YMLSection getConfigurationSection(@NotNull String path) {
@@ -120,22 +126,19 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @throws IllegalArgumentException if name is empty
      */
     public YMLConfig(@NotNull JavaPlugin plugin, @NotNull String name) {
-        this(plugin, new File(plugin.getDataFolder(), fixName(name)));
-        /*
-         * Validate.notNull(plugin, "plugin is null"); this.plugin = plugin; name =
-         * fixName(name); this.name = name; file = new File(plugin.getDataFolder(),
-         * name); reload();
-         */
+        this(plugin, new File(plugin.getDataFolder(), fixName(name)), fixName(name));
     }
 
     public YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file) {
-        Validate.notNull(plugin, "plugin is null");
-        Validate.notNull(plugin, "file is null");
+        this(plugin, file, file.getName());
+    }
+
+    private YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file, @NotNull String name) {
         if (file.isDirectory())
             throw new IllegalStateException("file is a directory");
         this.plugin = plugin;
         this.file = file;
-        this.name = file.getName();
+        this.name = name;
         reload();
     }
 
@@ -147,8 +150,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @throws NullPointerException     if name is null
      * @throws IllegalArgumentException if name is empty
      */
-    public static String fixName(String name) {
-        Validate.notNull(name, "YAML file must have a name!");
+    public static String fixName(@NotNull String name) {
         Validate.notEmpty(name, "YAML file must have a name!");
         if (!name.endsWith(".yml"))
             name += ".yml";
@@ -176,8 +178,8 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             if (!file.getParentFile().exists()) { // Create parent folders if they don't exist
                 file.getParentFile().mkdirs();
             }
-            if (plugin.getResource(file.getName()) != null) {
-                plugin.saveResource(file.getName(), true); // Save the one from the JAR if possible
+            if (plugin.getResource(name) != null) {
+                plugin.saveResource(name, true); // Save the one from the JAR if possible
             } else {
                 try {
                     file.createNewFile();
@@ -192,15 +194,11 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (plugin.getResource(file.getName()) != null) { // Set up defaults in case their config is broked.
-            InputStreamReader defConfigStream = null;
-            try {
-                defConfigStream = new InputStreamReader(plugin.getResource(file.getName()), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            this.setDefaults(YamlConfiguration.loadConfiguration(defConfigStream));
-        }
+        InputStream resource = plugin.getResource(name);
+        if (resource != null)
+            // Set up defaults in case their config is broked.
+            this.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8)));
+
         return existed;
     }
 
@@ -219,7 +217,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     private BukkitTask delayedSave = null;
 
     public void saveAsync() {
-        if (dirty == false || delayedSave != null)
+        if (!dirty || delayedSave != null)
             return;
         try {
 
@@ -245,11 +243,11 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 
     @Override
     public @NotNull Set<String> getKeys(@NotNull String path) {
-        if (path == null || path.isEmpty())
+        if (path.isEmpty())
             return getKeys(false);
         ConfigurationSection section = this.getConfigurationSection(path);
         if (section == null)
-            return new LinkedHashSet<String>();
+            return new LinkedHashSet<>();
         else
             return section.getKeys(false);
     }
@@ -300,12 +298,13 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def) {
         try {
             return get(path, def, List.class);
         } catch (Exception e) {
             e.printStackTrace();
-            return def;
+            return def == null ? Collections.emptyList() : def;
         }
     }
 
@@ -315,9 +314,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             if (type == null)
                 return def;
             Builder builder = FireworkEffect.builder().with(type)
-                    .flicker(loadBoolean(path + ".flicker", def == null ? false : def.hasFlicker()))
-                    .trail(loadBoolean(path + ".trail", def == null ? false : def.hasTrail()))
-                    .withColor(loadColors(path + ".colors", def == null ? Arrays.asList(Color.RED) : def.getColors()))
+                    .flicker(loadBoolean(path + ".flicker", def != null && def.hasFlicker()))
+                    .trail(loadBoolean(path + ".trail", def != null && def.hasTrail()))
+                    .withColor(loadColors(path + ".colors", def == null ? List.of(Color.RED) : def.getColors()))
                     .withFade(loadColors(path + ".fade_colors", def == null ? new ArrayList<>() : def.getFadeColors()));
             return builder.build();
         } catch (Exception e) {
@@ -331,11 +330,11 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         try {
             Type type = getEnum(path + ".type", def == null ? null : def.getType(), FireworkEffect.Type.class);
             if (type == null)
-                return def;
+                return null;
             Builder builder = FireworkEffect.builder().with(type)
-                    .flicker(getBoolean(path + ".flicker", def == null ? false : def.hasFlicker()))
-                    .trail(getBoolean(path + ".trail", def == null ? false : def.hasTrail()))
-                    .withColor(getColors(path + ".colors", def == null ? Arrays.asList(Color.RED) : def.getColors()))
+                    .flicker(getBoolean(path + ".flicker", def != null && def.hasFlicker()))
+                    .trail(getBoolean(path + ".trail", def != null && def.hasTrail()))
+                    .withColor(getColors(path + ".colors", def == null ? List.of(Color.RED) : def.getColors()))
                     .withFade(getColors(path + ".fade_colors", def == null ? new ArrayList<>() : def.getFadeColors()));
             return builder.build();
         } catch (Exception e) {
@@ -366,7 +365,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         for (String color : rgb) {
             try {
                 String[] args = color.split(" ");
-                colors.add(Color.fromRGB(Integer.valueOf(args[0]), Integer.valueOf(args[1]), Integer.valueOf(args[2])));
+                colors.add(Color.fromRGB(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
             } catch (Exception e) {
                 e.printStackTrace();
                 new IllegalArgumentException("color rgb format example '0 20 255'").printStackTrace();
@@ -376,7 +375,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     private @NotNull List<String> colorsToStringList(Collection<Color> colors) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         if (colors != null)
             for (Color color : colors)
                 list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
@@ -388,7 +387,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     private String getError(String path) {
-        return "Value has wrong type or wrong value at '" + path + ":' on file " + file.getName();
+        return "Value has wrong type or wrong value at '" + path + ":' on file " + name;
     }
 
     /**
@@ -399,7 +398,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @return int value or default
      */
     @Deprecated
-    public @Nullable int loadInt(@NotNull String path, @Nullable Integer def) {
+    public int loadInt(@NotNull String path, @Nullable Integer def) {
         Number val = load(path, def, Number.class);
         return val == null ? 0 : val.intValue();
     }
@@ -442,9 +441,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                                        boolean color, String... args) {
         if (args.length > 0) {
             if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder("");
+                StringBuilder build = new StringBuilder();
                 for (int i = 0; i < args.length; i += 2)
-                    build.append(args[i] + " ");
+                    build.append(args[i]).append(" ");
                 this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
             }
         }
@@ -479,9 +478,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                                       boolean color, String... args) {
         if (args.length > 0 && this.contains(path))
             if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder("");
+                StringBuilder build = new StringBuilder();
                 for (int i = 0; i < args.length; i += 2)
-                    build.append(args[i] + " ");
+                    build.append(args[i]).append(" ");
                 this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
                 save();
             }
@@ -539,9 +538,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                                                 @Nullable Player target, boolean color, String... args) {
         if (args.length > 0) {
             if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder("");
+                StringBuilder build = new StringBuilder();
                 for (int i = 0; i < args.length; i += 2)
-                    build.append(args[i] + " ");
+                    build.append(args[i]).append(" ");
                 this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
             }
         }
@@ -549,7 +548,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             return UtilsString.fix(load(path, def, List.class), target, color, args);
         } catch (Exception e) {
             e.printStackTrace();
-            return UtilsString.fix(def, target, color, args);
+            return def == null ? Collections.emptyList() : UtilsString.fix(def, target, color, args);
         }
     }
 
@@ -584,9 +583,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                                                @Nullable Player target, boolean color, String... args) {
         if (args.length > 0) {
             if (!this.contains(path + "_HOLDERS")) {
-                StringBuilder build = new StringBuilder("");
+                StringBuilder build = new StringBuilder();
                 for (int i = 0; i < args.length; i += 2)
-                    build.append(args[i] + " ");
+                    build.append(args[i]).append(" ");
                 this.set(path + "_HOLDERS", build.substring(0, build.length() - 1));
             }
         }
@@ -622,12 +621,12 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     public @Nullable ComponentBuilder loadSimpleComponentBuilder(@NotNull String path, @Nullable String defMessage,
                                                                  @Nullable String defHover, @Nullable String defClickSuggest, @Nullable CommandSender target, boolean color,
                                                                  String... holders) {
-        Player p = (target instanceof Player) ? null : ((Player) target);
+        Player p = (target instanceof Player) ? ((Player) target) : null;
         String message = loadString(path + ".message", defMessage, p, color, holders);
 
         if (message == null || message.isEmpty())
             return null;
-        if (holders != null && holders.length > 0) {
+        if (holders.length > 0) {
             String HOLDERS = "";
             for (int i = 0; i < holders.length; i += 2)
                 HOLDERS = HOLDERS + holders[i] + " ";
