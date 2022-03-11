@@ -7,23 +7,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 import net.milkbowl.vault.economy.Economy;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 public class VaultEconomyHandler {
 
-    private final static Economy economy = Bukkit.getServer().getServicesManager()
+    private static Economy economy = Bukkit.getServer().getServicesManager()
             .getRegistration(net.milkbowl.vault.economy.Economy.class).getProvider();
 
-    private static final DecimalFormat format = createFormat();
-
-    private static DecimalFormat createFormat() {
-        DecimalFormat format = new DecimalFormat("#.0");
-        int fractions = economy.fractionalDigits();
-        if (fractions == -1)
-            fractions = 0;
-        format.setMinimumFractionDigits(fractions);
-        format.setMaximumFractionDigits(fractions);
-        format.setRoundingMode(RoundingMode.DOWN);
-        return format;
+    public static void updateEconomy(){
+        economy = Bukkit.getServer().getServicesManager()
+                .getRegistration(net.milkbowl.vault.economy.Economy.class).getProvider();
     }
 
     /**
@@ -33,7 +27,7 @@ public class VaultEconomyHandler {
      * @param amount to check for
      * @return True if <b>player</b> has <b>amount</b>, False else wise
      */
-    public boolean hasMoney(OfflinePlayer player, double amount) {
+    public boolean hasMoney(@NotNull OfflinePlayer player, double amount) {
         return getMoney(player) >= amount;
     }
 
@@ -43,7 +37,7 @@ public class VaultEconomyHandler {
      * @param player of the player
      * @return Amount currently held in players account
      */
-    public double getMoney(OfflinePlayer player) {
+    public double getMoney(@NotNull OfflinePlayer player) {
         return economy.getBalance(player);
     }
 
@@ -54,7 +48,7 @@ public class VaultEconomyHandler {
      * @param amount Amount to deposit
      * @return True if operation was successful
      */
-    public boolean addMoney(OfflinePlayer player, double amount) {
+    public boolean addMoney(@NotNull OfflinePlayer player, double amount) {
         return economy.depositPlayer(player, amount).transactionSuccess();
     }
 
@@ -65,7 +59,7 @@ public class VaultEconomyHandler {
      * @param amount Amount to withdraw
      * @return True if operation was successful
      */
-    public boolean removeMoney(OfflinePlayer player, double amount) {
+    public boolean removeMoney(@NotNull OfflinePlayer player, double amount) {
         return economy.withdrawPlayer(player, amount).transactionSuccess();
     }
 
@@ -77,9 +71,7 @@ public class VaultEconomyHandler {
      * @param amount Amount to transfer
      * @return True if operation was successful
      */
-    public boolean payMoney(OfflinePlayer from, OfflinePlayer to, double amount) {
-        if (from == null || to == null)
-            throw new NullPointerException();
+    public boolean payMoney(@NotNull OfflinePlayer from,@NotNull  OfflinePlayer to, double amount) {
         if (!removeMoney(from, amount))
             return false;
         if (addMoney(to, amount))
@@ -106,13 +98,13 @@ public class VaultEconomyHandler {
     }
 
     /**
-     * Format a value with economy fractional digits amount
+     * Format a value with 2 fractional digits amount
      *
      * @param value Value to format
      * @return string value of formatted amount
      */
     public String format(double value) {
-        return format.format(value);
+        return UtilsString.formatForced2Digit(value);
     }
 
     public String getCurrencyNamePlural() {
