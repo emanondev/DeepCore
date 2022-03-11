@@ -29,7 +29,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
     private LoggerManager loggerManager;
 
-    private boolean useMultiLanguage = false;
+    private boolean useMultiLanguage = true;
     private String defaultLocale;
     private final List<String> languagesList = new ArrayList<>();
     private boolean languageListIsWhitelist = false;
@@ -83,8 +83,8 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
     private void setupLanguageConfig() {
         YMLConfig language = getConfig("languageConfig.yml");
-        useMultiLanguage = language.loadBoolean("use-multi-language", false);
         defaultLocale = language.loadString("default-locale", "en");
+        useMultiLanguage = language.loadBoolean("use-multi-language", true);
         languagesList.clear();
         languagesList.addAll(language.loadStringList("allowed-languages.list", new ArrayList<>()));
         languageListIsWhitelist = language.loadBoolean("allowed-languages.is-whitelist", false);
@@ -189,12 +189,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (cooldownApi != null) {
-            cooldownApi.save();
+        if (persistentCooldownApi != null) {
+            persistentCooldownApi.save();
             logDone("Saved &acooldownAPI &fcache");
         }
-        for (ResetTime reset : counterApiMap.keySet()) {
-            counterApiMap.get(reset).save();
+        for (ResetTime reset : persistentCounterApiMap.keySet()) {
+            persistentCounterApiMap.get(reset).save();
             logDone("Saved &acounterAPI " + reset.name().toLowerCase() + " &fcache");
         }
         enabledModules.forEach((k, v) -> {
