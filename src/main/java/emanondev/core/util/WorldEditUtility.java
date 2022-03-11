@@ -29,6 +29,10 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 
 public class WorldEditUtility {
 
+    private WorldEditUtility() {
+        throw new AssertionError();
+    }
+
     public static Clipboard load(File dest) {
         ClipboardFormat format = ClipboardFormats.findByFile(dest);
         try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {

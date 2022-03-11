@@ -13,6 +13,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,9 +47,9 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                 if (button.match(getRenameText()))
                     activeButtons.add(button);
         } else
-            for (int i = 0; i < buttons.size(); i++)
-                if (show.test(buttons.get(i).getValue()) && buttons.get(i).match(getRenameText()))
-                    activeButtons.add(buttons.get(i));
+            for (ContainerButton button : buttons)
+                if (show.test(button.getValue()) && button.match(getRenameText()))
+                    activeButtons.add(button);
 
         if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
             reloadInventory();
@@ -58,26 +59,26 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     /**
-     * @param title          may be null
-     * @param base
-     * @param player         may be null
-     * @param previousHolder may be null
-     * @param plugin
+     * @param title          title of the gui
+     * @param base           base item
+     * @param player         target player
+     * @param previousHolder previous gui
+     * @param plugin         plugin of the gui
      */
-    public AdvancedResearchGui(String title, ItemStack base, Player player, Gui previousHolder,
+    public AdvancedResearchGui(@Nullable String title, ItemStack base, Player player, @Nullable Gui previousHolder,
                                @NotNull CorePlugin plugin) {
         this(title, base, player, previousHolder, plugin, false);
     }
 
     /**
-     * @param title          may be null
-     * @param base
-     * @param player         may be null
-     * @param previousHolder may be null
-     * @param plugin
-     * @param isTimerUpdated
+     * @param title          title of the gui
+     * @param base           base item
+     * @param player         target player
+     * @param previousHolder previous gui
+     * @param plugin         plugin of the gui
+     * @param isTimerUpdated update the gui every second?
      */
-    public AdvancedResearchGui(String title, ItemStack base, Player player, Gui previousHolder,
+    public AdvancedResearchGui(@Nullable String title, ItemStack base, @Nullable Player player, @Nullable Gui previousHolder,
                                @NotNull CorePlugin plugin, boolean isTimerUpdated) {
         super(title, player, previousHolder, plugin, isTimerUpdated);
         this.page = Math.max(1, page);
@@ -108,7 +109,9 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
             updateControlButtons();
     }
-
+    /**
+     * @param slot must be 0-8 value if button should be shown
+     */
     public void setPreviousPageSlot(int slot) {
         if (slot == previousPageSlot)
             return;
@@ -121,6 +124,9 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
             updateControlButtons();
     }
 
+    /**
+     * @param slot must be 0-8 value if button should be shown
+     */
     public void setBackGuiSlot(int slot) {
         if (slot == backGuiSlot)
             return;
@@ -156,6 +162,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     /**
      * returns true if the page changed
      */
+    @Override
     public boolean setPage(int pag) {
         pag = Math.min(Math.max(1, pag), getMaxPage());
         if (pag == page)
@@ -195,7 +202,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         controlButtons[slot] = button;
         InventoryView view = getView();
         if (view != null)
-            view.getBottomInventory().setItem(/* PLAYER_INVENTORY_SIZE - 9 */ +slot, button == null ? null : button.getItem());
+            view.getBottomInventory().setItem(slot, button == null ? null : button.getItem());
     }
 
     /**

@@ -75,6 +75,7 @@ public abstract class Module implements Listener, ConsoleLogger {
      *
      * @param log Message to print
      */
+    @Override
     public void log(String log) {
         Bukkit.getConsoleSender()
                 .sendMessage(ChatColor.translateAlternateColorCodes('&',

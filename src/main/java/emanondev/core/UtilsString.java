@@ -128,7 +128,7 @@ public final class UtilsString {
         return itemCopy;
     }
 
-    @Contract("!null, _, _, _ -> !null")
+    @Contract("!null, _, _, _ -> !null; null, _, _, _ -> null")
     public static String fix(@Nullable String text, @Nullable Player papiTarget, boolean color, String... holders) {
         if (text == null)
             return null;
@@ -154,7 +154,7 @@ public final class UtilsString {
      * @param text Text to revert
      * @return a string with original colors and formats but with &amp; instead of §
      */
-    @Contract("!null -> !null")
+    @Contract("!null -> !null; null -> null")
     public static @Nullable String revertColors(@Nullable String text) {
         if (text == null)
             return null;
@@ -165,7 +165,7 @@ public final class UtilsString {
      * @param text Text to clear
      * @return a string with no colors and no formats
      */
-    @Contract("!null -> !null")
+    @Contract("!null -> !null; null -> null")
     public static @Nullable String clearColors(@Nullable String text) {
         if (text == null)
             return null;

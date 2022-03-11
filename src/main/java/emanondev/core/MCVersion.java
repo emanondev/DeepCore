@@ -23,7 +23,9 @@ public enum MCVersion {
         return version;
     }
 
-    public static MCVersion fromPackageName(String packageName) {
+    private static MCVersion fromPackageName(String packageName) {
+        if (packageName.contains("1_18_R1"))
+            return V1_18;
         if (packageName.contains("1_17_R1"))
             return V1_17;
         if (packageName.contains("1_16_R3"))

@@ -10,7 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * PaperLib is shaded inside the plugin, you can use it here instead of shading on every plugin where it is required
+ */
 public class PaperLib {
+
+    private PaperLib() {
+        throw new AssertionError();
+    }
 
     /**
      * Teleports an Entity to the target location, loading the chunk asynchronously first if needed.

@@ -41,8 +41,6 @@ public abstract class AnvilGui implements TextGui {
      * @param isTimerUpdated update the inventory each seconds as long as it has at least a player
      */
     public AnvilGui(@Nullable String title, @Nullable Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, boolean isTimerUpdated) {
-        if (plugin == null)
-            throw new NullPointerException();
         this.previousHolder = previousHolder;
         this.player = p;
         this.inv = Bukkit.createInventory(this, InventoryType.ANVIL, UtilsString.fix(title, player, true));
@@ -78,7 +76,7 @@ public abstract class AnvilGui implements TextGui {
     /**
      * Sets whenever the inventory should be updated when a player open it
      *
-     * @param value
+     * @param value whenever the inventory should be updated when a player open it or not
      */
     public void setUpdateOnOpen(boolean value) {
         this.updateOnOpen = value;
