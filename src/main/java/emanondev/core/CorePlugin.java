@@ -109,8 +109,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         long now = System.currentTimeMillis();
         try {
             // TODO bad
-            if (!new File(this.getDataFolder(), "permissions.yml").delete())
-                new Exception("Unable to delete file permissions.yml").printStackTrace();
+            File file = new File(this.getDataFolder(), "permissions.yml");
+            if (file.exists() && !file.delete())
+                    new Exception("Unable to delete file permissions.yml").printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -461,10 +462,13 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         String fileName = YMLConfig.fixName("language" + File.separator + locale);
         if (configs.containsKey(fileName))
             return configs.get(fileName);
+
         YMLConfig config = getConfig(fileName);
+
         //if (config.getKeys(false).isEmpty())
         //    config.
-        config.setDefaults(getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale)));
+        if (!defaultLocale.equals(locale))
+            config.setDefaults(getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale)));
         return config;
     }
 
@@ -488,14 +492,15 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             counterApiMap.put(reset, new CounterAPI(this, reset));
         return counterApiMap.get(reset);
     }
-    public CounterAPI getCounterAPI(CounterAPI.ResetTime reset,boolean persistent) {
+
+    public CounterAPI getCounterAPI(CounterAPI.ResetTime reset, boolean persistent) {
         if (!persistent) {
             if (!counterApiMap.containsKey(reset))
-                counterApiMap.put(reset, new CounterAPI(null, reset,false));
+                counterApiMap.put(reset, new CounterAPI(null, reset, false));
             return counterApiMap.get(reset);
         }
         if (!persistentCounterApiMap.containsKey(reset))
-            persistentCounterApiMap.put(reset, new CounterAPI(this, reset,true));
+            persistentCounterApiMap.put(reset, new CounterAPI(this, reset, true));
         return persistentCounterApiMap.get(reset);
     }
 
