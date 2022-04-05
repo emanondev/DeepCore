@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -740,7 +741,8 @@ public interface YMLSection extends ConfigurationSection {
             try {
                 if (value == null || value.isEmpty())
                     val = null;
-                val = Enum.valueOf(clazz, value);
+                else
+                    val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
                     val = Enum.valueOf(clazz, value.toUpperCase());
@@ -788,6 +790,7 @@ public interface YMLSection extends ConfigurationSection {
             try {
                 if (value == null || value.isEmpty())
                     val = null;
+                else
                 val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
@@ -825,6 +828,7 @@ public interface YMLSection extends ConfigurationSection {
             try {
                 if (value == null || value.isEmpty())
                     val = null;
+                else
                 val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
@@ -1134,6 +1138,66 @@ public interface YMLSection extends ConfigurationSection {
         if (val.isEmpty() && def != null)
             return def;
         return val;
+    }
+
+    /**
+     * Paths are material glow amount unbreakable customModelData damage
+     * @param path path to item config
+     * @param defMaterial default material
+     * @return gui item
+     */
+    @NotNull
+    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial){
+        return loadGuiItem(path, defMaterial, false, 1,false);
+    }
+
+    /**
+     * Paths are material glow amount unbreakable customModelData damage
+     * @param path path to item config
+     * @param defMaterial default material
+     * @param defGlow default glow value
+     * @return gui item
+     */
+    @NotNull
+    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow){
+        return loadGuiItem(path, defMaterial, defGlow, 1,false);
+    }
+
+    /**
+     * Paths are material glow amount unbreakable customModelData damage
+     * @param path path to item config
+     * @param defMaterial default material
+     * @param defGlow default glow value
+     * @param defAmount default amount
+     * @return gui item
+     */
+    @NotNull
+    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow,int defAmount){
+        return loadGuiItem(path, defMaterial, defGlow, defAmount,false);
+    }
+
+    /**
+     * Paths are material glow amount unbreakable customModelData damage
+     * @param path path to item config
+     * @param defMaterial default material
+     * @param defGlow default glow value
+     * @param defAmount default amount
+     * @param defUnbreakable default unbreakable value
+     * @return gui item
+     */
+    @NotNull
+    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow,int defAmount,boolean defUnbreakable){
+        if (this.get(path) instanceof ItemStack) {
+            ((CorePlugin) getPlugin()).log(this.getFileName()+" Path "+path+" isItemStack? true");
+            return new ItemBuilder(loadItemStack(path, new ItemStack(Material.STONE)));
+        }
+        YMLSection section = this.loadSection(path);
+
+        return new ItemBuilder(section.loadMaterial("material",defMaterial))
+                .hideAllFlags().addEnchantment(Enchantment.DURABILITY,section.getBoolean("glow",defGlow)?1:0)
+                .setAmount(section.getInteger("amount",defAmount)).setUnbreakable(section.getBoolean("unbreakable",defUnbreakable))
+                .setCustomModelData(section.getInteger("customModelData",0))
+                .setDamage(section.getInteger("damage",0));
     }
 
 }
