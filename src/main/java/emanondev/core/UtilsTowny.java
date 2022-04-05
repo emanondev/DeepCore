@@ -1,13 +1,18 @@
 package emanondev.core;
 
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
+import com.palmergames.bukkit.towny.object.Nation;
+import com.palmergames.bukkit.towny.object.Resident;
+import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.object.TownBlock;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
-import com.palmergames.bukkit.towny.object.*;
+import java.util.Collection;
 
 public final class UtilsTowny {
 
@@ -15,19 +20,23 @@ public final class UtilsTowny {
         throw new AssertionError();
     }
 
-    @SuppressWarnings("deprecation")
     public static @Nullable Resident getResident(Player p) {
-        try {
-            return TownyAPI.getInstance().getDataSource().getResident(p.getName());
-        } catch (NotRegisteredException e) {
-            return null;
-        }
+        return TownyUniverse.getInstance().getResident(p.getName());
+    }
+
+
+    public static @NotNull Collection<Town> getTowns() {
+        return TownyUniverse.getInstance().getTowns();
+    }
+
+    public static @NotNull Collection<Nation> getNations() {
+        return TownyUniverse.getInstance().getNations();
     }
 
     public static @Nullable Town getTown(Player p) {
         try {
             Resident r = getResident(p);
-            return r.hasTown() ? r.getTown() : null;
+            return r!=null && r.hasTown() ? r.getTown() : null;
         } catch (Exception e) {
             return null;
         }
