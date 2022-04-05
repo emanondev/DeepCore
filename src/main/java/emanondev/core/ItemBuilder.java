@@ -247,7 +247,14 @@ public class ItemBuilder {
         if (this.resultMeta instanceof Damageable)
             ((Damageable) this.resultMeta).setDamage(dmg);
         else
-            new IllegalStateException("meta is not Damageable").printStackTrace();
+            if (dmg!=0)
+                new IllegalStateException("meta is not Damageable").printStackTrace();
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public ItemBuilder setCustomModelData(int data) {
+        this.resultMeta.setCustomModelData(data);
         return this;
     }
 
