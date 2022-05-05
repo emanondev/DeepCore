@@ -1,8 +1,9 @@
 package emanondev.core;
 
-import emanondev.core.CounterAPI.ResetTime;
 import emanondev.core.gui.Gui;
 import emanondev.core.packetentity.PacketManager;
+import emanondev.core.spigot.Metrics;
+import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
 import emanondev.core.util.ConsoleLogger;
@@ -32,28 +33,17 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     private boolean useMultiLanguage = true;
     private String defaultLocale;
     private final HashMap<String, YMLConfig> languageConfigs = new HashMap<>();
-
     private final HashMap<String, YMLConfig> configs = new HashMap<>();
-
     private final HashSet<Command> registeredCommands = new HashSet<>();
-
-    private final EnumMap<CounterAPI.ResetTime, CounterAPI> counterApiMap = new EnumMap<>(
-            CounterAPI.ResetTime.class);
-    private final EnumMap<CounterAPI.ResetTime, CounterAPI> persistentCounterApiMap = new EnumMap<>(
-            CounterAPI.ResetTime.class);
-
+    private final EnumMap<CounterAPI.ResetTime, CounterAPI> counterApiMap = new EnumMap<>(CounterAPI.ResetTime.class);
+    private final EnumMap<CounterAPI.ResetTime, CounterAPI> persistentCounterApiMap = new EnumMap<>(CounterAPI.ResetTime.class);
     private CooldownAPI cooldownApi = null;
     private CooldownAPI persistentCooldownApi = null;
-
     private final Set<String> registeredPermissions = new HashSet<>();
-
     private final HashSet<SQLDatabase> connections = new HashSet<>();
-
     private PacketManager packetManager = null;
-
     private final Map<String, Module> modules = new HashMap<>();
-
-    private final Map<String, Boolean> enabledModules = new HashMap<>();
+    private final Set<Module> enabledModules = new HashSet<>();
 
     /**
      * Enable the plugin. <br>
@@ -67,8 +57,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
         setupLanguageConfig();
 
-        if (registerReloadCommand())
-            registerCommand(new ReloadCommand(this));
+        if (registerReloadCommand()) registerCommand(new ReloadCommand(this));
         enable();
         logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
@@ -81,14 +70,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     private void setupLanguageConfig() {
-        YMLConfig language = getConfig("languageConfig.yml");
-        defaultLocale = language.loadString("default-locale", "en");
-        useMultiLanguage = language.loadBoolean("use-multi-language", true);
+        defaultLocale = getConfig().loadString("language.default-locale", "en");
+        useMultiLanguage = getConfig().loadBoolean("language.multilanguage", true);
 
         if (useMultiLanguage) {
             this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
-        } else
-            this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
+        } else this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
     }
 
     /**
@@ -103,7 +90,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             // TODO bad
             File file = new File(this.getDataFolder(), "permissions.yml");
             if (file.exists() && !file.delete())
-                    new Exception("Unable to delete file permissions.yml").printStackTrace();
+                new Exception("Unable to delete file permissions.yml").printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,20 +108,18 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      */
     public final void onReload() {
         long now = System.currentTimeMillis();
-        {
-            for (YMLConfig conf : configs.values())
-                try {
-                    if (conf.getFile().exists())
-                        conf.reload();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-        }
+
+        for (YMLConfig conf : configs.values())
+            try {
+                if (conf.getFile().exists()) conf.reload();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         setupLanguageConfig();
         languageConfigs.clear();
         getLanguageConfig(null);
-        if (loggerManager != null)
-            loggerManager.reload();
+        if (loggerManager != null) loggerManager.reload();
 
         try {
             reload();
@@ -143,21 +128,21 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         }
 
         for (Module module : modules.values()) {
-            if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true) != enabledModules
-                    .get(module.getID())) {
-                enabledModules.put(module.getID(), !enabledModules.get(module.getID()));
-                if (enabledModules.get(module.getID())) {
+            if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true) != enabledModules.contains(module)) {
+                //enabledModules.put(module.getID(), !enabledModules.get(module.getID()));
+                if (!enabledModules.contains(module)) {
+                    enabledModules.add(module);
                     module.enable();
                     this.registerListener(module);
                     this.logDone("Enabled module &e" + module.getID());
                 } else {
+                    enabledModules.remove(module);
                     HandlerList.unregisterAll(module);
                     module.disable();
                     this.logDone("Disabled module &e" + module.getID());
                 }
             }
-            enabledModules.get(module.getID());
-            module.reload();
+            if (enabledModules.contains(module)) module.reload();
         }
         logPentaStar(ChatColor.YELLOW, "Reloaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
@@ -174,8 +159,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     public final void onDisable() {
         long now = System.currentTimeMillis();
         for (Player p : Bukkit.getOnlinePlayers())
-            if (p.getOpenInventory().getTopInventory().getHolder() instanceof Gui
-                    && this.equals(((Gui) p.getOpenInventory().getTopInventory().getHolder()).getPlugin())) {
+            if (p.getOpenInventory().getTopInventory().getHolder() instanceof Gui && this.equals(((Gui) p.getOpenInventory().getTopInventory().getHolder()).getPlugin())) {
                 p.closeInventory();
                 this.logDone("Safely closing gui for &e" + p.getName() + " &fto prevent dupe glitches");
             }
@@ -186,18 +170,18 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         }
         if (persistentCooldownApi != null) {
             persistentCooldownApi.save();
-            logDone("Saved &acooldownAPI &fcache");
+            logDone("Saved &aCooldownAPI &fcache");
         }
-        for (ResetTime reset : persistentCounterApiMap.keySet()) {
-            persistentCounterApiMap.get(reset).save();
-            logDone("Saved &acounterAPI " + reset.name().toLowerCase() + " &fcache");
-        }
-        enabledModules.forEach((k, v) -> {
-            if (v)
-                modules.get(k).disable();
+        persistentCounterApiMap.forEach((k, v) -> {
+            v.save();
+            logDone("Saved &aCounterAPI " + k.name().toLowerCase() + " &fcache");
         });
-        for (Command command : new HashSet<>(registeredCommands))
-            unregisterCommand(command);
+
+        modules.values().forEach(m -> {
+            if (enabledModules.contains(m)) m.disable();
+        });
+        new HashSet<>(registeredCommands).forEach(command -> unregisterCommand(command));
+
         if (this.packetManager != null) {
             packetManager.clearAll();
             logDone("Removed holograms and Packet entities");
@@ -211,18 +195,16 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             }
         for (YMLConfig conf : configs.values())
             try {
-                if (conf.getFile().exists())
-                    if (conf.isDirty()) {
-                        this.logDone("Force saving file &e" + conf.getFile().getPath() + "&f before turning off");
-                        conf.save();
-                    }
+                if (conf.getFile().exists()) if (conf.isDirty()) {
+                    this.logDone("Force saving file &e" + conf.getFile().getPath() + "&f before turning off");
+                    conf.save();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         for (String permission : registeredPermissions)
             Bukkit.getPluginManager().removePermission(permission);
-        if (loggerManager != null)
-            loggerManager.disable();
+        if (loggerManager != null) loggerManager.disable();
         logPentaStar(ChatColor.YELLOW, "Disabled  (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
@@ -299,8 +281,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     @SuppressWarnings("unchecked")
-    private static HashMap<String, Command> getKnownCommands(Object object)
-            throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+    private static HashMap<String, Command> getKnownCommands(Object object) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         Field objectField = SimpleCommandMap.class.getDeclaredField("knownCommands");
         objectField.setAccessible(true);
         Object result = objectField.get(object);
@@ -325,11 +306,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             if (!commandMap.register(this.getName().toLowerCase(), command))
                 throw new IllegalArgumentException("Unable to register the command '" + command.getName() + "'");
             registeredCommands.add(command);
-            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: "
-                    + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
         } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE
-                    + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
             e.printStackTrace();
             return false;
         }
@@ -347,23 +326,17 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
             CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            HashMap<String, Command> knownCommands = getKnownCommands(commandMap
-            );
+            HashMap<String, Command> knownCommands = getKnownCommands(commandMap);
             List<String> keys = new ArrayList<>();
             for (String key : knownCommands.keySet())
-                if (knownCommands.get(key).equals(command))
-                    keys.add(key);
+                if (knownCommands.get(key).equals(command)) keys.add(key);
             for (String key : keys)
                 knownCommands.remove(key);
             command.unregister(commandMap);
             registeredCommands.remove(command);
-            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for "
-                    + this.getName() + ", aliases: " + ChatColor.YELLOW
-                    + Arrays.toString(command.getAliases().toArray()));
+            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
         } catch (Exception e) {
-            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE
-                    + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW
-                    + Arrays.toString(command.getAliases().toArray()));
+            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
             e.printStackTrace();
         }
     }
@@ -396,17 +369,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             if (!perm.getChildren().equals(config.get("permission|" + perm.getName() + "|children"))) {
                 config.set("permissions|" + perm.getName() + "|children", perm.getChildren());
             }
-        if (!perm.getDefault().toString()
-                .equalsIgnoreCase(config.getString("permission|" + perm.getName() + "|default"))) {
+        if (!perm.getDefault().toString().equalsIgnoreCase(config.getString("permission|" + perm.getName() + "|default"))) {
             config.set("permissions|" + perm.getName() + "|default", perm.getDefault().toString());
         }
         if (Bukkit.getPluginManager().getPermission(perm.getName()) == null)
             Bukkit.getPluginManager().addPermission(perm);
-        else
-            Bukkit.getPluginManager().recalculatePermissionDefaults(perm);
+        else Bukkit.getPluginManager().recalculatePermissionDefaults(perm);
         registeredPermissions.add(perm.getName());
-        if (!silent)
-            logTetraStar(ChatColor.BLUE, "Registered permission " + ChatColor.YELLOW + perm.getName());
+        if (!silent) logTetraStar(ChatColor.BLUE, "Registered permission " + ChatColor.YELLOW + perm.getName());
     }
 
     /**
@@ -432,8 +402,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      */
     public @NotNull YMLConfig getConfig(@NotNull String fileName) {
         fileName = YMLConfig.fixName(fileName);
-        if (configs.containsKey(fileName))
-            return configs.get(fileName);
+        if (configs.containsKey(fileName)) return configs.get(fileName);
         YMLConfig conf = new YMLConfig(this, fileName);
         configs.put(fileName, conf);
         return conf;
@@ -446,77 +415,47 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param sender The target of language
      * @return Config file for sender language
      */
-    /*public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
-        if (!useMultiLanguage || !(sender instanceof Player))
-            return getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale));
-
-        String locale = ((Player) sender).getLocale().split("_")[0];
-        if (languageListIsWhitelist != languagesList.contains(locale))
-            locale = defaultLocale;
-        String fileName = YMLConfig.fixName("language" + File.separator + locale);
-        if (configs.containsKey(fileName))
-            return configs.get(fileName);
-
-        YMLConfig config = getConfig(fileName);
-
-        //if (config.getKeys(false).isEmpty())
-        //    config.
-        if (!defaultLocale.equals(locale))
-            config.setDefaults(getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale)));
-        return config;
-    }*/
-
-
     public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
         String locale;
-        if (!(sender instanceof Player))
-            locale = this.defaultLocale;
-        else if (this.useMultiLanguage)
-            locale = ((Player) sender).getLocale().split("_")[0];
-        else
-            locale = this.defaultLocale;
+        if (!(sender instanceof Player)) locale = this.defaultLocale;
+        else if (this.useMultiLanguage) locale = ((Player) sender).getLocale().split("_")[0];
+        else locale = this.defaultLocale;
 
-        if (this.languageConfigs.containsKey(locale))
-            return languageConfigs.get(locale);
-        String fileName = "languages" + File.separator + locale + ".yml";
+        if (this.languageConfigs.containsKey(locale)) return languageConfigs.get(locale);
+        String fileName = "language" + File.separator + locale + ".yml";
         if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists() || this.getResource(fileName) != null) {
             YMLConfig conf = new YMLConfig(this, fileName);
             languageConfigs.put(locale, conf);
             return conf;
         }
-        if (languageConfigs.containsKey(defaultLocale))
-            return languageConfigs.get(defaultLocale);
-        fileName = "languages" + File.separator + defaultLocale + ".yml";
+        if (languageConfigs.containsKey(defaultLocale)) return languageConfigs.get(defaultLocale);
+        fileName = "language" + File.separator + defaultLocale + ".yml";
         YMLConfig conf = new YMLConfig(this, fileName);
         languageConfigs.put(locale, conf);
         return conf;
     }
 
-    public CooldownAPI getCooldownAPI() {
+    public @NotNull CooldownAPI getCooldownAPI() {
         return getCooldownAPI(true);
     }
 
-    public CooldownAPI getCooldownAPI(boolean persistent) {
+    public @NotNull CooldownAPI getCooldownAPI(boolean persistent) {
         if (!persistent) {
-            if (cooldownApi == null)
-                cooldownApi = new CooldownAPI(null, false);
+            if (cooldownApi == null) cooldownApi = new CooldownAPI(null, false);
             return cooldownApi;
         }
-        if (persistentCooldownApi == null)
-            persistentCooldownApi = new CooldownAPI(this, true);
+        if (persistentCooldownApi == null) persistentCooldownApi = new CooldownAPI(this, true);
         return persistentCooldownApi;
     }
 
-    public CounterAPI getCounterAPI(CounterAPI.ResetTime reset) {
-        if (!counterApiMap.containsKey(reset))
-            counterApiMap.put(reset, new CounterAPI(this, reset));
+    public @NotNull CounterAPI getCounterAPI(@NotNull CounterAPI.ResetTime reset) {
+        if (!counterApiMap.containsKey(reset)) counterApiMap.put(reset, new CounterAPI(this, reset));
         return counterApiMap.get(reset);
     }
 
-    public CounterAPI getCounterAPI(CounterAPI.ResetTime reset, boolean persistent) {
+    public @NotNull CounterAPI getCounterAPI(@NotNull CounterAPI.ResetTime reset, boolean persistent) {
         if (!persistent) {
-            if (!counterApiMap.containsKey(reset))
-                counterApiMap.put(reset, new CounterAPI(null, reset, false));
+            if (!counterApiMap.containsKey(reset)) counterApiMap.put(reset, new CounterAPI(null, reset, false));
             return counterApiMap.get(reset);
         }
         if (!persistentCounterApiMap.containsKey(reset))
@@ -530,8 +469,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param log Message
      */
     public void log(String log) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', ChatColor.DARK_BLUE + "["
-                + ChatColor.WHITE + this.getName() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + this.getName() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
     }
 
     public void logOnFile(String fileName, String text) {
@@ -558,14 +496,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         return createConnection(databaseName, host, port, username, password);
     }
 
-    public SQLDatabase createConnection(String databaseName, String host, int port, String username, String password)
-            throws ClassNotFoundException, SQLException {
+    public SQLDatabase createConnection(String databaseName, String host, int port, String username, String password) throws ClassNotFoundException, SQLException {
         SQLType type = this.getConfig().loadEnum("database.type", SQLType.MYSQL, SQLType.class);
         return createConnection(type, databaseName, host, port, username, password);
     }
 
-    public SQLDatabase createConnection(SQLType type, String databaseName, String host, int port, String username,
-                                        String password) throws ClassNotFoundException, SQLException {
+    public SQLDatabase createConnection(SQLType type, String databaseName, String host, int port, String username, String password) throws ClassNotFoundException, SQLException {
         if (type == null) {
             logProblem("Invalid Database Type Connect");
             throw new SQLException();
@@ -593,15 +529,15 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         return packetManager;
     }
 
-    protected void registerModule(Module module) {
+    protected void registerModule(@NotNull Module module) {
         modules.put(module.getID(), module);
         if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true)) {
-            enabledModules.put(module.getID(), true);
+            enabledModules.add(module);//.put(module.getID(), true);
             this.registerListener(module);
             module.enable();
             this.logDone("Registered and &aenabled &fmodule &e" + module.getID());
         } else {
-            enabledModules.put(module.getID(), false);
+            //enabledModules.put(module.getID(), false);
             this.logDone("Registered as &cdisabled &fmodule &e" + module.getID());
             // HandlerList.unregisterAll(module);
         }
@@ -622,8 +558,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @see #getLanguageConfig(CommandSender)
      */
     @Deprecated
-    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path,
-                                                @Nullable String def, String... args) {
+    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path, @Nullable String def, String... args) {
         return getLanguageConfig(sender).loadMessage(path, def, true, args);
     }
 
@@ -643,8 +578,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     @Deprecated
     public void sendLanguageMessage(CommandSender sender, String path, String def, String... args) {
         String msg = loadLanguageMessage(sender, path, def, args);
-        if (msg != null && !msg.isEmpty())
-            sender.sendMessage(msg);
+        if (msg != null && !msg.isEmpty()) sender.sendMessage(msg);
     }
 
     /**
@@ -657,16 +591,36 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      */
     @Deprecated
     public LoggerManager getLoggerManager() {
-        if (loggerManager == null)
-            loggerManager = new LoggerManager(this);
+        if (loggerManager == null) loggerManager = new LoggerManager(this);
         return loggerManager;
     }
 
-    public Map<String, Module> getModules() {
+    public @NotNull Map<String, Module> getModules() {
         return Collections.unmodifiableMap(modules);
     }
 
-    public boolean isActive(Module module) {
-        return enabledModules.getOrDefault(module.getID(), false);
+    public boolean isActive(@NotNull Module module) {
+        return enabledModules.contains(module);
+    }
+
+    public @Nullable Metrics setMetrics(@Nullable Integer bStatsId) {
+        if (bStatsId == null) return null;
+        try {
+            return new Metrics(this, bStatsId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean setUpdateChecker(@Nullable Integer spigotResourceId) {
+        if (spigotResourceId == null) return false;
+        try {
+            new UpdateChecker(this, spigotResourceId);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

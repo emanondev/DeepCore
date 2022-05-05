@@ -1,11 +1,11 @@
 package emanondev.core.gui;
 
-import java.util.HashMap;
-
+import emanondev.core.CorePlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import emanondev.core.CorePlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
 
 public class MapGui extends ChestGui {
 
@@ -38,9 +38,12 @@ public class MapGui extends ChestGui {
     @Deprecated
     protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
 
+    /**
+     * @see #setButton(int, GuiButton)
+     */
     @Deprecated
     public void putGuiButton(int pos, GuiButton button) {
-        setButton(pos,button);
+        setButton(pos, button);
     }
 
     @Override
@@ -60,8 +63,8 @@ public class MapGui extends ChestGui {
     public void setButton(int slot, GuiButton button) {
         if (slot < 0)
             throw new IllegalArgumentException();
-        if (slot>=getInventory().getSize())
-            throw new IndexOutOfBoundsException("slot "+slot+" is outside gui slots");
+        if (slot >= getInventory().getSize())
+            throw new IndexOutOfBoundsException("slot " + slot + " is outside gui slots");
         if (button != null) {
             buttonsMap.put(slot, button);
             getInventory().setItem(slot, button.getItem());

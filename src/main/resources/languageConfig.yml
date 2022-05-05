@@ -1,4 +1,0 @@
-# default locale file used
-default-locale: "en"
-# use multiple languages or stick to default locale for everyone?
-use-multi-language: true

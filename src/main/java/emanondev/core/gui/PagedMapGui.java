@@ -16,7 +16,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     private int backGuiSlot = 4;
 
     private int page;
-    private final HashMap<Integer, GuiButton> buttons = new HashMap<>();
+    private final SortedMap<Integer, GuiButton> buttons = new TreeMap<>();
 
     private final GuiButton[] controlButtons = new GuiButton[9];
 
@@ -62,7 +62,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * @param timerUpdate
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate) {
-        this(title, rows, p, previousHolder, plugin, timerUpdate, 0);
+        this(title, rows, p, previousHolder, plugin, timerUpdate, 1);
     }
 
     /**
@@ -179,7 +179,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * starting from 1
      */
     public int getMaxPage() {
-        return buttons.isEmpty() ? 1 : (Collections.max(buttons.keySet()) - 1) / (getInventory().getSize() - 9) + 1;
+        return buttons.isEmpty() ? 1 : (buttons.lastKey() - 1) / (getInventory().getSize() - 9) + 1;
     }
 
     @Override

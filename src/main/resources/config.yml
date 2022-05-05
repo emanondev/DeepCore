@@ -1,16 +1,21 @@
 database:
-    # database name
-    database: "minecraft"
-    # host
-    host: "localhost"
-    # port
-    port: 3306
-    # login username
-    username: "root"
-    # login password
-    password: ""
-    # database type
-    # only MYSQL is supported actually
-    type: MYSQL
+  # database name
+  database: "minecraft"
+  # host
+  host: "localhost"
+  # port
+  port: 3306
+  # login username
+  username: "root"
+  # login password
+  password: ""
+  # database type
+  # only MYSQL is supported actually
+  type: MYSQL
 updates:
-    notify_admin: true
+  notify_admin: true
+language:
+  # default locale file used
+  default-locale: "en"
+  # use multiple languages or stick to default locale for everyone?
+  multilanguage: true

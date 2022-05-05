@@ -21,7 +21,7 @@ public interface Gui extends InventoryHolder, FileLogger {
 
     /**
      * Returns language section for the command sender<br>
-     * (load language config and go to sub pattern 'command.[command id]')
+     * (load language config and go to sub pattern 'guis')
      *
      * @param who may be null
      * @return language section for the command sender
@@ -37,6 +37,7 @@ public interface Gui extends InventoryHolder, FileLogger {
 
     /**
      * @return parent Gui or null
+     * @see #getPreviousGui()
      */
     @Deprecated
     @Nullable
@@ -202,5 +203,13 @@ public interface Gui extends InventoryHolder, FileLogger {
      * @return true if the inventory is updated when a player open it
      */
     boolean isUpdateOnOpen();
+
+    default boolean isTimerUpdated(){
+        return false;
+    }
+
+    default void setTimerUpdated(boolean value) {
+        new UnsupportedOperationException("This gui doesnt support timer updated option").printStackTrace();
+    }
 
 }

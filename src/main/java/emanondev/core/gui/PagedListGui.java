@@ -54,7 +54,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
      * @param timerUpdate
      * @param page
      */
-    public PagedListGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate,
+    public PagedListGui(String title, int rows, Player p,@Nullable Gui previousHolder,@NotNull CorePlugin plugin, boolean timerUpdate,
                         int page) {
         super(title, rows, p, previousHolder, plugin, timerUpdate);
         if (rows == 1)
@@ -137,7 +137,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
         recalculateButtons();
     }
 
-    public void sort(Comparator<T> comparator) {
+    public void sort(@NotNull Comparator<T> comparator) {
         buttons.sort((o1, o2) -> comparator.compare(o1.getValue(), o2.getValue()));
         recalculateButtons();
     }
@@ -148,11 +148,12 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
      * @param slot   - from 0 to 8
      * @param button - what button? might be null
      */
-    public void setControlGuiButton(int slot, GuiButton button) {
+    public void setControlGuiButton(int slot,@Nullable GuiButton button) {
         if (slot < 0 || slot >= 9)
             return;
         controlButtons[slot] = button;
-        getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
+        if (button!=null)
+            getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
     }
 
     /**

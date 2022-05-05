@@ -18,6 +18,7 @@ public abstract class AnvilGui implements TextGui {
     private final Inventory inv;
     private final CorePlugin plugin;
     private boolean updateOnOpen = true;
+    private boolean timerUpdated = false;
 
     /**
      * Create a anvil-type gui
@@ -78,6 +79,7 @@ public abstract class AnvilGui implements TextGui {
      *
      * @param value whenever the inventory should be updated when a player open it or not
      */
+    @Override
     public void setUpdateOnOpen(boolean value) {
         this.updateOnOpen = value;
     }
@@ -85,9 +87,19 @@ public abstract class AnvilGui implements TextGui {
     /**
      * @return true if the inventory is updated when a player open it
      */
+    @Override
     public boolean isUpdateOnOpen() {
         return this.updateOnOpen;
     }
 
+    @Override
+    public boolean isTimerUpdated() {
+        return timerUpdated;
+    }
+
+    @Override
+    public void setTimerUpdated(boolean value) {
+        timerUpdated = value;
+    }
 
 }

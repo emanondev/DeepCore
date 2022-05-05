@@ -24,6 +24,7 @@ public abstract class ChestGui implements Gui {
     private final Inventory inv;
     private final CorePlugin plugin;
     private boolean updateOnOpen = true;
+    private boolean timerUpdated = false;
 
     /**
      * Create a chest-type gui
@@ -82,12 +83,24 @@ public abstract class ChestGui implements Gui {
     public void onClose(@NotNull InventoryCloseEvent event) {
     }
 
+    @Override
     public void setUpdateOnOpen(boolean value) {
         this.updateOnOpen = value;
     }
 
+    @Override
     public boolean isUpdateOnOpen() {
         return this.updateOnOpen;
+    }
+
+    @Override
+    public boolean isTimerUpdated() {
+        return timerUpdated;
+    }
+
+    @Override
+    public void setTimerUpdated(boolean value) {
+        timerUpdated = value;
     }
 
     @Deprecated
@@ -227,5 +240,4 @@ public abstract class ChestGui implements Gui {
     protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
         return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui." + path, def, color, receiver, holders);
     }
-
 }

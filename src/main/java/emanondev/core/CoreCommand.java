@@ -73,6 +73,18 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param id                 Command ID.
      * @param plugin             Plugin that own this Command.
      * @param permission         Permission required to use this Command if exists.
+     */
+    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission) {
+        this(id, plugin, permission, null, null);
+    }
+
+    /**
+     * Construct a new Command. Note: id is used for both config file of the command
+     * and default command name.
+     *
+     * @param id                 Command ID.
+     * @param plugin             Plugin that own this Command.
+     * @param permission         Permission required to use this Command if exists.
      * @param defaultDescription Default description of the Command, might be updated on Command
      *                           file.
      */
@@ -122,7 +134,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         }
         this.setAliases(tempAliases);
         this.setDescription(config.loadMessage("info.description", defaultDescription == null ? "" : defaultDescription, true));
-        this.setUsage(config.loadMessage("info.usage", "&cUsage: /" + getName(), true));
+        this.setUsage(config.loadMessage("info.usage", ChatColor.RED +"Usage: /" + getName(), true));
         if (permission != null) {
             // plugin.registerPermission(permission);
             this.setPermission(permission.getName());
@@ -304,7 +316,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      */
     protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
                                        boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, loadMessage(receiver, path, def, color, target, holders));
+        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage( path, def, color, target, holders));
     }
 
     /**
