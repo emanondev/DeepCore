@@ -1,19 +1,19 @@
 package emanondev.core.gui;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Supplier;
-
+import emanondev.core.CoreMain;
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 
 public class NumberEditorFButton<T extends Number> extends AGuiButton {
 
@@ -26,31 +26,57 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     private final Supplier<List<String>> baseDescription;
     private final Supplier<List<String>> instructionsDescription;
 
+
     /**
-     * @param gui                     cannot be null
-     * @param changeAmountBase        Which should be the starting change value by
-     *                                click, cannot be null
-     * @param maxChangeValue          maximus allowed change amount by click amount,
-     *                                may be null
-     * @param minChangeValue          minimum allowed change amount by click amount,
-     *                                may be null
-     * @param getValue                cannot be null
-     * @param setValue                cannot be null
-     * @param baseItem                may be null
-     * @param baseDescription         may be null
-     * @param instructionsDescription may be null
+     * @param gui              parent gui
+     * @param changeAmountBase which amount should be the starting change value by
+     *                         click
+     * @param maxChangeValue   maximus allowed change amount by click amount
+     * @param minChangeValue   minimum allowed change amount by click amount
+     * @param getValue         get the value
+     * @param setValue         set the value change
+     * @param baseItem         display item
+     * @param baseDescription  should contain value description
+     * @throws IllegalArgumentException if maxChangeValue is less than
+     *                                  minChangeValue
+     * @throws IllegalArgumentException if maxChangeValue or minChangeValue are less
+     *                                  or equals to 0
+     */
+    public NumberEditorFButton(@NotNull Gui gui,
+                               @NotNull T changeAmountBase, @Nullable T minChangeValue, @Nullable T maxChangeValue,
+                               @NotNull Supplier<T> getValue,
+                               @NotNull Consumer<T> setValue,
+                               @Nullable Supplier<ItemStack> baseItem,
+                               @Nullable Supplier<List<String>> baseDescription) {
+        this(gui, changeAmountBase, minChangeValue, maxChangeValue,
+                getValue, setValue, baseItem, baseDescription, null);
+    }
+
+    /**
+     * @param gui              parent gui
+     * @param changeAmountBase which amount should be the starting change value by
+     *                         click
+     * @param maxChangeValue   maximus allowed change amount by click amount
+     * @param minChangeValue   minimum allowed change amount by click amount
+     * @param getValue         get the value
+     * @param setValue         set the value change
+     * @param baseItem         display item
+     * @param baseDescription  should contain value description
+     * @param instructionsDescription description of click effects
      * @throws IllegalArgumentException if maxChangeValue is less than
      *                                  minChangeValue
      * @throws IllegalArgumentException if maxChangeValue or minChangeValue are less
      *                                  or equals to 0
      */
     @SuppressWarnings("unchecked")
-    public NumberEditorFButton(Gui gui, T changeAmountBase, T minChangeValue, T maxChangeValue, Supplier<T> getValue,
-                               Consumer<T> setValue, Supplier<ItemStack> baseItem, Supplier<List<String>> baseDescription,
-                               Supplier<List<String>> instructionsDescription) {
+    public NumberEditorFButton(@NotNull Gui gui,
+                               @NotNull T changeAmountBase, @Nullable T minChangeValue, @Nullable T maxChangeValue,
+                               @NotNull Supplier<T> getValue,
+                               @NotNull Consumer<T> setValue,
+                               @Nullable Supplier<ItemStack> baseItem,
+                               @Nullable Supplier<List<String>> baseDescription,
+                               @Nullable Supplier<List<String>> instructionsDescription) {
         super(gui);
-        if (changeAmountBase == null || getValue == null || setValue == null)
-            throw new NullPointerException();
         this.changeAmount = changeAmountBase;
         if (maxChangeValue == null) {
             if (changeAmount instanceof BigDecimal)
@@ -99,20 +125,20 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         switch (event.getClick()) {
             case LEFT: {
                 T old = getValue();
-                setValue(addNumbers(old, getChangeAmount()));
+                setValue(subtractNumbers(old, getChangeAmount()));
                 return !old.equals(getValue());
             }
             case RIGHT: {
                 T old = getValue();
-                setValue(subtractNumbers(old, getChangeAmount()));
+                setValue(addNumbers(old, getChangeAmount()));
                 return !old.equals(getValue());
             }
-            case SHIFT_LEFT: {
+            case SHIFT_RIGHT: {
                 T old = getChangeAmount();
                 setChangeAmount(multiplyEditor(10D));
                 return !old.equals(getChangeAmount());
             }
-            case SHIFT_RIGHT: {
+            case SHIFT_LEFT: {
                 T old = getChangeAmount();
                 setChangeAmount(multiplyEditor(0.1D));
                 return !old.equals(getChangeAmount());
@@ -135,16 +161,13 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     }
 
     public List<String> getBaseDescription() {
-        return baseDescription == null ? this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditor.Base",
-                Arrays.asList("&6&lAmount: &e%value%", "")) : baseDescription.get();
+        return baseDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.base") : baseDescription.get();
     }
 
     public List<String> getInstructionsDescription() {
-        return instructionsDescription == null ? this.getLanguageSection(getTargetPlayer()).loadStringList(
-                "numberEditor.Instructions",
-                Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
-                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &e%amount% &9-> &e%amountx10%&b/&e%amount/10%"))
-                : instructionsDescription.get();
+        return instructionsDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.instructions") : instructionsDescription.get();
     }
 
     public T getValue() {
@@ -156,7 +179,8 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     }
 
     public ItemStack getBaseItem() {
-        return baseItem == null ? new ItemBuilder(Material.REPEATER).setGuiProperty().build() : baseItem.get();
+        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
     }
 
     @Override
@@ -165,8 +189,8 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         return base == null ? null
                 : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
                 UtilsString.formatOptional10Digit(getValue()), "%amount%",
-                UtilsString.formatOptional10Digit(changeAmount), "%amountx10%",
-                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount/10%",
+                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
                 UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
     }
 

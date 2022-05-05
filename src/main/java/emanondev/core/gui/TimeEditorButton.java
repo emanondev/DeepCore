@@ -12,6 +12,11 @@ import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see emanondev.core.gui.TimeEditorFButton
+ * @deprecated replaced
+ */
+@Deprecated
 public abstract class TimeEditorButton extends AGuiButton {
 
     private Long changeAmount;

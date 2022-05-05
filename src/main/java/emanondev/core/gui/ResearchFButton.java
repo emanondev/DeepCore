@@ -36,7 +36,7 @@ public class ResearchFButton<T> extends AGuiButton {
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
                            @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
-                           @NotNull Function<T, ItemStack> elementItem, Supplier<Collection<T>> getElements) {
+                           @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements) {
         this(parent, getItem, null, match, elementClick, elementItem, getElements, null);
     }
 
@@ -53,10 +53,8 @@ public class ResearchFButton<T> extends AGuiButton {
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
                            Function<InventoryClickEvent, Boolean> onClick, @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
-                           @NotNull Function<T, ItemStack> elementItem, Supplier<Collection<T>> getElements, Comparator<T> sort) {
+                           @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
         super(parent);
-        if (getItem == null || match == null || elementClick == null || elementItem == null || getElements == null)
-            throw new NullPointerException();
         this.getItem = getItem;
         this.onClick = onClick;
         this.match = match;

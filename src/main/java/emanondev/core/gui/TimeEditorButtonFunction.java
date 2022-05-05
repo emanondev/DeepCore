@@ -1,18 +1,26 @@
 package emanondev.core.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.*;
-
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+
+/**
+ * @see emanondev.core.gui.TimeEditorFButton
+ * @deprecated replaced
+ */
+@Deprecated
 public class TimeEditorButtonFunction extends AGuiButton {
 
     private final Consumer<Long> changeRequest;
@@ -21,6 +29,8 @@ public class TimeEditorButtonFunction extends AGuiButton {
     private final Long maxChangeAmount;
     private final Long minChangeAmount;
     private final ItemStack base;
+    private final Function<Long, List<String>> baseDescription = null;
+    private final BiFunction<Long, Long, List<String>> fullDescription = null;
 
     private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L, 4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
 
@@ -43,7 +53,7 @@ public class TimeEditorButtonFunction extends AGuiButton {
      */
     public TimeEditorButtonFunction(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, Material base,
                                     Long changeAmountBase) {
-        this(gui, grabValue, changeRequest, base == null ? null : new ItemBuilder(base).setGuiProperty().build(),
+        this(gui, grabValue, changeRequest, base == null ? null : new ItemStack(base),
                 changeAmountBase);
     }
 
@@ -56,7 +66,7 @@ public class TimeEditorButtonFunction extends AGuiButton {
      */
     public TimeEditorButtonFunction(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, ItemStack base,
                                     Long changeAmountBase) {
-        this(gui, grabValue, changeRequest, base == null ? null : new ItemBuilder(base).setGuiProperty().build(),
+        this(gui, grabValue, changeRequest, base,
                 changeAmountBase, null, null);
     }
 
@@ -81,7 +91,7 @@ public class TimeEditorButtonFunction extends AGuiButton {
             throw new NullPointerException();
         this.changeRequest = changeRequest;
         this.grabValue = grabValue;
-        this.base = base == null ? new ItemBuilder(Material.REPEATER).setGuiProperty().build() : base;
+        this.base = base == null ? new ItemBuilder(Material.REPEATER).setGuiProperty().build() : new ItemBuilder(base).setGuiProperty().build();
         this.changeAmount = changeAmountBase == null ? 60L : changeAmountBase;
         if (maxChangeValue == null) {
             this.maxChangeAmount = Long.MAX_VALUE;
@@ -97,22 +107,22 @@ public class TimeEditorButtonFunction extends AGuiButton {
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
-            case LEFT: {
+            case RIGHT: {
                 Long old = getValue();
                 changeRequest(addNumbers(old, getChangeAmount()));
                 return !old.equals(getValue());
             }
-            case RIGHT: {
+            case LEFT: {
                 Long old = getValue();
                 changeRequest(subtractNumbers(old, getChangeAmount()));
                 return !old.equals(getValue());
             }
-            case SHIFT_LEFT: {
+            case SHIFT_RIGHT: {
                 Long old = getChangeAmount();
                 setChangeAmount(multiply());
                 return !old.equals(getChangeAmount());
             }
-            case SHIFT_RIGHT: {
+            case SHIFT_LEFT: {
                 Long old = getChangeAmount();
                 setChangeAmount(divide());
                 return !old.equals(getChangeAmount());
@@ -122,9 +132,6 @@ public class TimeEditorButtonFunction extends AGuiButton {
                 return false;
         }
     }
-
-    private final Function<Long, List<String>> baseDescription = null;
-    private final BiFunction<Long, Long, List<String>> fullDescription = null;
 
     /**
      * holder %amount% for current value

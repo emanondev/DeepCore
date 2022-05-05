@@ -79,7 +79,7 @@ public abstract class ChestGui implements Gui {
     }
 
     @Override
-    public void onClose(InventoryCloseEvent event) {
+    public void onClose(@NotNull InventoryCloseEvent event) {
     }
 
     public void setUpdateOnOpen(boolean value) {

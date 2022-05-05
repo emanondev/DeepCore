@@ -1,39 +1,33 @@
 package emanondev.core.gui;
 
+import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class NextPageButton extends AGuiButton implements PagedButton {
-    private final ItemStack item;
+    private final ItemBuilder item;
 
     public NextPageButton(PagedGui parent) {
         super(parent);
-        this.item = new ItemStack(getPlugin().getConfig("guiConfig.yml").getItemStack("next_page.item",
-                new ItemBuilder(Material.ARROW).setGuiProperty().build()));
+        this.item = CoreMain.get().getConfig("guiConfig.yml").loadGuiItem("next_page", Material.ARROW);
     }
 
     @Override
     public ItemStack getItem() {
         if (getPage() >= getGui().getMaxPage())
             return null;
-        UtilsString.updateDescription(item,
-                getPlugin().getLanguageConfig(getTargetPlayer())
-                        .loadStringList("gui_button.next_page.description",
-                                List.of("&9Click to go to page &e%target_page%"))
-                , getTargetPlayer(), true, "%target_page%", String.valueOf(getGui().getPage() + 1));
-        return item;
+        return item.setAmount(Math.min(getPage() + 1, 101)).setDescription(CoreMain.get().getLanguageConfig(getTargetPlayer())
+                        .getStringList("gui_button.next_page")
+                , true, getTargetPlayer(), "%target_page%", String.valueOf(getPage() + 1)).build();
     }
 
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         getGui().incPage();
-        return false;
+        return false; //incPage should already call inventoryUpdate()
     }
 
     @Override

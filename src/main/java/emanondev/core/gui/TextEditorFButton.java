@@ -39,8 +39,6 @@ public class TextEditorFButton extends AGuiButton {
                              @Nullable Supplier<List<String>> valueDescription,
                              @Nullable Supplier<List<String>> instructionsDescription) {
         super(parent);
-        if (getValue == null || setValue == null)
-            throw new NullPointerException();
         this.getValue = getValue;
         this.setValue = setValue;
         this.baseItem = baseItem;

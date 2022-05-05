@@ -1,5 +1,6 @@
 package emanondev.core.gui;
 
+import emanondev.core.util.FileLogger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.*;
@@ -10,7 +11,7 @@ import emanondev.core.YMLSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface GuiButton {
+public interface GuiButton extends FileLogger {
 
     /**
      * This event is called when the player drags an item in their cursor across the
@@ -60,7 +61,9 @@ public interface GuiButton {
      *
      * @param event - the event
      * @return true if getGui().inventoryUpdate() should be call
+     * @deprecated never used
      */
+    @Deprecated
     default boolean onDrag(@NotNull InventoryDragEvent event) {
         return false;
     }

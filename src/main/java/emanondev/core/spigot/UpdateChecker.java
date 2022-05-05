@@ -7,6 +7,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import emanondev.core.CoreMain;
+import emanondev.core.UtilsMessages;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,11 +29,16 @@ public class UpdateChecker {
     private final boolean notifyOP;
     private final Permission updatePerm;
 
-    public UpdateChecker(final CorePlugin plugin, int id, boolean notifyOP) {
+
+    public UpdateChecker(CorePlugin plugin, int id) {
+        this(plugin,id,CoreMain.get().getConfig().loadBoolean("updates.notify_admin",true));
+    }
+
+    public UpdateChecker(CorePlugin plugin, int id, boolean notifyOP) {
         this.ID = id;
         this.plugin = plugin;
         this.localPluginVersion = plugin.getDescription().getVersion();
-        this.updatePerm = new PermissionBuilder(plugin, "update_notify").build();
+        this.updatePerm = PermissionBuilder.ofPlugin(plugin, "update_notify").build();
         this.notifyOP = notifyOP;
         this.plugin.registerPermission(updatePerm);
         checkForUpdate();
@@ -46,8 +53,7 @@ public class UpdateChecker {
                 spigotPluginVersion = new BufferedReader(new InputStreamReader(connection.getInputStream()))
                         .readLine();
             } catch (final IOException e) {
-                Bukkit.getServer().getConsoleSender().sendMessage(
-                        plugin.getConfig().loadMessage("update.error_message", "&cUpdate checker failed!", true));
+                plugin.logIssue(CoreMain.get().getLanguageConfig(null).loadMessage("update.console_error_message", "", true,"%plugin%",plugin.getName()));
                 e.printStackTrace();
                 return;
             }
@@ -56,9 +62,10 @@ public class UpdateChecker {
             if (localPluginVersion.equals(spigotPluginVersion))
                 return;
 
-            plugin.logIssue(plugin.getConfig().loadMessage("update.message",
-                    "A new update is available at:&b https://www.spigotmc.org/resources/" + ID + "/updates",
-                    true));
+            plugin.logIssue(CoreMain.get().getLanguageConfig(null).loadMessage("update.console_message",
+                    "",
+                    true,"%plugin%",plugin.getName(),"%link%","https://www.spigotmc.org/resources/"
+                            + ID + "/updates"));
 
             if (notifyOP)
                 // Register the PlayerJoinEvent
@@ -67,11 +74,10 @@ public class UpdateChecker {
                     public void onPlayerJoin(final PlayerJoinEvent event) {
                         if (!event.getPlayer().hasPermission(updatePerm))
                             return;
-                        event.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                                plugin.getConfig().loadMessage("update.message",
-                                        "A new update is available at:&b https://www.spigotmc.org/resources/"
-                                                + ID + "/updates",
-                                        true)));
+                        UtilsMessages.sendMessage(event.getPlayer(),CoreMain.get().getLanguageConfig(event.getPlayer()).loadMessage("update.admin_message",
+                                        "",
+                                        true,"%plugin%",plugin.getName(),"%link%","https://www.spigotmc.org/resources/"
+                        + ID + "/updates"));
                     }
                 }));
         });

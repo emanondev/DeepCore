@@ -77,21 +77,24 @@ public abstract class TextEditorGui extends AnvilGui {
         switch (event.getSlot()) {
             case 0:
                 switch (event.getClick()) {
-                    case LEFT:
+                    case LEFT -> {
                         updateInventory();
                         return;
-                    case RIGHT:
+                    }
+                    case RIGHT -> {
                         this.setLine("");
                         return;
-                    case MIDDLE:
+                    }
+                    case MIDDLE -> {
                         this.onTextConfirmed(getLine());
                         return;
-                    case SHIFT_LEFT:
-                    case SHIFT_RIGHT:
+                    }
+                    case SHIFT_LEFT, SHIFT_RIGHT -> {
                         this.setLine(getOriginal());
                         return;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
                 return;
             case 1:

@@ -1,0 +1,13 @@
+next_page:
+  material: ARROW
+previous_page:
+  material: ARROW
+back:
+  material: DARK_OAK_DOOR
+close:
+  material: BARRIER
+number_editor:
+  material: REPEATER
+time_editor:
+  material: CLOCK
+

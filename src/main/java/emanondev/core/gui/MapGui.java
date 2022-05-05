@@ -38,16 +38,9 @@ public class MapGui extends ChestGui {
     @Deprecated
     protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
 
+    @Deprecated
     public void putGuiButton(int pos, GuiButton button) {
-        if (pos < 0)
-            throw new IllegalArgumentException();
-        if (button != null) {
-            buttonsMap.put(pos, button);
-            getInventory().setItem(pos, button.getItem());
-        } else {
-            buttonsMap.remove(pos);
-            getInventory().setItem(pos, null);
-        }
+        setButton(pos,button);
     }
 
     @Override
@@ -65,13 +58,21 @@ public class MapGui extends ChestGui {
 
     @Override
     public void setButton(int slot, GuiButton button) {
-        putGuiButton(slot, button);
+        if (slot < 0)
+            throw new IllegalArgumentException();
+        if (slot>=getInventory().getSize())
+            throw new IndexOutOfBoundsException("slot "+slot+" is outside gui slots");
+        if (button != null) {
+            buttonsMap.put(slot, button);
+            getInventory().setItem(slot, button.getItem());
+        } else {
+            buttonsMap.remove(slot);
+            getInventory().setItem(slot, null);
+        }
     }
 
     @Override
     public void addButton(@NotNull GuiButton button) {
-        if (button == null)
-            throw new NullPointerException();
         for (int i = 0; i < getInventory().getSize(); i++)
             if (buttonsMap.get(i) == null) {
                 putGuiButton(i, button);

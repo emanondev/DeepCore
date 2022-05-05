@@ -27,7 +27,7 @@ import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
-public class WorldEditUtility {
+public final class WorldEditUtility {
 
     private WorldEditUtility() {
         throw new AssertionError();

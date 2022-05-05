@@ -31,8 +31,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
     private boolean useMultiLanguage = true;
     private String defaultLocale;
-    private final List<String> languagesList = new ArrayList<>();
-    private boolean languageListIsWhitelist = false;
+    private final HashMap<String, YMLConfig> languageConfigs = new HashMap<>();
 
     private final HashMap<String, YMLConfig> configs = new HashMap<>();
 
@@ -85,16 +84,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         YMLConfig language = getConfig("languageConfig.yml");
         defaultLocale = language.loadString("default-locale", "en");
         useMultiLanguage = language.loadBoolean("use-multi-language", true);
-        languagesList.clear();
-        languagesList.addAll(language.loadStringList("allowed-languages.list", new ArrayList<>()));
-        languageListIsWhitelist = language.loadBoolean("allowed-languages.is-whitelist", false);
 
         if (useMultiLanguage) {
             this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
-            if (languageListIsWhitelist)
-                this.logTetraStar(ChatColor.BLUE, "Allowed languages &a" + Arrays.toString(languagesList.toArray()));
-            else
-                this.logTetraStar(ChatColor.BLUE, "Unallowed languages &c" + Arrays.toString(languagesList.toArray()));
         } else
             this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
     }
@@ -139,6 +131,8 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
                 }
         }
         setupLanguageConfig();
+        languageConfigs.clear();
+        getLanguageConfig(null);
         if (loggerManager != null)
             loggerManager.reload();
 
@@ -452,7 +446,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @param sender The target of language
      * @return Config file for sender language
      */
-    public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
+    /*public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
         if (!useMultiLanguage || !(sender instanceof Player))
             return getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale));
 
@@ -470,6 +464,32 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         if (!defaultLocale.equals(locale))
             config.setDefaults(getConfig(YMLConfig.fixName("language" + File.separator + defaultLocale)));
         return config;
+    }*/
+
+
+    public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
+        String locale;
+        if (!(sender instanceof Player))
+            locale = this.defaultLocale;
+        else if (this.useMultiLanguage)
+            locale = ((Player) sender).getLocale().split("_")[0];
+        else
+            locale = this.defaultLocale;
+
+        if (this.languageConfigs.containsKey(locale))
+            return languageConfigs.get(locale);
+        String fileName = "languages" + File.separator + locale + ".yml";
+        if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists() || this.getResource(fileName) != null) {
+            YMLConfig conf = new YMLConfig(this, fileName);
+            languageConfigs.put(locale, conf);
+            return conf;
+        }
+        if (languageConfigs.containsKey(defaultLocale))
+            return languageConfigs.get(defaultLocale);
+        fileName = "languages" + File.separator + defaultLocale + ".yml";
+        YMLConfig conf = new YMLConfig(this, fileName);
+        languageConfigs.put(locale, conf);
+        return conf;
     }
 
     public CooldownAPI getCooldownAPI() {

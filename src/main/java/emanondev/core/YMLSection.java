@@ -1187,17 +1187,13 @@ public interface YMLSection extends ConfigurationSection {
      */
     @NotNull
     default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow,int defAmount,boolean defUnbreakable){
-        if (this.get(path) instanceof ItemStack) {
-            ((CorePlugin) getPlugin()).log(this.getFileName()+" Path "+path+" isItemStack? true");
+        if (this.get(path) instanceof ItemStack)
             return new ItemBuilder(loadItemStack(path, new ItemStack(Material.STONE)));
-        }
         YMLSection section = this.loadSection(path);
-
         return new ItemBuilder(section.loadMaterial("material",defMaterial))
                 .hideAllFlags().addEnchantment(Enchantment.DURABILITY,section.getBoolean("glow",defGlow)?1:0)
                 .setAmount(section.getInteger("amount",defAmount)).setUnbreakable(section.getBoolean("unbreakable",defUnbreakable))
                 .setCustomModelData(section.getInteger("customModelData",0))
                 .setDamage(section.getInteger("damage",0));
     }
-
 }

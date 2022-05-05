@@ -108,18 +108,18 @@ public class LoggerManager {
             Logger logger = getLogger(req.fileName);
 
             switch (req.type) {
-                case LOG_ARRAY_OF_TEXT:
+                case LOG_ARRAY_OF_TEXT -> {
                     logger.log(req.timestamp, (String[]) req.log);
-                    return;
-                case LOG_LIST_OF_TEXT:
+                }
+                case LOG_LIST_OF_TEXT -> {
                     logger.log(req.timestamp, (List<String>) req.log);
-                    return;
-                case LOG_TEXT:
+                }
+                case LOG_TEXT -> {
                     logger.log(req.timestamp, (String) req.log);
-                    return;
-                default:
+                }
+                default -> {
                     new IllegalArgumentException().printStackTrace();
-                    return;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

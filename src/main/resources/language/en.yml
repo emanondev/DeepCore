@@ -1,0 +1,48 @@
+gui_button:
+  next_page:
+    - "&9[&fClick&9] &7Go to page &e%target_page%"
+  previous_page:
+    - "&9[&fClick&9] &7Go to page &e%target_page%"
+  back:
+    - "&9[&fClick&9] &7Go Back"
+  close:
+    - "&9[&fClick&9] &7Close"
+  number_editor:
+    base:
+      - "&6&lAmount: &e%value%"
+      - ""
+    instructions:
+      - "&9[&fClick Left/Right&9] &c-%amount% &7/ &a+%amount%"
+      - "&9[&fClick Shift Left/Right&9] &7%amount_dec% < &e%amount% &7> %amount_inc%"
+  time_editor:
+    base:
+      - "&6&lTime: &e%value%"
+      - ""
+    instructions:
+      - "&9[&fClick Left/Right&9] &c-%amount% &7/ &a+%amount%"
+      - "&9[&fClick Shift Left/Right&9] &7%amount_dec% < &e%amount% &7> %amount_inc%"
+command:
+  reload:
+    success: "&9[&f%plugin%&9]&a Plugin reloaded"
+    fail: "&4[&c%plugin%&4]&c Plugin reload failed!"
+  players_only: "&4[&c%plugin%&4]&c Command for players only"
+  lack_permission: "&4[&c%plugin%&4]&c You lack of permission &6%permission%"
+conjunction:
+  and: e
+time:
+  multi:
+    second: s
+    minute: m
+    hour: h
+    day: d
+    week: w
+  single:
+    second: s
+    minute: m
+    hour: h
+    day: d
+    week: w
+update:
+  console_error_message: "&cUpdate check failed!"
+  console_message: "&fUpdate available:&b %link%"
+  admin_message: "&9[&f%plugin%&9] &fUpdate available:&b %link%"

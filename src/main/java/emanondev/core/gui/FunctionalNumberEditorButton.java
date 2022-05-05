@@ -14,6 +14,11 @@ import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * @see emanondev.core.gui.NumberEditorFButton
+ * @deprecated replaced
+ */
 public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
 
     private final Consumer<T> changeRequest;

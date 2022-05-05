@@ -150,7 +150,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     @Override
-    public void onClose(InventoryCloseEvent event) {
+    public void onClose(@NotNull InventoryCloseEvent event) {
         snap.apply(getTargetPlayer(), FieldType.INVENTORY);
     }
 

@@ -82,7 +82,7 @@ public class TypeGui implements Gui {
     }
 
     @Override
-    public void onClose(InventoryCloseEvent event) {
+    public void onClose(@NotNull InventoryCloseEvent event) {
     }
 
     /**

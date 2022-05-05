@@ -11,6 +11,11 @@ import org.bukkit.inventory.ItemStack;
 import emanondev.core.CorePlugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see emanondev.core.gui.PagedListGui
+ * @deprecated replaced
+ */
+@Deprecated
 public abstract class ListGui<T> extends ChestGui implements PagedGui {
 
     private int nextPageSlot = 8;

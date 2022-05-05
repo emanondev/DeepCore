@@ -2,6 +2,11 @@ package emanondev.core;
 
 import org.bukkit.Bukkit;
 
+/**
+ * @see emanondev.core.util.GameVersion
+ * @deprecated replaced
+ */
+@Deprecated
 public enum MCVersion {
     UNKNOWN("unknown", 100), V1_18("1.18", 16),V1_17("1.17", 15), V1_16_4("1.16.4", 14), V1_16_2("1.16.2", 13), V1_16("1.16", 12),
     V1_15("1.15", 11), V1_14("1.14", 10), V1_13_1("1.13.1", 9), V1_13("1.13", 8), V1_12("1.12", 7), V1_11("1.11", 6),

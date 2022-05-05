@@ -60,7 +60,7 @@ public class ItemEditorFButton extends AGuiButton {
         }
 
         @Override
-        public void onClose(InventoryCloseEvent event) {
+        public void onClose(@NotNull InventoryCloseEvent event) {
             onClose.accept(event);
         }
     }

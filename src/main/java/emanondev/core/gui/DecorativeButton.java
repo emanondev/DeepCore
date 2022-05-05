@@ -5,6 +5,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+@Deprecated
 public class DecorativeButton extends AGuiButton {
 
     private final ItemStack item;

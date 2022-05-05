@@ -1,17 +1,15 @@
 package emanondev.core.gui;
 
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-
 import emanondev.core.CoreMain;
+import org.bukkit.scheduler.BukkitRunnable;
 
-public class NameChangeHandler {
+class NameChangeHandler {
 
     public NameChangeHandler() {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();

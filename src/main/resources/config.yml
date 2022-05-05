@@ -12,3 +12,5 @@ database:
     # database type
     # only MYSQL is supported actually
     type: MYSQL
+updates:
+    notify_admin: true

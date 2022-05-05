@@ -1,13 +1,10 @@
 package emanondev.core.gui;
 
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
+import emanondev.core.CoreMain;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public class BackButton extends AGuiButton {
 
@@ -16,12 +13,14 @@ public class BackButton extends AGuiButton {
     public BackButton(Gui parent) {
         super(parent);
         if (parent.getPreviousGui() != null) {
-            item = new ItemStack(getPlugin().getConfig("guiConfig.yml").loadItemStack("back.item", new ItemBuilder(Material.DARK_OAK_DOOR).setGuiProperty().build()));
-            UtilsString.updateDescription(item, getPlugin().getLanguageConfig(getTargetPlayer()).loadStringList("gui_button.back.description", List.of("&4&lGo Back")), getTargetPlayer(), true);
+            item = CoreMain.get().getConfig("guiConfig.yml").loadGuiItem("back", Material.DARK_OAK_DOOR)
+                    .setDescription(CoreMain.get().getLanguageConfig(getTargetPlayer()).getStringList("gui_button.back"),
+                            true, getTargetPlayer()).build();
             return;
         }
-        item = new ItemStack(getPlugin().getConfig("guiConfig.yml").loadItemStack("close.item", new ItemBuilder(Material.DARK_OAK_DOOR).setGuiProperty().build()));
-        UtilsString.updateDescription(item, getPlugin().getLanguageConfig(getTargetPlayer()).loadStringList("gui_button.close.description", List.of("&4&lClose")), getTargetPlayer(), true);
+        item = CoreMain.get().getConfig("guiConfig.yml").loadGuiItem("close", Material.BARRIER)
+                .setDescription(CoreMain.get().getLanguageConfig(getTargetPlayer()).getStringList("gui_button.close"),
+                        true, getTargetPlayer()).build();
     }
 
     @Override
@@ -31,11 +30,10 @@ public class BackButton extends AGuiButton {
 
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
-        if (getGui().getPreviousGui() != null) {
+        if (getGui().getPreviousGui() != null)
             getGui().getPreviousGui().open(event.getWhoClicked());
-            return false;
-        }
-        event.getWhoClicked().closeInventory();
+        else
+            event.getWhoClicked().closeInventory();
         return false;
     }
 }

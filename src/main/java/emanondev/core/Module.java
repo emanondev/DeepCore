@@ -2,16 +2,17 @@ package emanondev.core;
 
 import java.io.File;
 
+import emanondev.core.util.FileLogger;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import emanondev.core.util.ConsoleLogger;
-import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Module implements Listener, ConsoleLogger {
+public abstract class Module implements Listener, ConsoleLogger, FileLogger {
 
     private final CorePlugin plugin;
 

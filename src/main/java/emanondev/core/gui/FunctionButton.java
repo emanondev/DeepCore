@@ -7,6 +7,11 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see emanondev.core.gui.FButton
+ * @deprecated replaced
+ */
+@Deprecated
 public class FunctionButton extends AGuiButton {
 
     private final Function<InventoryDragEvent, Boolean> onDrag;

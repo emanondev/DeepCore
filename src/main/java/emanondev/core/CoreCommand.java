@@ -1,10 +1,12 @@
 package emanondev.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.lang.Validate;
+import emanondev.core.util.CompleteUtility;
+import emanondev.core.util.ConsoleLogger;
+import emanondev.core.util.FileLogger;
+import emanondev.core.util.ReadUtility;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -15,14 +17,11 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import emanondev.core.util.CompleteUtility;
-import emanondev.core.util.ConsoleLogger;
-import emanondev.core.util.ReadUtility;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompleteUtility, ReadUtility, ConsoleLogger {
+public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompleteUtility, ReadUtility, ConsoleLogger, FileLogger {
 
     private final CorePlugin plugin;
     private final YMLConfig config;
@@ -35,7 +34,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      *
      * @return Command ID.
      */
-    public String getID() {
+    public @NotNull String getID() {
         return id;
     }
 
@@ -44,7 +43,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      *
      * @return Config file of this Command.
      */
-    public YMLConfig getConfig() {
+    public @NotNull YMLConfig getConfig() {
         return config;
     }
 
@@ -122,7 +121,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                 tempAliases.add(alias.toLowerCase());
         }
         this.setAliases(tempAliases);
-        this.setDescription(config.loadMessage("info.description", defaultDescription==null?"":defaultDescription, true));
+        this.setDescription(config.loadMessage("info.description", defaultDescription == null ? "" : defaultDescription, true));
         this.setUsage(config.loadMessage("info.usage", "&cUsage: /" + getName(), true));
         if (permission != null) {
             // plugin.registerPermission(permission);
@@ -207,7 +206,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     @Override
     public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
                                                    @NotNull String[] args) {
-        Validate.isTrue(args != null);
         return onComplete(sender, alias, args, null);
     }
 
@@ -264,8 +262,11 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param perm   lacking permission
      */
     protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
-        getLanguageSection(sender).loadMessage("lack_permission",
-                "&cYou lack of permission %permission%", "%permission%", perm.getName());
+        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.lack_permission",
+                "", "%permission%", perm.getName()
+                , "%plugin%", getPlugin().getName());
+        if (!msg.isEmpty())
+            sender.sendMessage(msg);
     }
 
     /**
@@ -274,7 +275,9 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender who
      */
     protected void playerOnlyNotify(CommandSender sender) {
-        getLanguageSection(sender).loadMessage("players_only", "&cCommand for players only");
+        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only", "", "%plugin%", getPlugin().getName());
+        if (!msg.isEmpty())
+            sender.sendMessage(msg);
     }
 
     /**

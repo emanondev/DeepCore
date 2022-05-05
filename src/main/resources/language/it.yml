@@ -1,0 +1,48 @@
+gui_button:
+  next_page:
+    - "&9[&fClick&9] &7Vai a pagina &e%target_page%"
+  previous_page:
+    - "&9[&fClick&9] &7Vai a pagina &e%target_page%"
+  back:
+    - "&9[&fClick&9] &7Torna indietro"
+  close:
+    - "&9[&fClick&9] &7Chiudi"
+  number_editor:
+    base:
+      - "&6&lQuantità: &e%value%"
+      - ""
+    instructions:
+      - "&9[&fClick Sx/Dx&9] &c-%amount% &7/ &a+%amount%"
+      - "&9[&fClick Shift Sx/Dx&9] &7%amount_dec% < &e%amount% &7> %amount_inc%"
+  time_editor:
+    base:
+      - "&6&lTempo: &e%value%"
+      - ""
+    instructions:
+      - "&9[&fClick Sx/Dx&9] &c-%amount% &7/ &a+%amount%"
+      - "&9[&fClick Shift Sx/Dx&9] &7%amount_dec% < &e%amount% &7> %amount_inc%"
+command:
+  reload:
+    success: "&9[&f%plugin%&9]&a Plugin ricaricato"
+    fail: "&4[&c%plugin%&4]&c Ricaricamento del plugin fallito!"
+  players_only: "&4[&c%plugin%&4]&c Commando solo per giocatori"
+  lack_permission: "&4[&c%plugin%&4]&c Ti manca il permesso &6%permission%"
+conjunction:
+  and: and
+time:
+  multi:
+    second: s
+    minute: m
+    hour: h
+    day: d
+    week: w
+  single:
+    second: s
+    minute: m
+    hour: h
+    day: d
+    week: w
+update:
+  console_error_message: "&cControllo update disponibili fallito!"
+  console_message: "&fUpdate disponibile:&b %link%"
+  admin_message: "&9[&f%plugin%&9] &fUpdate disponibile:&b %link%"

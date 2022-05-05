@@ -70,7 +70,7 @@ public abstract class AnvilGui implements TextGui {
     }
 
     @Override
-    public void onClose(InventoryCloseEvent event) {
+    public void onClose(@NotNull InventoryCloseEvent event) {
     }
 
     /**

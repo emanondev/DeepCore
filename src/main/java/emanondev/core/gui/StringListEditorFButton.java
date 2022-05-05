@@ -38,8 +38,6 @@ public class StringListEditorFButton extends AGuiButton {
                                    Supplier<List<String>> baseDescription, Supplier<List<String>> valueDescription,
                                    Supplier<List<String>> instructionsDescription) {
         super(parent);
-        if (getValue == null || setValue == null)
-            throw new NullPointerException();
         this.getValue = getValue;
         this.setValue = setValue;
         this.baseItem = baseItem;
@@ -63,23 +61,28 @@ public class StringListEditorFButton extends AGuiButton {
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
-            case LEFT:
+            case LEFT -> {
                 setLine(getLine() - 1);
                 return true;
-            case RIGHT:
+            }
+            case RIGHT -> {
                 setLine(getLine() + 1);
                 return true;
-            case MIDDLE:
+            }
+            case MIDDLE -> {
                 applyAction();
                 return true;
-            case SHIFT_LEFT:
+            }
+            case SHIFT_LEFT -> {
                 action = Action.values()[(action.ordinal() - 1 + Action.values().length) % Action.values().length];
                 return true;
-            case SHIFT_RIGHT:
+            }
+            case SHIFT_RIGHT -> {
                 action = Action.values()[(action.ordinal() + 1 + Action.values().length) % Action.values().length];
                 return true;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         return false;
     }
@@ -110,7 +113,7 @@ public class StringListEditorFButton extends AGuiButton {
             list = new ArrayList<>(list);
         int line = getLine();
         switch (action) {
-            case ADD_LINE:
+            case ADD_LINE -> {
                 try {
                     if (line >= list.size())
                         list.add("&f");
@@ -120,16 +123,16 @@ public class StringListEditorFButton extends AGuiButton {
                     e.printStackTrace();
                 }
                 this.setValue(list);
-                break;
-            case DELETE_LINE:
+            }
+            case DELETE_LINE -> {
                 try {
                     list.remove(line);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 this.setValue(list);
-                break;
-            case EDIT_LINE:
+            }
+            case EDIT_LINE -> {
                 final List<String> temp = list;
                 new TextEditorGui(subTitle, list.get(line), getTargetPlayer(), this.getGui(), getPlugin()) {
 
@@ -141,8 +144,8 @@ public class StringListEditorFButton extends AGuiButton {
                     }
 
                 }.open(getTargetPlayer());
-                break;
-            case MOVE_DOWN:
+            }
+            case MOVE_DOWN -> {
                 try {
                     if (line + 1 >= list.size())
                         list.add(line, "");
@@ -152,8 +155,8 @@ public class StringListEditorFButton extends AGuiButton {
                     e.printStackTrace();
                 }
                 this.setValue(list);
-                break;
-            case MOVE_UP:
+            }
+            case MOVE_UP -> {
                 try {
                     if (line - 1 < 0) {
                         action = Action.MOVE_DOWN;
@@ -166,9 +169,8 @@ public class StringListEditorFButton extends AGuiButton {
                     e.printStackTrace();
                 }
                 this.setValue(list);
-                break;
-            default:
-                throw new IllegalStateException();
+            }
+            default -> throw new IllegalStateException();
         }
 
     }
