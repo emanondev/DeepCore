@@ -107,7 +107,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         if (god != null)
             map.put("god", god);
         if (gameMode != null)
-            map.put("gameMode", gameMode);
+            map.put("gameMode", gameMode.name());
         if (flySpeed != null)
             map.put("flySpeed", flySpeed);
         if (fireTicks != null)
@@ -153,7 +153,12 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         snapshot.absorbition = (Double) map.get("absorbition");
         snapshot.allowFlight = (Boolean) map.get("allowFlight");
         snapshot.god = (Boolean) map.get("god");
-        snapshot.gameMode = (GameMode) map.get("gameMode");
+        try {
+            String tmp = (String) map.get("gameMode");
+            snapshot.gameMode = tmp == null ? null : GameMode.valueOf(tmp);
+        } catch (Exception e) {
+            snapshot.gameMode = null;
+        }
         snapshot.flySpeed = map.containsKey("flySpeed") ? ((Number) map.get("flySpeed")).floatValue() : null;
         snapshot.fireTicks = (Integer) map.get("fireTicks");
         snapshot.remainingAir = map.containsKey("remainingAir") ? (Integer) map.get("remainingAir") : null;
