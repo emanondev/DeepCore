@@ -706,13 +706,15 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case EXPERIENCE -> 0F;
             case EXHAUSTION -> 1F;
             case HEALTH -> 20D;
-            case AIR, FOODLEVEL -> 20;
+            case AIR -> 300;
+            case FOODLEVEL -> 20;
             case ALLOWFLIGHT, GOD, FLYING -> false;
             case ARMOR -> Collections.nCopies(4, (ItemStack) null);
             case EXTRACONTENTS -> Collections.nCopies(1, (ItemStack) null);
             case EFFECTS -> new ArrayList<PotionEffect>(0);
             case ENDERCHEST -> Collections.nCopies(9 * 3, (ItemStack) null);
-            case WALKSPEED, FLYSPEED, SATURATION -> 1;
+            case WALKSPEED, FLYSPEED -> 0.2F;
+            case SATURATION -> 1;
             case GAMEMODE -> GameMode.SURVIVAL;
             case INVENTORY -> Collections.nCopies(9 * 4, (ItemStack) null);
             case LOCATION -> null;// TODO fallback?
