@@ -21,6 +21,22 @@ gui_button:
     instructions:
       - "&9[&fClick Sx/Dx&9] &c-%amount% &7/ &a+%amount%"
       - "&9[&fClick Shift Sx/Dx&9] &7%amount_dec% < &e%amount% &7> %amount_inc%"
+  string_list_editor:
+    add_line:
+      symbol: "&a&l+"
+      description: "Add Line"
+    edit_line:
+      symbol: "&9✎"
+      description: "Edit line"
+    delete_line:
+      symbol: "&c&l✗"
+      description: "Delete line"
+    move_down:
+      symbol: "&e▽"
+      description: "Move line downside"
+    move_up:
+      symbol: "&e△"
+      description: "Move line upside"
 command:
   reload:
     success: "&9[&f%plugin%&9]&a Plugin ricaricato"
@@ -28,7 +44,7 @@ command:
   players_only: "&4[&c%plugin%&4]&c Commando solo per giocatori"
   lack_permission: "&4[&c%plugin%&4]&c Ti manca il permesso &6%permission%"
 conjunction:
-  and: and
+  and: e
 time:
   multi:
     second: s

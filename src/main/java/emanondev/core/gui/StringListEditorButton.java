@@ -2,7 +2,9 @@ package emanondev.core.gui;
 
 import java.util.*;
 
+import emanondev.core.CoreMain;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -169,8 +171,8 @@ public abstract class StringListEditorButton extends AGuiButton {
         tmp = getInstructionsDescription();
         if (tmp != null)
             desc.addAll(tmp);
-        return UtilsString.fix(desc, null, true, "%action_symbol%", action.symbol, "%action_description%",
-                action.desc, "%action_line%", actionLine());
+        return UtilsString.fix(desc, null, true, "%action_symbol%", action.getSymbol(getTargetPlayer()), "%action_description%",
+                action.getDescription(getTargetPlayer()), "%action_line%", actionLine());
     }
 
     public List<String> getBaseDescription() {
@@ -202,28 +204,30 @@ public abstract class StringListEditorButton extends AGuiButton {
 
     private String actionLine() {
         return "" +
-                (action == Action.ADD_LINE ? "&b[" + action.symbol + "&b] "
-                        : "&8[" + Action.ADD_LINE.symbol + "&8] ") +
-                (action == Action.EDIT_LINE ? "&b[" + action.symbol + "&b] "
-                        : "&8[" + Action.EDIT_LINE.symbol + "&8] ") +
-                (action == Action.DELETE_LINE ? "&b[" + action.symbol + "&b] "
-                        : "&8[" + Action.DELETE_LINE.symbol + "&8] ") +
-                (action == Action.MOVE_DOWN ? "&b[" + action.symbol + "&b] "
-                        : "&8[" + Action.MOVE_DOWN.symbol + "&8] ") +
-                (action == Action.MOVE_UP ? "&b[" + action.symbol + "&b] "
-                        : "&8[" + Action.MOVE_UP.symbol + "&8]");
+                (action == Action.ADD_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+                        : "&8[" + Action.ADD_LINE.getSymbol(getTargetPlayer()) + "&8] ") +
+                (action == Action.EDIT_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+                        : "&8[" + Action.EDIT_LINE.getSymbol(getTargetPlayer()) + "&8] ") +
+                (action == Action.DELETE_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+                        : "&8[" + Action.DELETE_LINE.getSymbol(getTargetPlayer()) + "&8] ") +
+                (action == Action.MOVE_DOWN ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+                        : "&8[" + Action.MOVE_DOWN.getSymbol(getTargetPlayer()) + "&8] ") +
+                (action == Action.MOVE_UP ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+                        : "&8[" + Action.MOVE_UP.getSymbol(getTargetPlayer()) + "&8]");
     }
 
     private enum Action {
-        ADD_LINE("&a&l+", "Add Line"), EDIT_LINE("&9✐", "Edit line"), DELETE_LINE("&c&l✗", "Delete line"),
-        MOVE_DOWN("&e▽", "Move line downside"), MOVE_UP("&e△", "Move line upside");
+        ADD_LINE, EDIT_LINE, DELETE_LINE,
+        MOVE_DOWN, MOVE_UP;
 
-        private final String symbol;
-        private final String desc;
+        private String getSymbol(CommandSender sender){
+            return CoreMain.get().getLanguageConfig(sender)
+                    .loadString("gui_button.string_list_editor."+this.name().toLowerCase()+".symbol","@");
+        }
 
-        Action(String symbol, String desc) {
-            this.symbol = symbol;
-            this.desc = desc;
+        private String getDescription(CommandSender sender){
+            return CoreMain.get().getLanguageConfig(sender)
+                    .loadString("gui_button.string_list_editor."+this.name().toLowerCase()+".desc","description");
         }
 
     }

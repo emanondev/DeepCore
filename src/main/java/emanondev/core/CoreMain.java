@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.util.ItemUtility;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,13 +30,14 @@ public final class CoreMain extends CorePlugin {
 
     public void enable() {
         this.registerListener(new CustomEventListener());
-        this.logDone("Enabled &aPlayerBuyMerchantRecipeEvent");
+        this.logDone("Enabled &aMerchantCraftEvent");
         this.registerListener(new GuiHandler());
         this.logDone("Enabled &aDeepCore Guis");
         this.registerListener(new SpawnReasonTracker());
         this.logDone("Enabled &aSpawnReasonTracker");
         this.registerListener(new EquipChangeListener());
         this.logDone("Enabled &aEquipmentChangeEvent");
+        ItemUtility.inizialize();
     }
 
     public void reload() {

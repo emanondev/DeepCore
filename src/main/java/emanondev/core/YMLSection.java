@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.util.ItemUtility;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -13,6 +14,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.Contract;
@@ -791,7 +794,7 @@ public interface YMLSection extends ConfigurationSection {
                 if (value == null || value.isEmpty())
                     val = null;
                 else
-                val = Enum.valueOf(clazz, value);
+                    val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
                     val = Enum.valueOf(clazz, value.toUpperCase());
@@ -829,7 +832,7 @@ public interface YMLSection extends ConfigurationSection {
                 if (value == null || value.isEmpty())
                     val = null;
                 else
-                val = Enum.valueOf(clazz, value);
+                    val = Enum.valueOf(clazz, value);
             } catch (IllegalArgumentException e) {
                 try {
                     val = Enum.valueOf(clazz, value.toUpperCase());
@@ -921,6 +924,21 @@ public interface YMLSection extends ConfigurationSection {
         return loadEnum(path, def, Material.class);
     }
 
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String,
+     * default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable Material getMaterial(@NotNull String path, @Nullable Material def) {
+        return getEnum(path, def, Material.class);
+    }
+
     /**
      * Gets the object from the config or set default.<br>
      * Get the object from path, if object at selected path is null or not a String
@@ -965,6 +983,20 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null -> !null")
     default @Nullable EntityType loadEntityType(@NotNull String path, @Nullable EntityType def) {
         return loadEnum(path, def, EntityType.class);
+    }
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String,
+     * default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable EntityType getEntityType(@NotNull String path, @Nullable EntityType def) {
+        return getEnum(path, def, EntityType.class);
     }
 
     /**
@@ -1140,60 +1172,136 @@ public interface YMLSection extends ConfigurationSection {
         return val;
     }
 
-    /**
-     * Paths are material glow amount unbreakable customModelData damage
-     * @param path path to item config
-     * @param defMaterial default material
-     * @return gui item
-     */
-    @NotNull
-    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial){
-        return loadGuiItem(path, defMaterial, false, 1,false);
+
+    @Contract("_,!null->!null")
+    @Nullable
+    default ItemBuilder getGuiItem(@NotNull String path, @Nullable ItemStack def) {
+        if (this.get(path) instanceof ItemStack) { //backward compability
+            return new ItemBuilder(getItemStack(path, def));
+        }
+        YMLSection section = this.loadSection(path);
+        ItemBuilder b = ItemUtility.convertItem(section);
+        if (b!=null)
+            return b;
+
+        ItemMeta meta = def == null ? null : def.getItemMeta();
+        return new ItemBuilder(section.getMaterial("material", def == null ? Material.STONE : def.getType()))
+                .hideAllFlags().addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow",
+                        def != null && def.getEnchantments().size() > 0) ? 1 : 0)
+                .setAmount(section.getInteger("amount", def == null ? 1 : def.getAmount()))
+                .setUnbreakable(section.getBoolean("unbreakable", def != null && meta.isUnbreakable()))
+                .setCustomModelData(section.getInteger("customModelData", def == null ? 0 : meta.getCustomModelData()))
+                .setDamage(section.getInteger("damage", def == null ? 0 : ((meta instanceof Damageable) ? ((Damageable) meta).getDamage() : 0)));
+    }
+
+    @Contract("_,!null->!null")
+    @Nullable
+    default ItemBuilder getGuiItem(@NotNull String path, @Nullable ItemBuilder def) {
+        return getGuiItem(path, def == null ? null : def.build());
+    }
+
+    @Contract("_,!null->!null")
+    @Nullable
+    default ItemBuilder loadGuiItem(@NotNull String path, @Nullable ItemStack def) {
+        if (this.get(path) instanceof ItemStack) { //backward compability
+            return new ItemBuilder(getItemStack(path, def));
+        }
+        YMLSection section = this.loadSection(path);
+        ItemBuilder b = ItemUtility.convertItem(section);
+        if (b!=null)
+            return b;
+
+        ItemMeta meta = def == null ? null : def.getItemMeta();
+        b = new ItemBuilder(section.loadMaterial("material", def == null ? Material.STONE : def.getType())).hideAllFlags();
+        if (def != null && def.getEnchantments().size() > 0)
+            b.addEnchantment(Enchantment.DURABILITY, section.loadBoolean("glow", true) ? 1 : 0);
+        else
+            b.addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow", true) ? 1 : 0);
+        if (def == null || def.getAmount() == 1)
+            b.setAmount(section.getInteger("amount", 1));
+        else
+            b.setAmount(section.loadInteger("amount", 1));
+        if (meta != null && meta.isUnbreakable())
+            b.setUnbreakable(section.loadBoolean("unbreakable",true));
+        else
+            b.setUnbreakable(section.getBoolean("unbreakable",false));
+        if (meta != null && meta.getCustomModelData()!=0)
+            b.setCustomModelData(section.loadInteger("customModelData",meta.getCustomModelData()));
+        else
+            b.setCustomModelData(section.getInteger("customModelData",0));
+        if (meta instanceof Damageable d && d.getDamage()!=0)
+            b.setCustomModelData(section.loadInteger("damage",d.getDamage()));
+        else
+            b.setCustomModelData(section.getInteger("damage",0));
+        return b;
+    }
+
+
+
+    @Contract("_,!null->!null")
+    @Nullable
+    default ItemBuilder loadGuiItem(@NotNull String path, @Nullable ItemBuilder def) {
+        return loadGuiItem(path, def == null ? null : def.build());
     }
 
     /**
      * Paths are material glow amount unbreakable customModelData damage
-     * @param path path to item config
+     *
+     * @param path        path to item config
      * @param defMaterial default material
-     * @param defGlow default glow value
      * @return gui item
      */
     @NotNull
-    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow){
-        return loadGuiItem(path, defMaterial, defGlow, 1,false);
+    default ItemBuilder loadGuiItem(@NotNull String path, @NotNull Material defMaterial) {
+        return loadGuiItem(path, defMaterial, false, 1, false);
     }
 
     /**
      * Paths are material glow amount unbreakable customModelData damage
-     * @param path path to item config
+     *
+     * @param path        path to item config
      * @param defMaterial default material
-     * @param defGlow default glow value
-     * @param defAmount default amount
+     * @param defGlow     default glow value
      * @return gui item
      */
     @NotNull
-    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow,int defAmount){
-        return loadGuiItem(path, defMaterial, defGlow, defAmount,false);
+    default ItemBuilder loadGuiItem(@NotNull String path, @NotNull Material defMaterial, boolean defGlow) {
+        return loadGuiItem(path, defMaterial, defGlow, 1, false);
     }
 
     /**
      * Paths are material glow amount unbreakable customModelData damage
-     * @param path path to item config
+     *
+     * @param path        path to item config
      * @param defMaterial default material
-     * @param defGlow default glow value
-     * @param defAmount default amount
+     * @param defGlow     default glow value
+     * @param defAmount   default amount
+     * @return gui item
+     */
+    @NotNull
+    default ItemBuilder loadGuiItem(@NotNull String path, @NotNull Material defMaterial, boolean defGlow, int defAmount) {
+        return loadGuiItem(path, defMaterial, defGlow, defAmount, false);
+    }
+
+    /**
+     * Paths are material glow amount unbreakable customModelData damage
+     *
+     * @param path           path to item config
+     * @param defMaterial    default material
+     * @param defGlow        default glow value
+     * @param defAmount      default amount
      * @param defUnbreakable default unbreakable value
      * @return gui item
      */
     @NotNull
-    default ItemBuilder loadGuiItem(@NotNull String path,@NotNull Material defMaterial,boolean defGlow,int defAmount,boolean defUnbreakable){
+    default ItemBuilder loadGuiItem(@NotNull String path, @NotNull Material defMaterial, boolean defGlow, int defAmount, boolean defUnbreakable) {
         if (this.get(path) instanceof ItemStack)
             return new ItemBuilder(loadItemStack(path, new ItemStack(Material.STONE)));
         YMLSection section = this.loadSection(path);
-        return new ItemBuilder(section.loadMaterial("material",defMaterial))
-                .hideAllFlags().addEnchantment(Enchantment.DURABILITY,section.getBoolean("glow",defGlow)?1:0)
-                .setAmount(section.getInteger("amount",defAmount)).setUnbreakable(section.getBoolean("unbreakable",defUnbreakable))
-                .setCustomModelData(section.getInteger("customModelData",0))
-                .setDamage(section.getInteger("damage",0));
+        return new ItemBuilder(section.loadMaterial("material", defMaterial))
+                .hideAllFlags().addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow", defGlow) ? 1 : 0)
+                .setAmount(section.getInteger("amount", defAmount)).setUnbreakable(section.getBoolean("unbreakable", defUnbreakable))
+                .setCustomModelData(section.getInteger("customModelData", 0))
+                .setDamage(section.getInteger("damage", 0));
     }
 }

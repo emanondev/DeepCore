@@ -18,12 +18,13 @@ import emanondev.core.ItemBuilder;
 public class ResearchFButton<T> extends AGuiButton {
 
     private final Supplier<ItemStack> getItem;
-    private final Function<InventoryClickEvent, Boolean> onClick;
+    private final Function<InventoryClickEvent, Boolean> shouldOverrideClick;
     private final BiFunction<String, T, Boolean> match;
     private final BiFunction<InventoryClickEvent, T, Boolean> elementClick;
     private final Function<T, ItemStack> elementItem;
     private final Supplier<Collection<T>> getElements;
     private final Comparator<T> sort;
+    private final Function<InventoryClickEvent, Boolean> overrideClick;
 
     /**
      * @param parent
@@ -37,13 +38,33 @@ public class ResearchFButton<T> extends AGuiButton {
                            @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
                            @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements) {
-        this(parent, getItem, null, match, elementClick, elementItem, getElements, null);
+        this(parent, getItem, null, null, match, elementClick, elementItem, getElements, null);
+    }
+
+
+    /**
+     * @param parent
+     * @param getItem      create the item for this button
+     * @param shouldOverrideClick      override click
+     * @param match        select which string match which elements
+     * @param elementClick what happens when clicked
+     * @param elementItem  create the item for element
+     * @param getElements  get allowed values
+     * @param sort         how to sort entities
+     */
+    @Deprecated
+    public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
+                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, @NotNull BiFunction<String, T, Boolean> match,
+                           @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
+                           @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
+        this(parent, getItem, shouldOverrideClick, null, match, elementClick, elementItem, getElements, sort);
     }
 
     /**
      * @param parent
      * @param getItem      create the item for this button
-     * @param onClick      override click
+     * @param shouldOverrideClick      true if shoudl override override click
+     * @param overrideClick      if overrideclick handle click
      * @param match        select which string match which elements
      * @param elementClick what happens when clicked
      * @param elementItem  create the item for element
@@ -51,12 +72,13 @@ public class ResearchFButton<T> extends AGuiButton {
      * @param sort         how to sort entities
      */
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
-                           Function<InventoryClickEvent, Boolean> onClick, @NotNull BiFunction<String, T, Boolean> match,
+                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, Function<InventoryClickEvent,Boolean> overrideClick, @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
                            @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
         super(parent);
         this.getItem = getItem;
-        this.onClick = onClick;
+        this.shouldOverrideClick = shouldOverrideClick;
+        this.overrideClick = overrideClick;
         this.match = match;
         this.elementClick = elementClick;
         this.elementItem = elementItem;
@@ -69,7 +91,12 @@ public class ResearchFButton<T> extends AGuiButton {
     }
 
     public boolean onClick(@NotNull InventoryClickEvent event) {
-        return onClick == null ? defaultOnClick(event) : onClick.apply(event);
+        if (shouldOverrideClick == null)
+            return defaultOnClick(event);
+        if (shouldOverrideClick.apply(event))
+            return overrideClick != null && overrideClick.apply(event);
+        else
+            return defaultOnClick(event);
     }
 
     public boolean defaultOnClick(InventoryClickEvent event) {

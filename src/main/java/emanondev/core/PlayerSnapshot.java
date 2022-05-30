@@ -37,6 +37,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     private Integer remainingAir;
     private Float walkSpeed;
     private Boolean flying;
+    private List<ItemStack> extraContents;
 
     public PlayerSnapshot() {
     }
@@ -75,6 +76,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             map.put("locationPitch", locationPitch);
         if (armor != null)
             map.put("armor", armor);
+        if (extraContents != null)
+            map.put("extraContents", extraContents);
         if (inventory != null)
             map.put("inventory", inventory);
         if (enderChest != null)
@@ -125,6 +128,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         snapshot.locationPitch = map.containsKey("locationPitch") ? ((Number) map.get("locationPitch")).floatValue()
                 : null;
         snapshot.armor = (List<ItemStack>) map.get("armor");
+        snapshot.extraContents = (List<ItemStack>) map.get("extraContents");
         snapshot.inventory = (List<ItemStack>) map.get("inventory");
         snapshot.enderChest = (List<ItemStack>) map.get("enderChest");
         snapshot.level = (Integer) map.get("level");
@@ -151,7 +155,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
      * which do manage inventory, EFFECTS should be loaded before ABSORBITION and HEALTH
      */
     private final FieldType[] LOAD_ORDER = new FieldType[]{FieldType.LOCATION, FieldType.EFFECTS,
-            FieldType.ABSORBITION, FieldType.ARMOR, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
+            FieldType.ABSORBITION, FieldType.ARMOR, FieldType.EXTRACONTENTS, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
             FieldType.EXPERIENCE, FieldType.FOODLEVEL, FieldType.EXHAUSTION, FieldType.HEALTH, FieldType.ALLOWFLIGHT,
             FieldType.GOD, FieldType.GAMEMODE, FieldType.FLYSPEED, FieldType.FIRETICKS, FieldType.AIR,
             FieldType.WALKSPEED, FieldType.SATURATION};
@@ -191,6 +195,10 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case ARMOR -> {
                 if (this.armor != null)
                     who.getInventory().setArmorContents(this.armor.toArray(new ItemStack[0]));
+            }
+            case EXTRACONTENTS -> {
+                if (this.extraContents != null)
+                    who.getInventory().setExtraContents(this.extraContents.toArray(new ItemStack[0]));
             }
             case EFFECTS -> {
                 if (this.effects != null) {
@@ -300,6 +308,16 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
                         this.armor.set(i, null);
                 }
             }
+            case EXTRACONTENTS -> {
+                this.extraContents = new ArrayList<>(Arrays.asList(who.getInventory().getExtraContents()));
+                for (int i = 0; i < this.extraContents.size(); i++) {
+                    ItemStack el = this.extraContents.get(i);
+                    if (el == null)
+                        continue;
+                    if (el.getType() == Material.AIR)
+                        this.extraContents.set(i, null);
+                }
+            }
             case EFFECTS -> this.effects = new ArrayList<>(who.getActivePotionEffects());
             case ENDERCHEST -> {
                 this.enderChest = new ArrayList<>(Arrays.asList(who.getEnderChest().getStorageContents()));
@@ -354,6 +372,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case AIR -> getRemainingAir();
             case ALLOWFLIGHT -> getAllowFlight();
             case ARMOR -> getArmor();
+            case EXTRACONTENTS -> getExtraContents();
             case EFFECTS -> getEffects();
             case ENDERCHEST -> getEnderChest();
             case EXHAUSTION -> getExhaustion();
@@ -382,6 +401,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case AIR -> setRemainingAir((Integer) value);
             case ALLOWFLIGHT -> setAllowFlight((Boolean) value);
             case ARMOR -> setArmor((List<ItemStack>) value);
+            case EXTRACONTENTS -> setExtraContents((List<ItemStack>) value);
             case EFFECTS -> setEffects((Collection<PotionEffect>) value);
             case ENDERCHEST -> setEnderChest((List<ItemStack>) value);
             case EXHAUSTION -> setExhaustion((Float) value);
@@ -415,9 +435,14 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     }
 
     public void setArmor(List<ItemStack> value) {
-        if (value != null && value.size() != 5)
+        if (value != null && value.size() != 4)
             throw new IllegalArgumentException();
         this.armor = value == null ? null : new ArrayList<>(value);
+    }
+    public void setExtraContents(List<ItemStack> value) {
+        if (value != null && value.size() != 1)
+            throw new IllegalArgumentException();
+        this.extraContents = value == null ? null : new ArrayList<>(value);
     }
 
     public void setEffects(Collection<PotionEffect> value) {
@@ -511,6 +536,11 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             return null;
         return Collections.unmodifiableList(this.armor);
     }
+    public List<ItemStack> getExtraContents() {
+        if (this.extraContents == null)
+            return null;
+        return Collections.unmodifiableList(this.extraContents);
+    }
 
     public Collection<PotionEffect> getEffects() {
         if (this.effects == null)
@@ -593,7 +623,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public enum FieldType {
         LOCATION, ARMOR, INVENTORY, ENDERCHEST, LEVEL, EXPERIENCE, EFFECTS, FOODLEVEL, EXHAUSTION, HEALTH, ABSORBITION,
-        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING
+        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS
     }
 
     public void fillEmpty() {
@@ -613,6 +643,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case AIR -> this.remainingAir != null;
             case ALLOWFLIGHT -> this.allowFlight != null;
             case ARMOR -> this.armor != null;
+            case EXTRACONTENTS -> this.extraContents != null;
             case EFFECTS -> this.effects != null;
             case ENDERCHEST -> this.enderChest != null;
             case EXHAUSTION -> this.exhaustion != null;
@@ -640,6 +671,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case AIR -> this.remainingAir = (Integer) getDefault(type);
             case ALLOWFLIGHT -> this.allowFlight = (Boolean) getDefault(type);
             case ARMOR -> this.armor = (List<ItemStack>) getDefault(type);
+            case EXTRACONTENTS -> this.extraContents = (List<ItemStack>) getDefault(type);
             case EFFECTS -> this.effects = (Collection<PotionEffect>) getDefault(type);
             case ENDERCHEST -> this.enderChest = (List<ItemStack>) getDefault(type);
             case EXHAUSTION -> this.exhaustion = (Float) getDefault(type);
@@ -670,13 +702,17 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public Object getDefault(FieldType type) {
         return switch (type) {
-            case ABSORBITION, EXPERIENCE, FIRETICKS, LEVEL -> 0;
-            case AIR, HEALTH, FOODLEVEL -> 20;
+            case ABSORBITION, FIRETICKS, LEVEL -> 0;
+            case EXPERIENCE -> 0F;
+            case EXHAUSTION -> 1F;
+            case HEALTH -> 20D;
+            case AIR, FOODLEVEL -> 20;
             case ALLOWFLIGHT, GOD, FLYING -> false;
-            case ARMOR -> Collections.nCopies(5, (ItemStack) null);
+            case ARMOR -> Collections.nCopies(4, (ItemStack) null);
+            case EXTRACONTENTS -> Collections.nCopies(1, (ItemStack) null);
             case EFFECTS -> new ArrayList<PotionEffect>(0);
             case ENDERCHEST -> Collections.nCopies(9 * 3, (ItemStack) null);
-            case EXHAUSTION, WALKSPEED, FLYSPEED, SATURATION -> 1;
+            case WALKSPEED, FLYSPEED, SATURATION -> 1;
             case GAMEMODE -> GameMode.SURVIVAL;
             case INVENTORY -> Collections.nCopies(9 * 4, (ItemStack) null);
             case LOCATION -> null;// TODO fallback?
