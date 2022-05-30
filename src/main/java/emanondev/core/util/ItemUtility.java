@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 public class ItemUtility {
 
-    private static HashSet<ItemConverter> converters;
+    private static final HashSet<ItemConverter> converters = new HashSet<>();
 
     public static ItemBuilder convertItem(YMLSection section){
         if (section==null)
