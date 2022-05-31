@@ -1,5 +1,7 @@
 package emanondev.core.events;
 
+import emanondev.core.CoreMain;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,9 +13,6 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
-
-import emanondev.core.CoreMain;
-import net.md_5.bungee.api.ChatColor;
 
 public class CustomEventListener implements Listener {
 

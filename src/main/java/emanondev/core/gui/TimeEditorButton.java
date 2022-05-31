@@ -1,16 +1,15 @@
 package emanondev.core.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @see emanondev.core.gui.TimeEditorFButton

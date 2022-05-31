@@ -1,18 +1,20 @@
 package emanondev.core.gui;
 
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
+import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.*;
-
-import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
-import org.jetbrains.annotations.NotNull;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 /**

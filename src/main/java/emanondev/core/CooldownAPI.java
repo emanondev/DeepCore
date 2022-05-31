@@ -18,14 +18,14 @@ public class CooldownAPI {
 
     @Contract("null, true -> fail")
     CooldownAPI(CorePlugin plugin, boolean persistent) {
-        this(plugin,persistent,"cooldownData.yml");
+        this(plugin, persistent, "cooldownData.yml");
     }
 
     @Contract("_, true, null -> fail; null, true, _ -> fail")
-    CooldownAPI(CorePlugin plugin, boolean persistent,String fileName) {
+    CooldownAPI(CorePlugin plugin, boolean persistent, String fileName) {
         long now = System.currentTimeMillis();
         conf = persistent ? plugin.getConfig(fileName) : null;
-        if (conf!=null)
+        if (conf != null)
             for (String id : conf.getKeys("users")) {
                 HashMap<String, Long> map = new HashMap<>();
                 cooldowns.put(UUID.fromString(id), map);
@@ -41,7 +41,7 @@ public class CooldownAPI {
     }
 
     void save() {
-        if (conf!=null) {
+        if (conf != null) {
             long now = System.currentTimeMillis();
             conf.set("users", null, false);
             for (UUID uuid : cooldowns.keySet()) {

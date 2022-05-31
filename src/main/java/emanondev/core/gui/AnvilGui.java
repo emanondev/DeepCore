@@ -1,5 +1,7 @@
 package emanondev.core.gui;
 
+import emanondev.core.CorePlugin;
+import emanondev.core.UtilsString;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -7,9 +9,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import emanondev.core.CorePlugin;
-import emanondev.core.UtilsString;
 
 public abstract class AnvilGui implements TextGui {
 

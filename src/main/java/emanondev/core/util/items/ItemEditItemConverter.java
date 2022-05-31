@@ -10,11 +10,11 @@ public class ItemEditItemConverter implements ItemConverter {
 
     @Override
     public ItemBuilder convert(@NotNull YMLSection section) {
-        String id = section.getString("serveritem",null);
-        if (id==null)
+        String id = section.getString("serveritem", null);
+        if (id == null)
             return null;
         ItemStack item = ItemEdit.get().getServerStorage().getItem(id);
-        return item==null?null:new ItemBuilder(item);
+        return item == null ? null : new ItemBuilder(item);
     }
 
 }

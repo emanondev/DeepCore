@@ -1,8 +1,5 @@
 package emanondev.core;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -10,6 +7,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class PermissionBuilder {
 
@@ -24,7 +24,7 @@ public class PermissionBuilder {
      * @param plugin  plugin responsible for this permission
      * @param subName permission subName
      */
-    public PermissionBuilder(@NotNull Plugin plugin,@NotNull  String subName) {
+    public PermissionBuilder(@NotNull Plugin plugin, @NotNull String subName) {
         this(plugin.getName() + "." + subName);
     }
 
@@ -81,7 +81,6 @@ public class PermissionBuilder {
 
 
     /**
-     *
      * @param perm base permission
      */
     public PermissionBuilder(@NotNull Permission perm) {

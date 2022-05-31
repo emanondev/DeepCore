@@ -1,11 +1,7 @@
 package emanondev.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-
+import com.google.common.base.Predicate;
+import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -15,9 +11,11 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Predicate;
-
-import de.myzelyam.api.vanish.VanishAPI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
 public final class UtilsCommand {
 
@@ -211,7 +209,7 @@ public final class UtilsCommand {
         if (elements == null)
             return results;
         for (String e : elements)
-            if (e!=null && e.toLowerCase().startsWith(prefix))
+            if (e != null && e.toLowerCase().startsWith(prefix))
                 results.add(e);
         return results;
     }

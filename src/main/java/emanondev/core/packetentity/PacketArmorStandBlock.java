@@ -8,7 +8,7 @@ public class PacketArmorStandBlock extends PacketArmorStand {
 
     PacketArmorStandBlock(Location location, PacketManager manager, ItemStack block) {
         super(location, manager);
-        this.setItem(EquipmentSlot.HEAD,block);
+        this.setItem(EquipmentSlot.HEAD, block);
         this.setInvulnerable(true);
         this.setVisible(false);
     }

@@ -1,19 +1,19 @@
 package emanondev.core.gui;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
+import emanondev.core.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import emanondev.core.ItemBuilder;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ResearchFButton<T> extends AGuiButton {
 
@@ -44,13 +44,13 @@ public class ResearchFButton<T> extends AGuiButton {
 
     /**
      * @param parent
-     * @param getItem      create the item for this button
-     * @param shouldOverrideClick      override click
-     * @param match        select which string match which elements
-     * @param elementClick what happens when clicked
-     * @param elementItem  create the item for element
-     * @param getElements  get allowed values
-     * @param sort         how to sort entities
+     * @param getItem             create the item for this button
+     * @param shouldOverrideClick override click
+     * @param match               select which string match which elements
+     * @param elementClick        what happens when clicked
+     * @param elementItem         create the item for element
+     * @param getElements         get allowed values
+     * @param sort                how to sort entities
      */
     @Deprecated
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
@@ -62,17 +62,17 @@ public class ResearchFButton<T> extends AGuiButton {
 
     /**
      * @param parent
-     * @param getItem      create the item for this button
-     * @param shouldOverrideClick      true if shoudl override override click
-     * @param overrideClick      if overrideclick handle click
-     * @param match        select which string match which elements
-     * @param elementClick what happens when clicked
-     * @param elementItem  create the item for element
-     * @param getElements  get allowed values
-     * @param sort         how to sort entities
+     * @param getItem             create the item for this button
+     * @param shouldOverrideClick true if shoudl override override click
+     * @param overrideClick       if overrideclick handle click
+     * @param match               select which string match which elements
+     * @param elementClick        what happens when clicked
+     * @param elementItem         create the item for element
+     * @param getElements         get allowed values
+     * @param sort                how to sort entities
      */
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
-                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, Function<InventoryClickEvent,Boolean> overrideClick, @NotNull BiFunction<String, T, Boolean> match,
+                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, Function<InventoryClickEvent, Boolean> overrideClick, @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
                            @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
         super(parent);

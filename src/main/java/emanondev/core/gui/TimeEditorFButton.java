@@ -30,10 +30,10 @@ public class TimeEditorFButton extends AGuiButton {
 
 
     /**
-     * @param gui              parent gui
-     * @param grabValue        Supply the current value (seconds)
-     * @param changeRequest    Apply changes to current value (seconds)
-     * @param baseItem         Which item should be used for the button
+     * @param gui           parent gui
+     * @param grabValue     Supply the current value (seconds)
+     * @param changeRequest Apply changes to current value (seconds)
+     * @param baseItem      Which item should be used for the button
      */
     public TimeEditorFButton(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, @Nullable Supplier<ItemStack> baseItem) {
         this(gui, grabValue, changeRequest, baseItem,

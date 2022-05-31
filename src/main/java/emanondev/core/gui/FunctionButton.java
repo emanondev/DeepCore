@@ -1,11 +1,12 @@
 package emanondev.core.gui;
 
-import java.util.function.*;
-
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @see emanondev.core.gui.FButton

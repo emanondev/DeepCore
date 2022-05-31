@@ -1,17 +1,16 @@
 package emanondev.core.gui;
 
-import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
+import emanondev.core.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class ItemEditorFButton extends AGuiButton {
 

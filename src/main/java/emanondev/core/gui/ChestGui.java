@@ -1,20 +1,19 @@
 package emanondev.core.gui;
 
-import java.util.List;
-
+import emanondev.core.CorePlugin;
+import emanondev.core.UtilsMessages;
+import emanondev.core.UtilsString;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-
-import emanondev.core.CorePlugin;
-import emanondev.core.UtilsMessages;
-import emanondev.core.UtilsString;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 
 public abstract class ChestGui implements Gui {

@@ -11,7 +11,7 @@ public class DrcGuiItemConverter implements ItemConverter {
     @Override
     public ItemBuilder convert(@NotNull YMLSection section) {
         ItemStack item = DracarysGUIAPI.parseItem("dracarysgui");
-        if (item==null || item.getType().isAir())
+        if (item == null || item.getType().isAir())
             return null;
         return new ItemBuilder(item);
     }

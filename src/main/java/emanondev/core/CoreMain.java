@@ -1,11 +1,10 @@
 package emanondev.core;
 
+import emanondev.core.events.CustomEventListener;
+import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.ItemUtility;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
-
-import emanondev.core.events.CustomEventListener;
-import emanondev.core.gui.GuiHandler;
 
 public final class CoreMain extends CorePlugin {
 

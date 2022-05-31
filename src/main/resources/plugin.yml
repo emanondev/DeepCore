@@ -3,4 +3,4 @@ main: ${groupId}.CoreMain
 version: ${project.version}
 author: emanon
 api-version: 1.13
-softdepend: [SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny,ItemEdit,MythicMobs,DracarysGui]
+softdepend: [ SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny,ItemEdit,MythicMobs,DracarysGui ]

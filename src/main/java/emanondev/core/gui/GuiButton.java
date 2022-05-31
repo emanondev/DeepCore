@@ -1,13 +1,13 @@
 package emanondev.core.gui;
 
+import emanondev.core.CorePlugin;
+import emanondev.core.YMLSection;
 import emanondev.core.util.FileLogger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.CorePlugin;
-import emanondev.core.YMLSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

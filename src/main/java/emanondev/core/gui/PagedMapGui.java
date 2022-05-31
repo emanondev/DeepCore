@@ -1,13 +1,13 @@
 package emanondev.core.gui;
 
-import java.util.*;
-
+import emanondev.core.CorePlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-
-import emanondev.core.CorePlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class PagedMapGui extends ChestGui implements PagedGui {
 

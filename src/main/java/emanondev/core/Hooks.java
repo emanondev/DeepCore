@@ -1,9 +1,8 @@
 package emanondev.core;
 
+import emanondev.virginblock.VirginBlockAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-
-import emanondev.virginblock.VirginBlockAPI;
 
 public class Hooks {
     public static boolean isVault() {

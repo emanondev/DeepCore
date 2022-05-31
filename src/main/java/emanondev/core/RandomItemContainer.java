@@ -3,7 +3,10 @@ package emanondev.core;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class RandomItemContainer<T> {
 
@@ -21,14 +24,14 @@ public class RandomItemContainer<T> {
     }
 
     /**
-     *
-     * @param items items to add
+     * @param items  items to add
      * @param weight weight of the items, must be positive
      */
-    public void addItems(@NotNull Collection<T> items,@Range(from = 1, to = Integer.MAX_VALUE) int weight) {
+    public void addItems(@NotNull Collection<T> items, @Range(from = 1, to = Integer.MAX_VALUE) int weight) {
         for (T item : items)
             addItem(item, weight);
     }
+
     /**
      * Adds selected item, weight is 100 by default
      *
@@ -41,10 +44,10 @@ public class RandomItemContainer<T> {
     /**
      * Adds selected item
      *
-     * @param item item to add
+     * @param item   item to add
      * @param weight weight of the item, must be positive
      */
-    public void addItem(T item,@Range(from = 1, to = Integer.MAX_VALUE) int weight) {
+    public void addItem(T item, @Range(from = 1, to = Integer.MAX_VALUE) int weight) {
         items.add(item);
         weights.add(weight);
         fullWeight += weight;
@@ -59,7 +62,7 @@ public class RandomItemContainer<T> {
         return true;
     }
 
-    public boolean setWeight(T item,@Range(from = 1, to = Integer.MAX_VALUE) int weight) {
+    public boolean setWeight(T item, @Range(from = 1, to = Integer.MAX_VALUE) int weight) {
         if (!deleteItem(item))
             return false;
         addItem(item, weight);
@@ -87,6 +90,10 @@ public class RandomItemContainer<T> {
     @NotNull
     public List<Integer> getWeights() {
         return Collections.unmodifiableList(weights);
+    }
+
+    public long getFullWeight() {
+        return fullWeight;
     }
 
 }

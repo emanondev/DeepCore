@@ -1,15 +1,17 @@
 package emanondev.core.gui;
 
-import java.util.*;
-import java.util.function.Predicate;
-
+import emanondev.core.CorePlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-
-import emanondev.core.CorePlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
 
 public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
 
@@ -54,7 +56,7 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
      * @param timerUpdate
      * @param page
      */
-    public PagedListGui(String title, int rows, Player p,@Nullable Gui previousHolder,@NotNull CorePlugin plugin, boolean timerUpdate,
+    public PagedListGui(String title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, boolean timerUpdate,
                         int page) {
         super(title, rows, p, previousHolder, plugin, timerUpdate);
         if (rows == 1)
@@ -148,11 +150,11 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
      * @param slot   - from 0 to 8
      * @param button - what button? might be null
      */
-    public void setControlGuiButton(int slot,@Nullable GuiButton button) {
+    public void setControlGuiButton(int slot, @Nullable GuiButton button) {
         if (slot < 0 || slot >= 9)
             return;
         controlButtons[slot] = button;
-        if (button!=null)
+        if (button != null)
             getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
     }
 

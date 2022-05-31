@@ -1,16 +1,15 @@
 package emanondev.core;
 
-import java.io.File;
-
+import emanondev.core.util.ConsoleLogger;
 import emanondev.core.util.FileLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
-
-import emanondev.core.util.ConsoleLogger;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 public abstract class Module implements Listener, ConsoleLogger, FileLogger {
 
@@ -20,11 +19,11 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
     private final String description;
 
     @Deprecated
-    public Module(@NotNull String id,@NotNull CorePlugin plugin) {
+    public Module(@NotNull String id, @NotNull CorePlugin plugin) {
         this(id, plugin, null);
     }
 
-    public Module(@NotNull String id,@NotNull CorePlugin plugin, String description) {
+    public Module(@NotNull String id, @NotNull CorePlugin plugin, String description) {
         if (!UtilsString.isValidID(id))
             throw new IllegalArgumentException("invalid module id");
         this.id = id;
@@ -35,6 +34,7 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
 
     /**
      * Returns module description
+     *
      * @return module description
      */
     public final String getDescription() {
@@ -43,6 +43,7 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
 
     /**
      * Returns module identifier
+     *
      * @return module identifier
      */
     public final String getID() {
@@ -51,6 +52,7 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
 
     /**
      * Returns module plugin
+     *
      * @return module plugin
      */
     public final CorePlugin getPlugin() {

@@ -1,7 +1,8 @@
 package emanondev.core.packetentity;
 
-import java.util.Collection;
-
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -9,10 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import java.util.Collection;
 
 public class PacketItem extends PacketEntity {
 

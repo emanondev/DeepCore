@@ -1,7 +1,5 @@
 package emanondev.core;
 
-import java.util.*;
-
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -9,6 +7,9 @@ import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ColorablePlayerSnapshot extends PlayerSnapshot {
 

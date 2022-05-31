@@ -1,16 +1,17 @@
 package emanondev.core.gui;
 
-import java.util.*;
-
 import emanondev.core.CoreMain;
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class StringListEditorButton extends AGuiButton {
 
@@ -220,14 +221,14 @@ public abstract class StringListEditorButton extends AGuiButton {
         ADD_LINE, EDIT_LINE, DELETE_LINE,
         MOVE_DOWN, MOVE_UP;
 
-        private String getSymbol(CommandSender sender){
+        private String getSymbol(CommandSender sender) {
             return CoreMain.get().getLanguageConfig(sender)
-                    .loadString("gui_button.string_list_editor."+this.name().toLowerCase()+".symbol","@");
+                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase() + ".symbol", "@");
         }
 
-        private String getDescription(CommandSender sender){
+        private String getDescription(CommandSender sender) {
             return CoreMain.get().getLanguageConfig(sender)
-                    .loadString("gui_button.string_list_editor."+this.name().toLowerCase()+".desc","description");
+                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase() + ".desc", "description");
         }
 
     }

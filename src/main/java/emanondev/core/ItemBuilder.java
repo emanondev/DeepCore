@@ -1,8 +1,5 @@
 package emanondev.core;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -13,17 +10,14 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemBuilder {
     private final ItemStack result;
@@ -246,9 +240,8 @@ public class ItemBuilder {
     public ItemBuilder setDamage(int dmg) {
         if (this.resultMeta instanceof Damageable)
             ((Damageable) this.resultMeta).setDamage(dmg);
-        else
-            if (dmg!=0)
-                new IllegalStateException("meta is not Damageable").printStackTrace();
+        else if (dmg != 0)
+            new IllegalStateException("meta is not Damageable").printStackTrace();
         return this;
     }
 

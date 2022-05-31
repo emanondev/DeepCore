@@ -12,7 +12,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -166,10 +165,10 @@ public interface Gui extends InventoryHolder, FileLogger {
      */
     void setButton(int slot, @Nullable GuiButton button);
 
-	/**
-	 * @param button
-	 * @throws UnsupportedOperationException if the add operation is not supported by this gui
-	 */
+    /**
+     * @param button
+     * @throws UnsupportedOperationException if the add operation is not supported by this gui
+     */
     void addButton(@NotNull GuiButton button);
 
     /**
@@ -204,7 +203,7 @@ public interface Gui extends InventoryHolder, FileLogger {
      */
     boolean isUpdateOnOpen();
 
-    default boolean isTimerUpdated(){
+    default boolean isTimerUpdated() {
         return false;
     }
 

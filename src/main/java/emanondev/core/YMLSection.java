@@ -1181,7 +1181,7 @@ public interface YMLSection extends ConfigurationSection {
         }
         YMLSection section = this.loadSection(path);
         ItemBuilder b = ItemUtility.convertItem(section);
-        if (b!=null)
+        if (b != null)
             return b;
 
         ItemMeta meta = def == null ? null : def.getItemMeta();
@@ -1208,7 +1208,7 @@ public interface YMLSection extends ConfigurationSection {
         }
         YMLSection section = this.loadSection(path);
         ItemBuilder b = ItemUtility.convertItem(section);
-        if (b!=null)
+        if (b != null)
             return b;
 
         ItemMeta meta = def == null ? null : def.getItemMeta();
@@ -1222,20 +1222,19 @@ public interface YMLSection extends ConfigurationSection {
         else
             b.setAmount(section.loadInteger("amount", 1));
         if (meta != null && meta.isUnbreakable())
-            b.setUnbreakable(section.loadBoolean("unbreakable",true));
+            b.setUnbreakable(section.loadBoolean("unbreakable", true));
         else
-            b.setUnbreakable(section.getBoolean("unbreakable",false));
-        if (meta != null && meta.getCustomModelData()!=0)
-            b.setCustomModelData(section.loadInteger("customModelData",meta.getCustomModelData()));
+            b.setUnbreakable(section.getBoolean("unbreakable", false));
+        if (meta != null && meta.getCustomModelData() != 0)
+            b.setCustomModelData(section.loadInteger("customModelData", meta.getCustomModelData()));
         else
-            b.setCustomModelData(section.getInteger("customModelData",0));
-        if (meta instanceof Damageable d && d.getDamage()!=0)
-            b.setCustomModelData(section.loadInteger("damage",d.getDamage()));
+            b.setCustomModelData(section.getInteger("customModelData", 0));
+        if (meta instanceof Damageable d && d.getDamage() != 0)
+            b.setCustomModelData(section.loadInteger("damage", d.getDamage()));
         else
-            b.setCustomModelData(section.getInteger("damage",0));
+            b.setCustomModelData(section.getInteger("damage", 0));
         return b;
     }
-
 
 
     @Contract("_,!null->!null")

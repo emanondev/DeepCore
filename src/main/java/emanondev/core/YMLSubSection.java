@@ -1,16 +1,16 @@
 package emanondev.core;
 
-import java.io.File;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class YMLSubSection extends MemorySection implements YMLSection {
 

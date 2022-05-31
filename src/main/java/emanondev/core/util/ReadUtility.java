@@ -1,14 +1,13 @@
 package emanondev.core.util;
 
+import de.myzelyam.api.vanish.VanishAPI;
+import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import de.myzelyam.api.vanish.VanishAPI;
-import emanondev.core.Hooks;
 
 public interface ReadUtility {
 

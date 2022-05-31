@@ -21,6 +21,6 @@ public class MythicMobsItemConverter implements ItemConverter {
         ItemStack finalItem = MythicMobs.inst().getItemManager().getItemStack(itemName);
 
 
-        return finalItem == null?null: new ItemBuilder(finalItem).setAmount(amount);
+        return finalItem == null ? null : new ItemBuilder(finalItem).setAmount(amount);
     }
 }

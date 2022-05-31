@@ -6,20 +6,20 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-/**
- * @see emanondev.core.gui.PagedListGui
- * @deprecated replaced
- */
-@Deprecated
-public abstract class ListGui<T> extends ChestGui implements PagedGui {
+public class PagedListFGui<T> extends ChestGui implements PagedGui {
 
+    private final BiFunction<InventoryClickEvent, T, Boolean> onClick;
+    private final Function<T, ItemStack> getItem;
     private int nextPageSlot = 8;
     private int previousPageSlot = 0;
     private int backGuiSlot = 4;
@@ -32,7 +32,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     private final List<ContainerButton> activeButtons = new ArrayList<>();
     private Predicate<T> show;
 
-    public void recalculateButtons() {
+    private void recalculateButtons() {
         activeButtons.clear();
         if (show == null)
             activeButtons.addAll(buttons);
@@ -42,24 +42,12 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                     activeButtons.add(buttons.get(i));
         if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
             reloadInventory();
+        controlButtons[nextPageSlot] = nextB;
+        controlButtons[previousPageSlot] = prevB;
+        controlButtons[backGuiSlot] = backB;
     }
 
     private final GuiButton[] controlButtons = new GuiButton[9];
-
-
-    /**
-     * This implementation uses the last row for pages buttons, those buttons won't
-     * change position changing gui page
-     *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
-     */
-    public ListGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin) {
-        this(title, rows, p, previousHolder, plugin, false, 1);
-    }
 
     /**
      * This implementation uses the last row for pages buttons, those buttons won't
@@ -71,18 +59,15 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
      * @param previousHolder
      * @param plugin
      * @param timerUpdate
-     * @param page
      */
-    public ListGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate,
-                   int page) {
+    public PagedListFGui(String title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, boolean timerUpdate,
+                         @Nullable BiFunction<InventoryClickEvent, T, Boolean> onClick, @NotNull Function<T, ItemStack> getItem) {
         super(title, rows, p, previousHolder, plugin, timerUpdate);
         if (rows == 1)
             throw new IllegalArgumentException("at least 2 rows");
         this.page = Math.max(1, page);
-        controlButtons[nextPageSlot] = nextB;
-        controlButtons[previousPageSlot] = prevB;
-        controlButtons[backGuiSlot] = backB;
-
+        this.onClick = onClick;
+        this.getItem = getItem;
     }
 
     /**
@@ -126,7 +111,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
 
     public void onOpen(@NotNull InventoryOpenEvent event) {
         if (isUpdateOnOpen())
-            this.recalculateButtons();
+            this.reloadInventory();
     }
 
     @Override
@@ -159,7 +144,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         recalculateButtons();
     }
 
-    public void sort(Comparator<T> comparator) {
+    public void sort(@NotNull Comparator<T> comparator) {
         buttons.sort((o1, o2) -> comparator.compare(o1.getValue(), o2.getValue()));
         recalculateButtons();
     }
@@ -170,11 +155,12 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
      * @param slot   - from 0 to 8
      * @param button - what button? might be null
      */
-    public void setControlGuiButton(int slot, GuiButton button) {
+    public void setControlGuiButton(int slot, @Nullable GuiButton button) {
         if (slot < 0 || slot >= 9)
             return;
         controlButtons[slot] = button;
-        getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
+        if (button != null)
+            getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
     }
 
     /**
@@ -196,13 +182,14 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
             return;
         }
         int index = (this.getInventory().getSize() - 9) * (page - 1) + event.getSlot();
-        b = getButton(index);
+        b = getButton(index);//activeButtons.get(index);
 
         if (b != null && b.onClick(event))
             updateInventory();
     }
 
     @Override
+    @Nullable
     public GuiButton getButton(int slot) {
         return activeButtons.size() > slot ? activeButtons.get(slot) : null;
     }
@@ -224,7 +211,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     }
 
     public void addElement(T value) {
-        ListGui<T>.ContainerButton container = getContainer(value);
+        PagedListFGui<T>.ContainerButton container = new ContainerButton(value);
         buttons.add(container);
         if (show == null || show.test(value)) {
             activeButtons.add(container);
@@ -243,7 +230,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     public void addElements(Collection<T> values) {
         boolean added = false;
         for (T value : values) {
-            ListGui<T>.ContainerButton container = getContainer(value);
+            PagedListFGui<T>.ContainerButton container = new ContainerButton(value);
             buttons.add(container);
             if (show == null || show.test(value)) {
                 activeButtons.add(container);
@@ -257,7 +244,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     public void addElements(T[] values) {
         boolean added = false;
         for (T value : values) {
-            ListGui<T>.ContainerButton container = getContainer(value);
+            PagedListFGui<T>.ContainerButton container = new ContainerButton(value);
             buttons.add(container);
             if (show == null || show.test(value)) {
                 activeButtons.add(container);
@@ -272,7 +259,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         boolean added = false;
         for (T value : values)
             if (shouldAdd.test(value)) {
-                ListGui<T>.ContainerButton container = getContainer(value);
+                PagedListFGui<T>.ContainerButton container = new ContainerButton(value);
                 buttons.add(container);
                 if (show == null || show.test(value)) {
                     activeButtons.add(container);
@@ -287,7 +274,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         boolean added = false;
         for (T value : values)
             if (shouldAdd.test(value)) {
-                ListGui<T>.ContainerButton container = getContainer(value);
+                PagedListFGui<T>.ContainerButton container = new ContainerButton(value);
                 buttons.add(container);
                 if (show == null || show.test(value)) {
                     activeButtons.add(container);
@@ -314,10 +301,6 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                 getInventory().setItem(getInventory().getSize() - 9 + i, null);
     }
 
-    private ContainerButton getContainer(T value) {
-        return new ContainerButton(value);
-    }
-
     private class ContainerButton implements GuiButton {
 
         private final T val;
@@ -330,23 +313,20 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
             return val;
         }
 
-        public @NotNull Gui getGui() {
-            return ListGui.this;
-        }
-
         @Override
         public boolean onClick(@NotNull InventoryClickEvent event) {
-            return ListGui.this.onElementClick(event, getValue());
+            return PagedListFGui.this.onClick != null && PagedListFGui.this.onClick.apply(event, val);
         }
 
         @Override
-        public ItemStack getItem() {
-            return ListGui.this.getElementItem(getValue());
+        public @Nullable ItemStack getItem() {
+            return PagedListFGui.this.getItem.apply(val);
         }
+
+        public @NotNull Gui getGui() {
+            return PagedListFGui.this;
+        }
+
     }
-
-    public abstract boolean onElementClick(InventoryClickEvent event, T value);
-
-    public abstract ItemStack getElementItem(T value);
 
 }

@@ -1,7 +1,5 @@
 package emanondev.core;
 
-import java.util.*;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -10,6 +8,9 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @SerializableAs(value = "SoundInfo")
 public class SoundInfo implements ConfigurationSerializable {

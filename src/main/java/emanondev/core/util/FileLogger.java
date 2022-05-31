@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface FileLogger extends CorePluginLinked {
 
-    public default void logOnFile(String fileName, String text){
+    public default void logOnFile(String fileName, String text) {
         getPlugin().getLoggerManager().logText(fileName, text);
     }
 

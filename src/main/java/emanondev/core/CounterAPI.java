@@ -42,31 +42,32 @@ public class CounterAPI {
                     throw new IllegalStateException();
             }
         }
+
         public long getPreviousId() {
             Calendar cal;
-            switch(this) {
+            switch (this) {
                 case MINUTE:
-                    return Calendar.getInstance().getTimeInMillis() / 60000L-1;
+                    return Calendar.getInstance().getTimeInMillis() / 60000L - 1;
                 case HOUR_QUARTER:
-                    return Calendar.getInstance().getTimeInMillis() / 900000L-1;
+                    return Calendar.getInstance().getTimeInMillis() / 900000L - 1;
                 case HOUR:
-                    return Calendar.getInstance().getTimeInMillis() / 3600000L-1;
+                    return Calendar.getInstance().getTimeInMillis() / 3600000L - 1;
                 case DAY:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.DATE, -1);
-                    return (long)cal.get(1) * 512L + (long)cal.get(6);
+                    return (long) cal.get(1) * 512L + (long) cal.get(6);
                 case MONTH:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.MONTH, -1);
-                    return (long)cal.get(1) * 16L + (long)cal.get(2);
+                    return (long) cal.get(1) * 16L + (long) cal.get(2);
                 case PERMANENT:
                     return 0L;
                 case WEEK:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.WEEK_OF_YEAR, -1);
-                    return (long)cal.get(1) * 64L + (long)cal.get(3);
+                    return (long) cal.get(1) * 64L + (long) cal.get(3);
                 case YEAR:
-                    return (long)Calendar.getInstance().get(1)-1;
+                    return (long) Calendar.getInstance().get(1) - 1;
                 default:
                     throw new IllegalStateException();
             }

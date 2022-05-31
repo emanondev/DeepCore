@@ -1,8 +1,5 @@
 package emanondev.core;
 
-import java.util.EnumMap;
-import java.util.List;
-
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +8,9 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+
+import java.util.EnumMap;
+import java.util.List;
 
 /**
  * @author emanon This class keeps tracks of mob spawning reasons

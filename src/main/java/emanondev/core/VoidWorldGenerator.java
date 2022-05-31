@@ -1,13 +1,14 @@
 package emanondev.core;
 
-import java.util.*;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Random;
 
 public class VoidWorldGenerator extends ChunkGenerator {
 

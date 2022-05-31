@@ -1,12 +1,12 @@
 package emanondev.core.packetentity;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.UUID;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.UUID;
 
 public abstract class PacketEntity {
 

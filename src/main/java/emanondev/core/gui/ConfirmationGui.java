@@ -1,11 +1,10 @@
 package emanondev.core.gui;
 
+import emanondev.core.CorePlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import emanondev.core.CorePlugin;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class ConfirmationGui extends ChestGui {

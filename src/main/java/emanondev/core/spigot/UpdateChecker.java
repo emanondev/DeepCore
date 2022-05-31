@@ -1,13 +1,8 @@
 package emanondev.core.spigot;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import emanondev.core.CoreMain;
+import emanondev.core.CorePlugin;
+import emanondev.core.PermissionBuilder;
 import emanondev.core.UtilsMessages;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -16,9 +11,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.permissions.Permission;
 
-import emanondev.core.CorePlugin;
-import emanondev.core.PermissionBuilder;
-import net.md_5.bungee.api.ChatColor;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 public class UpdateChecker {
 
@@ -31,7 +28,7 @@ public class UpdateChecker {
 
 
     public UpdateChecker(CorePlugin plugin, int id) {
-        this(plugin,id,CoreMain.get().getConfig().loadBoolean("updates.notify_admin",true));
+        this(plugin, id, CoreMain.get().getConfig().loadBoolean("updates.notify_admin", true));
     }
 
     public UpdateChecker(CorePlugin plugin, int id, boolean notifyOP) {
@@ -53,7 +50,7 @@ public class UpdateChecker {
                 spigotPluginVersion = new BufferedReader(new InputStreamReader(connection.getInputStream()))
                         .readLine();
             } catch (final IOException e) {
-                plugin.logIssue(CoreMain.get().getLanguageConfig(null).loadMessage("update.console_error_message", "", true,"%plugin%",plugin.getName()));
+                plugin.logIssue(CoreMain.get().getLanguageConfig(null).loadMessage("update.console_error_message", "", true, "%plugin%", plugin.getName()));
                 e.printStackTrace();
                 return;
             }
@@ -64,7 +61,7 @@ public class UpdateChecker {
 
             plugin.logIssue(CoreMain.get().getLanguageConfig(null).loadMessage("update.console_message",
                     "",
-                    true,"%plugin%",plugin.getName(),"%link%","https://www.spigotmc.org/resources/"
+                    true, "%plugin%", plugin.getName(), "%link%", "https://www.spigotmc.org/resources/"
                             + ID + "/updates"));
 
             if (notifyOP)
@@ -74,10 +71,10 @@ public class UpdateChecker {
                     public void onPlayerJoin(final PlayerJoinEvent event) {
                         if (!event.getPlayer().hasPermission(updatePerm))
                             return;
-                        UtilsMessages.sendMessage(event.getPlayer(),CoreMain.get().getLanguageConfig(event.getPlayer()).loadMessage("update.admin_message",
-                                        "",
-                                        true,"%plugin%",plugin.getName(),"%link%","https://www.spigotmc.org/resources/"
-                        + ID + "/updates"));
+                        UtilsMessages.sendMessage(event.getPlayer(), CoreMain.get().getLanguageConfig(event.getPlayer()).loadMessage("update.admin_message",
+                                "",
+                                true, "%plugin%", plugin.getName(), "%link%", "https://www.spigotmc.org/resources/"
+                                        + ID + "/updates"));
                     }
                 }));
         });

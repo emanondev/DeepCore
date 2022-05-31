@@ -1,7 +1,6 @@
 package emanondev.core.packetentity;
 
-import java.util.Collection;
-
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,7 +9,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import java.util.Collection;
 
 public class PacketItemFrame extends PacketEntity {
     private ItemStack item;

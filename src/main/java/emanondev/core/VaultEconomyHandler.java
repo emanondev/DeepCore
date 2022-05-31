@@ -1,21 +1,16 @@
 package emanondev.core;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-
-import net.milkbowl.vault.economy.Economy;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 public class VaultEconomyHandler {
 
     private static Economy economy = Bukkit.getServer().getServicesManager()
             .getRegistration(net.milkbowl.vault.economy.Economy.class).getProvider();
 
-    public static void updateEconomy(){
+    public static void updateEconomy() {
         economy = Bukkit.getServer().getServicesManager()
                 .getRegistration(net.milkbowl.vault.economy.Economy.class).getProvider();
     }
@@ -71,7 +66,7 @@ public class VaultEconomyHandler {
      * @param amount Amount to transfer
      * @return True if operation was successful
      */
-    public boolean payMoney(@NotNull OfflinePlayer from,@NotNull  OfflinePlayer to, double amount) {
+    public boolean payMoney(@NotNull OfflinePlayer from, @NotNull OfflinePlayer to, double amount) {
         if (!removeMoney(from, amount))
             return false;
         if (addMoney(to, amount))

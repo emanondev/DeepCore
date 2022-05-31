@@ -1,8 +1,9 @@
 package emanondev.core.packetentity;
 
-import java.util.Collection;
-import java.util.EnumMap;
-
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import emanondev.core.UtilsInventory;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -10,11 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-
-import emanondev.core.UtilsInventory;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
+import java.util.Collection;
+import java.util.EnumMap;
 
 public class PacketArmorStand extends PacketEntity {
     private boolean hasArms;

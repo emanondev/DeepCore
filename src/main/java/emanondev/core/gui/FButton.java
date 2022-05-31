@@ -1,11 +1,12 @@
 package emanondev.core.gui;
 
-import java.util.function.*;
-
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class FButton extends AGuiButton {
 
@@ -13,7 +14,7 @@ public class FButton extends AGuiButton {
     private final Supplier<ItemStack> getItem;
 
     /**
-     * @param gui parent gui
+     * @param gui     parent gui
      * @param getItem item supplier
      * @param onClick click handler
      */

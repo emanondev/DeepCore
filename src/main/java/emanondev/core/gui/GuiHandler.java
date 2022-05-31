@@ -1,8 +1,8 @@
 package emanondev.core.gui;
 
-import java.util.*;
-
+import emanondev.core.CoreMain;
 import emanondev.core.CorePlugin;
+import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,8 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import emanondev.core.CoreMain;
-import emanondev.core.Hooks;
+import java.util.HashMap;
 
 public class GuiHandler implements Listener {
     private static final HashMap<Player, Gui> latestUsedGui = new HashMap<>();
@@ -73,13 +72,14 @@ public class GuiHandler implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     private static void onPluginDisable(PluginDisableEvent event) {
         if (event.getPlugin() instanceof CorePlugin)
-            for (Player p:Bukkit.getOnlinePlayers())
+            for (Player p : Bukkit.getOnlinePlayers())
                 if (p.getOpenInventory().getTopInventory().getHolder() instanceof Gui gui && gui.getPlugin().equals(event.getPlugin()))
                     p.closeInventory();
     }
 
     /**
      * {@link emanondev.core.gui.Gui#setTimerUpdated(boolean)}
+     *
      * @param gui
      */
     public static void registerTimerUpdatedGui(@NotNull Gui gui) {
@@ -88,6 +88,7 @@ public class GuiHandler implements Listener {
 
     /**
      * {@link emanondev.core.gui.Gui#setTimerUpdated(boolean)}
+     *
      * @param gui
      */
     public static void unregisterTimerUpdatedGui(@NotNull Gui gui) {
@@ -99,10 +100,12 @@ public class GuiHandler implements Listener {
         public void run() {
             long time = System.currentTimeMillis();
             int counter = 0;
-            for (Player p: Bukkit.getOnlinePlayers())
+            for (Player p : Bukkit.getOnlinePlayers())
                 if (p.getOpenInventory().getTopInventory() instanceof Gui gui &&
-                    gui.isTimerUpdated()){
-                    gui.updateInventory();counter++;}
+                        gui.isTimerUpdated()) {
+                    gui.updateInventory();
+                    counter++;
+                }
             time = System.currentTimeMillis() - time;
             if (time > 8)
                 CoreMain.get().logIssue("GuiHandler used &e" + time + " &fms to update &e" + counter + "&f gui with timer");

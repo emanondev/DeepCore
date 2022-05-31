@@ -109,6 +109,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
             updateControlButtons();
     }
+
     /**
      * @param slot must be 0-8 value if button should be shown
      */

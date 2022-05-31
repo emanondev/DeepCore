@@ -1,12 +1,12 @@
 package emanondev.core.packetentity;
 
-import java.util.Optional;
-
 import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import emanondev.core.MCVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
+
+import java.util.Optional;
 
 class WatchableCollection {
 

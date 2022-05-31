@@ -1,14 +1,13 @@
 package emanondev.core.gui;
 
-import java.util.List;
-
+import emanondev.core.UtilsMessages;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 
-import emanondev.core.UtilsMessages;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import java.util.List;
 
 public abstract class AGuiButton implements GuiButton {
 

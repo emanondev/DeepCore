@@ -1,7 +1,5 @@
 package emanondev.core;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -9,6 +7,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * PaperLib is shaded inside the plugin, you can use it here instead of shading on every plugin where it is required

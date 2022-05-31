@@ -1,9 +1,8 @@
 package emanondev.core.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import emanondev.core.CorePlugin;
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,9 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import emanondev.core.CorePlugin;
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class TextEditorGui extends AnvilGui {
 

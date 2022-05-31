@@ -53,15 +53,15 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     }
 
     /**
-     * @param gui              parent gui
-     * @param changeAmountBase which amount should be the starting change value by
-     *                         click
-     * @param maxChangeValue   maximus allowed change amount by click amount
-     * @param minChangeValue   minimum allowed change amount by click amount
-     * @param getValue         get the value
-     * @param setValue         set the value change
-     * @param baseItem         display item
-     * @param baseDescription  should contain value description
+     * @param gui                     parent gui
+     * @param changeAmountBase        which amount should be the starting change value by
+     *                                click
+     * @param maxChangeValue          maximus allowed change amount by click amount
+     * @param minChangeValue          minimum allowed change amount by click amount
+     * @param getValue                get the value
+     * @param setValue                set the value change
+     * @param baseItem                display item
+     * @param baseDescription         should contain value description
      * @param instructionsDescription description of click effects
      * @throws IllegalArgumentException if maxChangeValue is less than
      *                                  minChangeValue

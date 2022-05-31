@@ -209,12 +209,12 @@ public interface CompleteUtility {
     }
 
     /**
-     * @param prefix  prefix to match, case-insensitive
+     * @param prefix prefix to match, case-insensitive
      * @return a list of boolean strings matching prefix
      */
     default @NotNull List<String> completeBoolean(@Nullable String prefix) {
         if (prefix == null || prefix.isEmpty())
-            return List.of("false","true");
+            return List.of("false", "true");
         List<String> results = new ArrayList<>();
         prefix = prefix.toLowerCase();
         if ("true".startsWith(prefix))

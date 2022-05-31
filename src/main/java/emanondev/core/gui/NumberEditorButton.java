@@ -1,21 +1,20 @@
 package emanondev.core.gui;
 
+import emanondev.core.ItemBuilder;
+import emanondev.core.UtilsString;
+import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
-
-import emanondev.core.ItemBuilder;
-import emanondev.core.UtilsString;
-import org.jetbrains.annotations.NotNull;
-
 /**
- * @see emanondev.core.gui.NumberEditorFButton
  * @param <T>
+ * @see emanondev.core.gui.NumberEditorFButton
  */
 @Deprecated
 public abstract class NumberEditorButton<T extends Number> extends AGuiButton {

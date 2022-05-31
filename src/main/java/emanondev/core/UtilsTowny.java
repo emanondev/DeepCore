@@ -36,7 +36,7 @@ public final class UtilsTowny {
     public static @Nullable Town getTown(@NotNull OfflinePlayer p) {
         try {
             Resident r = getResident(p);
-            return r!=null && r.hasTown() ? r.getTown() : null;
+            return r != null && r.hasTown() ? r.getTown() : null;
         } catch (Exception e) {
             return null;
         }
@@ -65,7 +65,7 @@ public final class UtilsTowny {
     public static @Nullable Nation getNation(@NotNull OfflinePlayer p) {
         try {
             Resident r = getResident(p);
-            return r.hasNation()?r.getNation():null;
+            return r.hasNation() ? r.getNation() : null;
         } catch (Exception e) {
             return null;
         }
@@ -74,7 +74,7 @@ public final class UtilsTowny {
 
     public static @Nullable Nation getNation(@Nullable TownBlock tBlock) {
         Town t = getTown(tBlock);
-        if (t==null)
+        if (t == null)
             return null;
         try {
             return t.hasNation() ? t.getNation() : null;
@@ -82,6 +82,7 @@ public final class UtilsTowny {
             return null;
         }
     }
+
     public static @Nullable TownBlock getTownBlock(Location l) {
         try {
             return TownyAPI.getInstance().getTownBlock(l);
@@ -126,6 +127,7 @@ public final class UtilsTowny {
     public static @Nullable Nation getLocationNation(Location l) {
         return getNation(l);
     }
+
     public static @Nullable TownBlock getTownBlock(Block b) {
         return getTownBlock(b.getLocation());
     }
@@ -163,11 +165,11 @@ public final class UtilsTowny {
     }
 
     public static boolean hasTown(@NotNull OfflinePlayer p) {
-        return getTown(p)!=null;
+        return getTown(p) != null;
     }
 
     public static boolean hasNation(Player p) {
-        return getNation(p)!=null;
+        return getNation(p) != null;
     }
 
     public static boolean areSameTown(Player p, Player p2) {
@@ -209,7 +211,7 @@ public final class UtilsTowny {
         }
     }
 
-    public static boolean areAlliedNations(@NotNull OfflinePlayer p,@NotNull  OfflinePlayer p2) {
+    public static boolean areAlliedNations(@NotNull OfflinePlayer p, @NotNull OfflinePlayer p2) {
         try {
             return areAlliedNations(getTown(p), getTown(p2));
         } catch (Exception e) {
