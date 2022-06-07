@@ -31,6 +31,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     private Double absorbition;
     private Boolean allowFlight;
     private Boolean god;
+    private Boolean collidable;
+    private Boolean canPickupItems;
     private GameMode gameMode;
     private Float flySpeed;
     private Integer fireTicks;
@@ -126,6 +128,10 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             map.put("freezeTicks", freezeTicks);
         if (glowing != null)
             map.put("glowing", glowing);
+        if (collidable != null)
+            map.put("collidable", collidable);
+        if (canPickupItems != null)
+            map.put("canPickupItems", canPickupItems);
         return map;
     }
 
@@ -168,6 +174,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         snapshot.heldItemSlot = map.containsKey("heldItemSlot") ? (Integer) map.get("heldItemSlot") : null;
         snapshot.freezeTicks = map.containsKey("freezeTicks") ? (Integer) map.get("freezeTicks") : null;
         snapshot.glowing = map.containsKey("glowing") ? (Boolean) map.get("glowing") : null;
+        snapshot.collidable = map.containsKey("collidable") ? (Boolean) map.get("collidable") : null;
+        snapshot.canPickupItems = map.containsKey("canPickupItems") ? (Boolean) map.get("canPickupItems") : null;
         return snapshot;
     }
 
@@ -179,7 +187,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             FieldType.ABSORBITION, FieldType.ARMOR, FieldType.EXTRACONTENTS, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
             FieldType.EXPERIENCE, FieldType.FOODLEVEL, FieldType.EXHAUSTION, FieldType.HEALTH, FieldType.ALLOWFLIGHT,
             FieldType.GOD, FieldType.GAMEMODE, FieldType.FLYSPEED, FieldType.FIRETICKS, FieldType.AIR,
-            FieldType.WALKSPEED, FieldType.SATURATION, FieldType.INVISIBLE, FieldType.HELDITEMSLOT, FieldType.FREEZETICKS, FieldType.GLOWING};
+            FieldType.WALKSPEED, FieldType.SATURATION, FieldType.INVISIBLE, FieldType.COLLIDABLE, FieldType.CANPICKUPITEMS,
+            FieldType.HELDITEMSLOT, FieldType.FREEZETICKS, FieldType.GLOWING};
 
     public void apply(Player who) {
         apply(who, EnumSet.allOf(FieldType.class));
@@ -309,6 +318,14 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
                 if (this.glowing != null)
                     who.setGlowing(this.glowing);
             }
+            case COLLIDABLE -> {
+                if (this.collidable != null)
+                    who.setCollidable(this.collidable);
+            }
+            case CANPICKUPITEMS -> {
+                if (this.canPickupItems != null)
+                    who.setCanPickupItems(this.canPickupItems);
+            }
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
     }
@@ -401,6 +418,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case HELDITEMSLOT -> this.heldItemSlot = who.getInventory().getHeldItemSlot();
             case FREEZETICKS -> this.freezeTicks = who.getFreezeTicks();
             case GLOWING -> this.glowing = who.isGlowing();
+            case COLLIDABLE -> this.collidable = who.isCollidable();
+            case CANPICKUPITEMS -> this.canPickupItems = who.getCanPickupItems();
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
     }
@@ -432,9 +451,20 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case HELDITEMSLOT -> getHeldItemSlot();
             case FREEZETICKS -> getFreezeTicks();
             case GLOWING -> getGlowing();
+            case COLLIDABLE -> getCollidable();
+            case CANPICKUPITEMS -> getCanPickupItems();
             default -> throw new IllegalStateException();
         };
 
+    }
+
+
+    public Boolean getCollidable() {
+        return this.collidable;
+    }
+
+    public Boolean getCanPickupItems() {
+        return this.canPickupItems;
     }
 
     public Boolean getGlowing() {
@@ -481,23 +511,33 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case HELDITEMSLOT -> setHeldItemSlot((Integer) value);
             case FREEZETICKS -> setFreezeTicks((Integer) value);
             case GLOWING -> setGlowing((Boolean) value);
+            case COLLIDABLE -> setCollidable((Boolean) value);
+            case CANPICKUPITEMS -> setCanPickupItems((Boolean) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
     }
 
-    private void setFreezeTicks(Integer value) {
+    public void setCollidable(Boolean value) {
+        this.collidable = value;
+    }
+
+    public void setCanPickupItems(Boolean value) {
+        this.canPickupItems = value;
+    }
+
+    public void setFreezeTicks(Integer value) {
         this.freezeTicks = value;
     }
 
-    private void setHeldItemSlot(Integer value) { //check on number validity
+    public void setHeldItemSlot(Integer value) { //check on number validity
         this.heldItemSlot = value;
     }
 
-    private void setInvisible(Boolean value) {
+    public void setInvisible(Boolean value) {
         this.invisible = value;
     }
 
-    private void setGlowing(Boolean value) {
+    public void setGlowing(Boolean value) {
         this.glowing = value;
     }
 
@@ -704,7 +744,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public enum FieldType {
         LOCATION, ARMOR, INVENTORY, ENDERCHEST, LEVEL, EXPERIENCE, EFFECTS, FOODLEVEL, EXHAUSTION, HEALTH, ABSORBITION,
-        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, INVISIBLE, HELDITEMSLOT, FREEZETICKS, GLOWING
+        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, INVISIBLE, HELDITEMSLOT,
+        FREEZETICKS, COLLIDABLE, CANPICKUPITEMS, GLOWING
     }
 
     public void fillEmpty() {
@@ -745,6 +786,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case GLOWING -> this.glowing != null;
             case FREEZETICKS -> this.freezeTicks != null;
             case HELDITEMSLOT -> this.heldItemSlot != null;
+            case COLLIDABLE -> this.collidable != null;
+            case CANPICKUPITEMS -> this.canPickupItems != null;
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
     }
@@ -783,6 +826,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case WALKSPEED -> this.walkSpeed = (Float) getDefault(type);
             case INVISIBLE -> this.invisible = (Boolean) getDefault(type);
             case GLOWING -> this.glowing = (Boolean) getDefault(type);
+            case COLLIDABLE -> this.collidable = (Boolean) getDefault(type);
+            case CANPICKUPITEMS -> this.canPickupItems = (Boolean) getDefault(type);
             case FREEZETICKS -> this.freezeTicks = (Integer) getDefault(type);
             case HELDITEMSLOT -> this.heldItemSlot = (Integer) getDefault(type);
             default -> throw new IllegalStateException("Unexpected value: " + type);
@@ -798,6 +843,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case AIR -> 300;
             case FOODLEVEL -> 20;
             case ALLOWFLIGHT, GOD, FLYING, GLOWING, INVISIBLE -> false;
+            case COLLIDABLE, CANPICKUPITEMS -> true;
             case ARMOR -> Collections.nCopies(4, (ItemStack) null);
             case EXTRACONTENTS -> Collections.nCopies(1, (ItemStack) null);
             case EFFECTS -> new ArrayList<PotionEffect>(0);

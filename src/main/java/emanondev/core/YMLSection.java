@@ -1190,7 +1190,8 @@ public interface YMLSection extends ConfigurationSection {
                         def != null && def.getEnchantments().size() > 0) ? 1 : 0)
                 .setAmount(section.getInteger("amount", def == null ? 1 : def.getAmount()))
                 .setUnbreakable(section.getBoolean("unbreakable", def != null && meta.isUnbreakable()))
-                .setCustomModelData(section.getInteger("customModelData", def == null ? 0 : meta.getCustomModelData()))
+                .setCustomModelData(section.getInteger("customModelData",
+                        meta.hasCustomModelData() ? meta.getCustomModelData() : null))
                 .setDamage(section.getInteger("damage", def == null ? 0 : ((meta instanceof Damageable) ? ((Damageable) meta).getDamage() : 0)));
     }
 
@@ -1225,10 +1226,10 @@ public interface YMLSection extends ConfigurationSection {
             b.setUnbreakable(section.loadBoolean("unbreakable", true));
         else
             b.setUnbreakable(section.getBoolean("unbreakable", false));
-        if (meta != null && meta.getCustomModelData() != 0)
+        if (meta != null && meta.hasCustomModelData() && meta.getCustomModelData() != 0)
             b.setCustomModelData(section.loadInteger("customModelData", meta.getCustomModelData()));
         else
-            b.setCustomModelData(section.getInteger("customModelData", 0));
+            b.setCustomModelData(section.getInteger("customModelData", null));
         if (meta instanceof Damageable d && d.getDamage() != 0)
             b.setCustomModelData(section.loadInteger("damage", d.getDamage()));
         else

@@ -246,8 +246,9 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setCustomModelData(int data) {
-        this.resultMeta.setCustomModelData(data);
+    public ItemBuilder setCustomModelData(Integer data) {
+        if (this.resultMeta.hasCustomModelData())
+            this.resultMeta.setCustomModelData(data);
         return this;
     }
 

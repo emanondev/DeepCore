@@ -1,9 +1,12 @@
 package emanondev.core.util;
 
+import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.*;
@@ -13,7 +16,13 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
+import emanondev.core.CoreMain;
+import emanondev.core.Hooks;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.BoundingBox;
@@ -28,6 +37,31 @@ public final class WorldEditUtility {
         throw new AssertionError();
     }
 
+    public static Clipboard copy(Location corner1, Location corner2, boolean copyEntity, boolean copyBiomes) {
+        return copy(corner1, corner2, copyEntity, copyBiomes, true);
+    }
+
+    public static Clipboard copy(World w, BoundingBox area, boolean copyEntity, boolean copyBiomes) {
+        return copy(w, area, copyEntity, copyBiomes, true);
+    }
+
+    public static boolean paste(Location dest, Clipboard clip) {
+        return paste(dest, clip, true);
+    }
+
+
+    public static boolean paste(Location dest, Clipboard clip, double rotationDegree) {
+        return paste(dest, clip, rotationDegree, true);
+    }
+
+    public static void clearArea(Location corner1, Location corner2) {
+        clearArea(corner1, corner2, true);
+    }
+
+    public static void clearArea(World w, BoundingBox area) {
+        clearArea(w, area, true);
+    }
+
     public static Clipboard load(File dest) {
         ClipboardFormat format = ClipboardFormats.findByFile(dest);
         try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
@@ -38,13 +72,13 @@ public final class WorldEditUtility {
         return null;
     }
 
-    public static Clipboard copy(Location corner1, Location corner2, boolean copyEntity, boolean copyBiomes) {
+    public static Clipboard copy(Location corner1, Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
         if (!corner1.getWorld().equals(corner2.getWorld()))
             throw new IllegalArgumentException();
         return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
     }
 
-    public static Clipboard copy(World w, BoundingBox area, boolean copyEntity, boolean copyBiomes) {
+    public static Clipboard copy(World w, BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async) {
         BlockVector3 min = BlockVector3.at((int) area.getMinX(), (int) area.getMinY(), (int) area.getMinZ());
 
         CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(w), min,
@@ -67,23 +101,52 @@ public final class WorldEditUtility {
         return clipboard;
     }
 
-    public static boolean paste(Location dest, Clipboard clip) {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-                .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
-            Operation operation = new ClipboardHolder(clip).createPaste(editSession)
-                    .to(BlockVector3.at(dest.getBlockX(), dest.getBlockY(), dest.getBlockZ())).ignoreAirBlocks(false)
-                    .build();
-            Operations.complete(operation);
-        } catch (WorldEditException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public static boolean paste(Location dest, Clipboard clip, boolean async) {
+        if (async && mayAsync())
+            FaweAPI.getTaskManager().async(() -> {
+                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                        .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
+                    Operation operation = new ClipboardHolder(clip).createPaste(editSession)
+                            .to(BlockVector3.at(dest.getBlockX(), dest.getBlockY(), dest.getBlockZ())).ignoreAirBlocks(false)
+                            .build();
+                    Operations.complete(operation);
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
+                }
+            });
+        else
+            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                    .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
+                Operation operation = new ClipboardHolder(clip).createPaste(editSession)
+                        .to(BlockVector3.at(dest.getBlockX(), dest.getBlockY(), dest.getBlockZ())).ignoreAirBlocks(false)
+                        .build();
+                Operations.complete(operation);
+            } catch (WorldEditException e) {
+                e.printStackTrace();
+                return false;
+            }
         return true;
     }
 
 
-    public static boolean paste(Location dest, Clipboard clip, double rotationDegree) {
-        try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+    public static boolean paste(Location dest, Clipboard clip, double rotationDegree, boolean async) {
+        if (async && mayAsync())
+            Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {
+                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
+                        .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
+                    ClipboardHolder holder = new ClipboardHolder(clip);
+                    if (rotationDegree != 0) {
+                        holder.setTransform(new AffineTransform().rotateY(-rotationDegree));
+                    }
+                    Operation operation = holder.createPaste(editSession)
+                            .to(BlockVector3.at(dest.getBlockX(), dest.getBlockY(), dest.getBlockZ())).ignoreAirBlocks(false)
+                            .build();
+                    Operations.complete(operation);
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
+                }
+            });
+        else try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                 .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
             ClipboardHolder holder = new ClipboardHolder(clip);
             if (rotationDegree != 0) {
@@ -109,5 +172,38 @@ public final class WorldEditUtility {
             return false;
         }
         return true;
+    }
+
+
+    public static void clearArea(Location corner1, Location corner2, boolean async) {
+        if (!corner1.getWorld().equals(corner2.getWorld()))
+            throw new IllegalArgumentException();
+        clearArea(corner1.getWorld(), BoundingBox.of(corner1, corner2));
+    }
+
+    public static void clearArea(World w, BoundingBox area, boolean async) {
+        BukkitWorld world = new BukkitWorld(w);
+        BlockVector3 pos1 = BlockVector3.at(area.getMinX(), Math.max(w.getMinHeight(), area.getMinY()), area.getMinZ());
+        BlockVector3 pos2 = BlockVector3.at(area.getMaxX() - 1, Math.min(w.getMaxHeight(), area.getMaxY() - 1), area.getMaxZ() - 1);
+        CuboidRegion region = new CuboidRegion(world, pos1, pos2);
+        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+        BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
+        if (async && mayAsync())
+            Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {
+                try {
+                    editSession.setBlocks((Region) region, block);
+                } catch (MaxChangedBlocksException e) {
+                    e.printStackTrace();
+                }
+            });
+        else try {
+            editSession.setBlocks((Region) region, block);
+        } catch (MaxChangedBlocksException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean mayAsync() {
+        return Hooks.isEnabled("FastAsyncWorldEdit");
     }
 }
