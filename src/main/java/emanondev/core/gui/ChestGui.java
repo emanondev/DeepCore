@@ -55,8 +55,6 @@ public abstract class ChestGui implements Gui {
         this.player = player;
         this.inv = Bukkit.createInventory(this, rows * 9, UtilsString.fix(title, player, true));
         this.plugin = plugin;
-        if (isTimerUpdated)
-            GuiHandler.registerTimerUpdatedGui(this);
     }
 
     public @NotNull CorePlugin getPlugin() {

@@ -45,8 +45,6 @@ public abstract class AnvilGui implements TextGui {
         this.player = p;
         this.inv = Bukkit.createInventory(this, InventoryType.ANVIL, UtilsString.fix(title, player, true));
         this.plugin = plugin;
-        if (isTimerUpdated)
-            GuiHandler.registerTimerUpdatedGui(this);
     }
 
     public @NotNull CorePlugin getPlugin() {

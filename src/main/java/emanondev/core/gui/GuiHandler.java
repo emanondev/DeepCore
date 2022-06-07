@@ -77,24 +77,6 @@ public class GuiHandler implements Listener {
                     p.closeInventory();
     }
 
-    /**
-     * {@link emanondev.core.gui.Gui#setTimerUpdated(boolean)}
-     *
-     * @param gui
-     */
-    public static void registerTimerUpdatedGui(@NotNull Gui gui) {
-        new IllegalStateException("no longer supported").printStackTrace();
-    }
-
-    /**
-     * {@link emanondev.core.gui.Gui#setTimerUpdated(boolean)}
-     *
-     * @param gui
-     */
-    public static void unregisterTimerUpdatedGui(@NotNull Gui gui) {
-        new IllegalStateException("no longer supported").printStackTrace();
-    }
-
     public static final BukkitTask timerSeconds = new BukkitRunnable() {
         @Override
         public void run() {
@@ -111,6 +93,5 @@ public class GuiHandler implements Listener {
                 CoreMain.get().logIssue("GuiHandler used &e" + time + " &fms to update &e" + counter + "&f gui with timer");
         }
     }.runTaskTimer(CoreMain.get(), 100L, 20L);
-
 
 }

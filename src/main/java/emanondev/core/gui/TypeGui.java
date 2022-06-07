@@ -53,8 +53,6 @@ public class TypeGui implements Gui {
         this.inv = Bukkit.createInventory(this, type, UtilsString.fix(title, player, true));
         this.plugin = plugin;
         this.buttons = new GuiButton[inv.getSize()];
-        if (isTimerUpdated)
-            GuiHandler.registerTimerUpdatedGui(this);
     }
 
     public InventoryType getInventoryType() {
