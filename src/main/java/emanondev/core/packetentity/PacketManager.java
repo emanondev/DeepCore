@@ -187,7 +187,7 @@ public class PacketManager {
 
     protected void removeArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+        packet1.getIntegers().write(0, entity.getEntityId());
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -236,23 +236,6 @@ public class PacketManager {
             packet1.getDoubles().write(1, location.getY());
             packet1.getDoubles().write(2, location.getZ());
         }
-/*
-        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-        packet1.getIntegers().write(0, entity.getEntityId());
-        packet1.getIntegers().write(1, (int) (entity.getVelocity().getX() * 8000.0D));
-        packet1.getIntegers().write(2, (int) (entity.getVelocity().getY() * 8000.0D));
-        packet1.getIntegers().write(3, (int) (entity.getVelocity().getZ() * 8000.0D));
-        packet1.getIntegers().write(4, (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
-        packet1.getIntegers().write(5, (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
-
-        packet1.getEntityTypeModifier().write(0, entity.getType());
-        packet1.getIntegers().write(6, 1);
-
-        packet1.getUUIDs().write(0, entity.getUniqueId());
-        Location location = entity.getLocation();
-        packet1.getDoubles().write(0, location.getX());
-        packet1.getDoubles().write(1, location.getY());
-        packet1.getDoubles().write(2, location.getZ());*/
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
@@ -313,7 +296,7 @@ public class PacketManager {
 
     protected void removeItem(Collection<? extends Player> players, PacketItem entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+        packet1.getIntegers().write(0, entity.getEntityId());
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -392,7 +375,7 @@ public class PacketManager {
 
     protected void removeItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegerArrays().write(0, new int[]{entity.getEntityId()});
+        packet1.getIntegers().write(0, entity.getEntityId());
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
