@@ -214,7 +214,11 @@ public class PacketArmorStand extends PacketEntity {
     }
 
     public WrappedDataWatcher getWrappedDataWatcher() {
-        return WatchableCollection.getWatchableCollection(this);
+        if (getDataWatcher()==null)
+            dataWatcher = WatchableCollection.getWatchableCollection(this,getDataWatcher());
+        else
+            WatchableCollection.getWatchableCollection(this,getDataWatcher());
+        return dataWatcher;
     }
 
     public double getHeight() {

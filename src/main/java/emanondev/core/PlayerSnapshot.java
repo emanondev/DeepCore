@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -232,7 +233,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             }
             case EFFECTS -> {
                 if (this.effects != null) {
-                    who.getActivePotionEffects().clear();
+                    for (PotionEffect value:new ArrayList<>(who.getActivePotionEffects())) //TODO maybe no need of copy, test this
+                        who.removePotionEffect(value.getType());
                     who.addPotionEffects(effects);
                 }
             }

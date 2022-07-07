@@ -1,5 +1,6 @@
 package emanondev.core.packetentity;
 
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -16,6 +17,11 @@ public abstract class PacketEntity {
     protected boolean lock;
     private boolean isSilent;
     private final PacketManager manager;
+    protected WrappedDataWatcher dataWatcher;
+
+    public WrappedDataWatcher getDataWatcher(){
+        return dataWatcher;
+    }
 
     public PacketEntity(Location location, PacketManager manager) {
         if (location == null || manager == null)

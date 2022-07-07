@@ -85,6 +85,8 @@ public enum MCVersion {
     }
 
     public int getMetaVersion() {
+        if (this.isNewerOrEqualTo(V1_17))
+            return 4;
         if (this.isNewerOrEqualTo(V1_15))
             return 3;
         if (this.isNewerOrEqualTo(V1_14))

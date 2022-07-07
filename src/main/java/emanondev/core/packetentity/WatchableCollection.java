@@ -37,11 +37,15 @@ class WatchableCollection {
         vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
     }
 
-    public static WrappedDataWatcher getWatchableCollection(PacketArmorStand stand) {
-        WrappedDataWatcher watcher = new WrappedDataWatcher();
+    public static WrappedDataWatcher getWatchableCollection(PacketArmorStand stand, WrappedDataWatcher watcher) {
+        //WrappedDataWatcher watcher = new WrappedDataWatcher();
+        // ###
+        if (watcher == null)
+            watcher = new WrappedDataWatcher();
         byte bitmask = 0;
         bitmask = !stand.isVisible() ? (byte) (bitmask | 0x20) : bitmask;
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, byteSerializer), bitmask);
+
         switch (metaversion) {
             case 0 -> {
                 if (stand.getCustomName() != null && !stand.getCustomName().toPlainText().equals("")) {
@@ -50,7 +54,13 @@ class WatchableCollection {
                 }
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, stringSerializer), "");
             }
-            case 1, 2, 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(stand.getCustomName())).getHandle()));
+            case 1, 2, 3, 4 -> {
+                if (stand.getCustomName() != null && !stand.getCustomName().toPlainText().equals("")) {
+                    watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(stand.getCustomName())).getHandle()));
+                    break;
+                }
+                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.empty());
+            }
         }
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), stand.isCustomNameVisible());
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(4, booleanSerializer), stand.isSilent());
@@ -60,42 +70,34 @@ class WatchableCollection {
         standbitmask = stand.hasArms() ? (byte) (standbitmask | 0x4) : standbitmask;
         standbitmask = !stand.hasBasePlate() ? (byte) (standbitmask | 0x8) : standbitmask;
         standbitmask = stand.isMarker() ? (byte) (standbitmask | 0x10) : standbitmask;
+
+
+
         switch (metaversion) {
             case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(11, byteSerializer), standbitmask);
             case 2 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(13, byteSerializer), standbitmask);
             case 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(14, byteSerializer), standbitmask);
+            case 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, byteSerializer), standbitmask);
         }
         Vector3F headrotation = new Vector3F();
         headrotation.setX((float) Math.toDegrees(stand.getHeadPose().getX()));
         headrotation.setY((float) Math.toDegrees(stand.getHeadPose().getY()));
         headrotation.setZ((float) Math.toDegrees(stand.getHeadPose().getZ()));
         switch (metaversion) {
-            case 0:
-            case 1:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(12, vectorSerializer), headrotation);
-                break;
-            case 2:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(14, vectorSerializer), headrotation);
-                break;
-            case 3:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, vectorSerializer), headrotation);
-                break;
+            case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(12, vectorSerializer), headrotation);
+            case 2 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(14, vectorSerializer), headrotation);
+            case 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, vectorSerializer), headrotation);
+            case 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, vectorSerializer), headrotation);
         }
         Vector3F rightarmrotation = new Vector3F();
         rightarmrotation.setX((float) Math.toDegrees(stand.getRightArmPose().getX()));
         rightarmrotation.setY((float) Math.toDegrees(stand.getRightArmPose().getY()));
         rightarmrotation.setZ((float) Math.toDegrees(stand.getRightArmPose().getZ()));
         switch (metaversion) {
-            case 0:
-            case 1:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, vectorSerializer), rightarmrotation);
-                break;
-            case 2:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, vectorSerializer), rightarmrotation);
-                break;
-            case 3:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(18, vectorSerializer), rightarmrotation);
-                break;
+            case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, vectorSerializer), rightarmrotation);
+            case 2 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17, vectorSerializer), rightarmrotation);
+            case 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(18, vectorSerializer), rightarmrotation);
+            case 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(19, vectorSerializer), rightarmrotation);
         }
         return watcher;
     }
