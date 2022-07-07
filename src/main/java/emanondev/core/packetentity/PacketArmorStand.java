@@ -197,6 +197,8 @@ public class PacketArmorStand extends PacketEntity {
     public PacketArmorStand setItem(EquipmentSlot slot, ItemStack item) {
         if (UtilsInventory.isAirOrNull(item))
             equip.remove(slot);
+        else
+            equip.put(slot,item);
         return this;
     }
 

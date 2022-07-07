@@ -72,7 +72,6 @@ class WatchableCollection {
         standbitmask = stand.isMarker() ? (byte) (standbitmask | 0x10) : standbitmask;
 
 
-
         switch (metaversion) {
             case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(11, byteSerializer), standbitmask);
             case 2 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(13, byteSerializer), standbitmask);
@@ -108,30 +107,21 @@ class WatchableCollection {
         bitmask = item.isGlowing() ? (byte) (bitmask | 0x40) : bitmask;
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, byteSerializer), bitmask);
         switch (metaversion) {
-            case 0:
+            case 0 -> {
                 if (item.getCustomName() != null && !item.getCustomName().toPlainText().equals("")) {
                     watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, stringSerializer), item.getCustomName().toLegacyText());//LanguageUtils.convert(item.getCustomName(), InteractionVisualizer.language).toLegacyText());
                     break;
                 }
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, stringSerializer), "");
-                break;
-            case 1:
-            case 2:
-            case 3:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(item.getCustomName())).getHandle()));
-                break;
+            }
+            case 1, 2, 3, 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(item.getCustomName())).getHandle()));
         }
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), item.isCustomNameVisible());
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(5, booleanSerializer), !item.hasGravity());
         switch (metaversion) {
-            case 0:
-            case 1:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(6, itemSerializer), item.getItemStack());
-                break;
-            case 2:
-            case 3:
-                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(7, itemSerializer), item.getItemStack());
-                break;
+            case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(6, itemSerializer), item.getItemStack());
+            case 2, 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(7, itemSerializer), item.getItemStack());
+            case 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(8, itemSerializer), item.getItemStack());
         }
         return watcher;
     }
@@ -140,16 +130,18 @@ class WatchableCollection {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(4, booleanSerializer), frame.isSilent());
         switch (metaversion) {
-            case 0:
-            case 1:
+            case 0, 1 -> {
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(6, itemSerializer), frame.getItem());
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(7, intSerializer), frame.getFrameRotation());
-                break;
-            case 2:
-            case 3:
+            }
+            case 2, 3 -> {
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(7, itemSerializer), frame.getItem());
                 watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(8, intSerializer), frame.getFrameRotation());
-                break;
+            }
+            case 4 -> {
+                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(8, itemSerializer), frame.getItem());
+                watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(9, intSerializer), frame.getFrameRotation());
+            }
         }
         return watcher;
     }
