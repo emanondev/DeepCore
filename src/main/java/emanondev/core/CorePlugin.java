@@ -7,6 +7,8 @@ import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
 import emanondev.core.util.ConsoleLogger;
+import emanondev.core.command.CoreCommand;
+
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -126,6 +128,10 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        for (Command command : registeredCommands) {
+            if (command instanceof CoreCommand coreCommand)
+                coreCommand.reload();
+        }
 
         for (Module module : modules.values()) {
             if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true) != enabledModules.contains(module)) {
@@ -180,7 +186,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         modules.values().forEach(m -> {
             if (enabledModules.contains(m)) m.disable();
         });
-        new HashSet<>(registeredCommands).forEach(command -> unregisterCommand(command));
+        new HashSet<>(registeredCommands).forEach(this::unregisterCommand);
 
         if (this.packetManager != null) {
             packetManager.clearAll();

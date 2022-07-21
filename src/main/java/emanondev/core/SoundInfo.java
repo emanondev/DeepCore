@@ -19,6 +19,10 @@ public class SoundInfo implements ConfigurationSerializable {
         return new SoundInfo(Sound.ENTITY_VILLAGER_NO, 1, 1, true);
     }
 
+    public static SoundInfo getSelfExperiencePickup() {
+        return new SoundInfo(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1, true);
+    }
+
     private Sound sound;
     private float volume;
     private float pitch;

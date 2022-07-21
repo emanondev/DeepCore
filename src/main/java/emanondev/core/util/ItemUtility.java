@@ -12,6 +12,10 @@ import java.util.HashSet;
 
 public class ItemUtility {
 
+    private ItemUtility() {
+        throw new AssertionError();
+    }
+
     private static final HashSet<ItemConverter> converters = new HashSet<>();
 
     public static ItemBuilder convertItem(YMLSection section) {

@@ -1,0 +1,452 @@
+package emanondev.core.command;
+
+import emanondev.core.*;
+import emanondev.core.util.CompleteUtility;
+import emanondev.core.util.ConsoleLogger;
+import emanondev.core.util.FileLogger;
+import emanondev.core.util.ReadUtility;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginIdentifiableCommand;
+import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompleteUtility, ReadUtility, ConsoleLogger, FileLogger {
+
+    private final CorePlugin plugin;
+    private final YMLConfig config;
+    private final String id;
+
+    private final Permission permission;
+
+    /**
+     * Returns the ID of the Command.
+     *
+     * @return Command ID.
+     */
+    public @NotNull String getID() {
+        return id;
+    }
+
+    /**
+     * Returns config file of this Command.
+     *
+     * @return Config file of this Command.
+     */
+    public @NotNull YMLConfig getConfig() {
+        return config;
+    }
+
+    /**
+     * Returns the owner of this PluginIdentifiableCommand.
+     *
+     * @return Plugin that owns this Command.
+     */
+    @Override
+    public @NotNull CorePlugin getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * Returns the permission associated to the command.
+     *
+     * @return the permission associated to the command
+     */
+    public @Nullable Permission getCommandPermission() {
+        return permission;
+    }
+
+    /**
+     * Construct a new Command. Note: id is used for both config file of the command
+     * and default command name.
+     *
+     * @param id         Command ID.
+     * @param plugin     Plugin that own this Command.
+     * @param permission Permission required to use this Command if exists.
+     */
+    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission) {
+        this(id, plugin, permission, null, null);
+    }
+
+    /**
+     * Construct a new Command. Note: id is used for both config file of the command
+     * and default command name.
+     *
+     * @param id                 Command ID.
+     * @param plugin             Plugin that own this Command.
+     * @param permission         Permission required to use this Command if exists.
+     * @param defaultDescription Default description of the Command, might be updated on Command
+     *                           file.
+     */
+    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
+                       @Nullable String defaultDescription) {
+        this(id, plugin, permission, defaultDescription, null);
+    }
+
+    /**
+     * Construct a new Command. Note: id is used for both config file of the command
+     * and default command name.
+     *
+     * @param id                 Command ID.
+     * @param plugin             Plugin that own this Command.
+     * @param permission         Permission required to use this Command if exists.
+     * @param defaultDescription Default description of the Command, might be updated on Command
+     *                           file.
+     * @param defaultAliases     Default aliases of the Command, might be changed on Command file
+     *                           and applied with Server restart or Plugin restart.
+     */
+    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
+                       @Nullable String defaultDescription, @Nullable List<String> defaultAliases) {
+        super(plugin.getConfig("Commands/" + id.toLowerCase()).loadString("info.name", id.toLowerCase()).toLowerCase());
+        if (id.isEmpty() || id.contains(" "))
+            throw new IllegalArgumentException("Invalid id");
+        this.id = id.toLowerCase();
+
+        this.plugin = plugin;
+        this.config = this.plugin.getConfig("Commands/" + this.id);
+        this.permission = permission;
+        List<String> tempAliases = new ArrayList<>();
+        for (String alias : config.loadStringList("info.aliases",
+                defaultAliases == null ? Collections.emptyList() : defaultAliases)) {
+            if (alias == null)
+                new NullPointerException("Null alias while creating command '" + id + "' (" + getName() + ")")
+                        .printStackTrace();
+            else if (alias.contains(" "))
+                new IllegalArgumentException(
+                        "Invalid alias '" + alias + "' while creating command '" + id + "' (" + getName() + ")")
+                        .printStackTrace();
+            else if (tempAliases.contains(alias.toLowerCase()))
+                new IllegalArgumentException(
+                        "Alias used twice '" + alias + "' while creating command '" + id + "' (" + getName() + ")")
+                        .printStackTrace();
+            else
+                tempAliases.add(alias.toLowerCase());
+        }
+        this.setAliases(tempAliases);
+        this.setDescription(config.loadMessage("info.description", defaultDescription == null ? "" : defaultDescription, true));
+        this.setUsage(config.loadMessage("info.usage", ChatColor.RED + "Usage: /" + getName(), true));
+        if (permission != null) {
+            // plugin.registerPermission(permission);
+            this.setPermission(permission.getName());
+            this.setPermissionMessage(
+                    config.loadMessage("info.permission-message", getDefaultPermissionMessage(), true));
+        }
+    }
+
+    /**
+     * Override this only if you wish to change message shown on command fail used
+     * as default<br>
+     * Note: default is used only if the config file of the command has no value
+     * set for this message
+     *
+     * @return defaultPermissionMessage
+     */
+    protected String getDefaultPermissionMessage() {
+        return permission == null ? (ChatColor.RED + "You lack of permissions")
+                : (ChatColor.RED + "You lack of permission " + permission.getName());
+    }
+
+    /**
+     * Execute the command.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  The alias of the command used
+     * @param args   All arguments passed to the command, split via ' '
+     * @return true
+     */
+    @Override
+    public final boolean execute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+        if (this.getCommandPermission() != null && !sender.hasPermission(this.getCommandPermission())) {
+            this.permissionLackNotify(sender, this.getCommandPermission());
+            return true;
+        }
+        onExecute(sender, alias, args);
+        return true;
+    }
+
+    /**
+     * Execute the command.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  The alias of the command used
+     * @param args   All arguments passed to the command, split via ' '
+     */
+    public abstract void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args);
+
+    /**
+     * Executed on tab completion for this command, returning a list of options the
+     * player can tab through.
+     *
+     * @param sender   Source object which is executing this command
+     * @param alias    the alias being used
+     * @param args     All arguments passed to the command, split via ' '
+     * @param location The position looked at by the sender, or null if none
+     * @return a list of tab-completions for the specified arguments. This will
+     * never be null. List may be immutable.
+     * @throws IllegalArgumentException if sender, alias, or args is null
+     */
+    @Override
+    public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args,
+                                                   @Nullable Location location) {
+        if (args == null)
+            throw new NullPointerException();
+        List<String> val = onComplete(sender, alias, args, location);
+        return val == null ? new ArrayList<>() : val;
+    }
+
+    /**
+     * Executed on tab completion for this command, returning a list of options the
+     * player can tab through.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  the alias being used
+     * @param args   All arguments passed to the command, split via ' '
+     * @return a list of tab-completions for the specified arguments. This will
+     * never be null. List may be immutable.
+     * @throws IllegalArgumentException if sender, alias, or args is null
+     */
+    @Override
+    public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
+                                                   @NotNull String[] args) {
+        return onComplete(sender, alias, args, null);
+    }
+
+    /**
+     * Executed on tab completion for this command, returning a list of options the
+     * player can tab through.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  the alias being used
+     * @param args   All arguments passed to the command, split via ' '
+     * @param loc    sender location
+     * @return a list of tab-completions for the specified arguments. May be null.
+     * @throws IllegalArgumentException if sender, alias, or args is null
+     */
+    public abstract List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
+                                            @NotNull String[] args, @Nullable Location loc);
+
+    /**
+     * @param sender     the sender
+     * @param permission the permission
+     * @return true if permission is null or sender has permission
+     */
+    protected boolean hasPermission(@NotNull Permissible sender, @Nullable Permission permission) {
+        if (permission == null)
+            return true;
+        return sender.hasPermission(permission);
+    }
+
+    /**
+     * @param sender     the sender
+     * @param permission the permission
+     * @return true if permission is null or sender has permission
+     * @see #hasPermission(Permissible, Permission)
+     */
+    @Deprecated
+    protected boolean hasPermission(@NotNull Permissible sender, @Nullable String permission) {
+        if (permission == null)
+            return true;
+        return sender.hasPermission(permission);
+    }
+
+    public void log(String log) {
+        Bukkit.getConsoleSender()
+                .sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + getPlugin().getName() + ChatColor.DARK_BLUE + "|Command "
+                                + ChatColor.WHITE + getID() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
+    }
+
+    /**
+     * Notify sender the lack of permission as specified at
+     * 'generic.lack_permission' path of language file
+     *
+     * @param sender target to notify
+     * @param perm   lacking permission
+     */
+    protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
+        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.lack_permission",
+                "", "%permission%", perm.getName()
+                , "%plugin%", getPlugin().getName());
+        if (!msg.isEmpty())
+            sender.sendMessage(msg);
+    }
+
+    /**
+     * Notify sender the command may be used by players only
+     *
+     * @param sender who
+     */
+    protected void playerOnlyNotify(CommandSender sender) {
+        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only", "", "%plugin%", getPlugin().getName());
+        if (!msg.isEmpty())
+            sender.sendMessage(msg);
+    }
+
+    /**
+     * Returns language section for the command sender<br>
+     * (load language config and go to sub pattern 'command.[command id]')
+     *
+     * @param who target user
+     * @return language section for the command sender
+     */
+    public @NotNull YMLSection getLanguageSection(@Nullable CommandSender who) {
+        return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       boolean color, String... holders) {
+        sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                       boolean color, String... holders) {
+        sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       String... holders) {
+        sendMessageFeedback(receiver, path, def, true, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                       String... holders) {
+        sendMessageFeedback(receiver, path, def, true, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       @Nullable CommandSender target, String... holders) {
+        sendMessageFeedback(receiver, path, def, true, target, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMultiMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                            @Nullable CommandSender target, String... holders) {
+        sendMessageFeedback(receiver, path, def, true, target, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver,
+                getPlugin().getLanguageConfig(receiver).loadMessage("command."+ this.getID() + "." + path, def, color,
+                        target, holders));
+    }
+
+    public void reload(){};
+
+
+    /**
+     * Returns language section for this command.
+     * @param sender language target
+     * @return language section for this command.
+     */
+    public YMLSection getCommandLang(CommandSender sender) {
+        return getPlugin().getLanguageConfig(sender).loadSection("command." + getID() );
+    }
+
+
+    /**
+     * Returns language section for selected sub command.
+     * @param sender language target
+     * @param id sub command id
+     * @return language section for selected sub command.
+     */
+    public YMLSection getSubCommandLang(CommandSender sender, String id) {
+        return getCommandLang(sender).loadSection("subCommand." + id);
+    }
+
+}

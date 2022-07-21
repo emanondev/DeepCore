@@ -174,6 +174,10 @@ public interface YMLSection extends ConfigurationSection {
         return get(path, def, SoundInfo.class);
     }
 
+    default @Nullable SoundInfo getSoundInfo(@NotNull String path) {
+        return getSoundInfo(path, null);
+    }
+
     /**
      * Gets the object from the config or set default.<br>
      * Get the object from path, if object at selected path is null or of another
@@ -351,13 +355,7 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         return UtilsString.fix(load(path, def, String.class), target instanceof Player ? ((Player) target) : null,
                 color, holders);
@@ -367,13 +365,7 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
                                          @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         try {
             return UtilsString.fix(String.join("\n", load(path, def, List.class)),
@@ -408,13 +400,7 @@ public interface YMLSection extends ConfigurationSection {
     @Contract("_, !null, _, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         try {
             return UtilsString.fix(load(path, def, List.class), target instanceof Player ? ((Player) target) : null,
@@ -437,13 +423,7 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable String defMessage,
                                                    @Nullable String defHover, @Nullable String defClick, @Nullable ClickEvent.Action action, boolean color,
                                                    @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders);
@@ -475,13 +455,7 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable String defMessage,
                                                             @Nullable String defHover, @Nullable String defClick, @Nullable ClickEvent.Action action, boolean color,
                                                             @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         String message = UtilsString.fix(loadString(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders);
@@ -517,13 +491,7 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                    @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
                                                    boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders));
@@ -550,13 +518,7 @@ public interface YMLSection extends ConfigurationSection {
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                             @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
                                                             boolean color, @Nullable CommandSender target, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+        holdersCheck(path, holders);
 
         String message = String.join("\n", UtilsString.fix(loadStringList(path + ".message", defMessage),
                 target instanceof Player ? ((Player) target) : null, color, holders));
@@ -873,7 +835,7 @@ public interface YMLSection extends ConfigurationSection {
             Map<String, Object> subMap = ((ConfigurationSection) this.get(path)).getValues(true);
             try {
                 return (Map<String, T>) subMap;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
 
             Map<String, T> result = new LinkedHashMap<>();
@@ -1303,5 +1265,220 @@ public interface YMLSection extends ConfigurationSection {
                 .setAmount(section.getInteger("amount", defAmount)).setUnbreakable(section.getBoolean("unbreakable", defUnbreakable))
                 .setCustomModelData(section.getInteger("customModelData", 0))
                 .setDamage(section.getInteger("damage", 0));
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #get(String, Object, Class)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path  path to object
+     * @param def   default value
+     * @param clazz class type
+     * @param <T>   class type
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default <T> @NotNull T getTrack(@NotNull String path, @NotNull T def, @NotNull Class<T> clazz) {
+        T val = this.get(path, null, clazz);
+        if (val == null) {
+            if (this.getPlugin() instanceof CorePlugin plugin) {
+                plugin.logProblem("value undefined at " + getFile().getPath() + " " +
+                        (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path);
+                plugin.logOnFile("undefined_configs", getFile().getPath() + " " + (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path);
+            }
+        }
+        return val == null ? def : val;
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getInt(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default int getTrackInt(@NotNull String path) {
+        return getTrack(path, 0, Integer.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getDouble(String)} (String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default double getTrackDouble(@NotNull String path) {
+        return getTrack(path, 0D, Double.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getLong(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default long getTrackLong(@NotNull String path) {
+        return getTrack(path, 0L, Long.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getString(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull String getTrackString(@NotNull String path) {
+        return getTrack(path, "", String.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getSoundInfo(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull SoundInfo getTrackSoundInfo(@NotNull String path) {
+        return getTrack(path, SoundInfo.getSelfExperiencePickup(), SoundInfo.class);
+    }
+
+    default @NotNull String getTrackMessage(@NotNull String path, @Nullable CommandSender sender, String... holders) {
+        holdersCheck(path, holders);
+        return UtilsString.fix(getTrackString(path), sender instanceof Player ? (Player) sender : null, true, holders);
+    }
+
+    default @NotNull List<String> getTrackMultiMessage(@NotNull String path, @Nullable CommandSender sender, String... holders) {
+        holdersCheck(path, holders);
+        return UtilsString.fix(getTrackStringList(path), sender instanceof Player ? (Player) sender : null, true, holders);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getStringList(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull List<String> getTrackStringList(@NotNull String path) {
+        return getTrack(path, List.of(path), List.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getMaterial(String,Material)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull Material getTrackMaterial(@NotNull String path) {
+        return getTrackEnum(path, Material.STONE, Material.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getEntityType(String,EntityType)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull EntityType getTrackEntityType(@NotNull String path) {
+        return getTrackEnum(path, EntityType.SHEEP, EntityType.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getEnum(String,T,Class<T>)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull <T extends Enum<T>> T getTrackEnum(@NotNull String path, @NotNull T def, @NotNull Class<T> clazz) {
+        String val = getTrackString(path);
+        try {
+            return Enum.valueOf(clazz, val);
+        } catch (Exception e) {
+            try {
+                return Enum.valueOf(clazz, val.toUpperCase());
+            } catch (Exception ignored) {
+                if (this.getPlugin() instanceof CorePlugin plugin) {
+                    plugin.logProblem("value invalid at " + getFile().getPath() + " " +
+                            (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path);
+                    plugin.logOnFile("undefined_configs", getFile().getPath() + " " + (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path+" (invalid enum value)");
+                }
+            }
+        }
+        return def;
+    }
+
+    default String getMessage(@NotNull String path, @Nullable CommandSender target, String... holders) {
+        return getMessage(path, null, true, target, holders);
+    }
+
+    default String getMessage(
+            @NotNull String path, @Nullable String def,
+            @Nullable CommandSender target, String... holders) {
+        return getMessage(path, def, true, target, holders);
+    }
+
+    default String getMessage(@NotNull String path, boolean color, @Nullable CommandSender target, String... holders) {
+        return getMessage(path, null, color, target, holders);
+    }
+
+    default String getMessage(
+            @NotNull String path, @Nullable String def, boolean color,
+            @Nullable CommandSender target, String... holders) {
+        holdersCheck(path, holders);
+        try {
+            return UtilsString.fix(get(path, def, String.class),
+                    target instanceof Player ? ((Player) target) : null, color, holders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def == null ? null
+                    : UtilsString.fix(String.join("\n", def), target instanceof Player ? ((Player) target) : null,
+                    color, holders);
+        }
+    }
+
+
+    private void holdersCheck(String path, String... holders) {
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
+        }
     }
 }

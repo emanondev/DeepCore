@@ -135,7 +135,7 @@ public enum MCVersion {
         try {
             Class.forName("org.spigotmc.SpigotConfig");
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
         }
         return false;
     }
@@ -144,7 +144,7 @@ public enum MCVersion {
         try {
             Class.forName("com.destroystokyo.paper.VersionHistoryManager.VersionData");
             return true;
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
         }
         return false;
     }
