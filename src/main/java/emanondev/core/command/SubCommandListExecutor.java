@@ -57,8 +57,8 @@ public class SubCommandListExecutor<T> implements TriConsumer<CommandSender,Stri
             color = !color;
             mBuilder.addText(subConfig.getTrackMessage("text", sender), "%name%", names.apply(val))
                     .addHover(descriptions.apply(val),"%name%", names.apply(val))
-                    .addSuggestCommandConfigurable("command", "%label%", alias,
-                            "%name%", names.apply(val));
+                    .addSuggestCommand(subConfig.getTrackMessage("suggest",null, "%label% ", alias,
+                            "%name%", names.apply(val)));
         }
         mBuilder.send();
     }

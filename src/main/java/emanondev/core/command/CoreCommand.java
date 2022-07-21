@@ -6,8 +6,6 @@ import emanondev.core.util.ConsoleLogger;
 import emanondev.core.util.FileLogger;
 import emanondev.core.util.ReadUtility;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -35,7 +33,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      *
      * @return Command ID.
      */
-    public @NotNull String getID() {
+    public final @NotNull String getID() {
         return id;
     }
 
@@ -202,7 +200,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         if (args == null)
             throw new NullPointerException();
         List<String> val = onComplete(sender, alias, args, location);
-        return val == null ? new ArrayList<>() : val;
+        return val == null ? Collections.emptyList() : val;
     }
 
     /**
@@ -219,7 +217,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     @Override
     public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
                                                    @NotNull String[] args) {
-        return onComplete(sender, alias, args, null);
+        return tabComplete(sender, alias, args, null);
     }
 
     /**
@@ -233,7 +231,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @return a list of tab-completions for the specified arguments. May be null.
      * @throws IllegalArgumentException if sender, alias, or args is null
      */
-    public abstract List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
+    public abstract @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
                                             @NotNull String[] args, @Nullable Location loc);
 
     /**
@@ -242,9 +240,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @return true if permission is null or sender has permission
      */
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable Permission permission) {
-        if (permission == null)
-            return true;
-        return sender.hasPermission(permission);
+        return permission == null || sender.hasPermission(permission);
     }
 
     /**
@@ -255,11 +251,10 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      */
     @Deprecated
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable String permission) {
-        if (permission == null)
-            return true;
-        return sender.hasPermission(permission);
+        return permission == null || sender.hasPermission(permission);
     }
 
+    @Override
     public void log(String log) {
         Bukkit.getConsoleSender()
                 .sendMessage(ChatColor.translateAlternateColorCodes('&',
@@ -275,11 +270,9 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param perm   lacking permission
      */
     protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
-        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.lack_permission",
+        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.lack_permission",
                 "", "%permission%", perm.getName()
-                , "%plugin%", getPlugin().getName());
-        if (!msg.isEmpty())
-            sender.sendMessage(msg);
+                , "%plugin%", getPlugin().getName()));
     }
 
     /**
@@ -288,9 +281,8 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender who
      */
     protected void playerOnlyNotify(CommandSender sender) {
-        String msg = CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only", "", "%plugin%", getPlugin().getName());
-        if (!msg.isEmpty())
-            sender.sendMessage(msg);
+        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only",                ""
+                , "%plugin%", getPlugin().getName()));
     }
 
     /**
@@ -422,31 +414,56 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
                                        boolean color, @Nullable CommandSender target, String... holders) {
         UtilsMessages.sendMessage(receiver,
-                getPlugin().getLanguageConfig(receiver).loadMessage("command."+ this.getID() + "." + path, def, color,
+                getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
                         target, holders));
     }
 
-    public void reload(){};
+    public void reload() {
+    }
+
+    ;
 
 
     /**
      * Returns language section for this command.
+     *
      * @param sender language target
      * @return language section for this command.
      */
-    public YMLSection getCommandLang(CommandSender sender) {
-        return getPlugin().getLanguageConfig(sender).loadSection("command." + getID() );
+    public YMLSection getCommandLang(@Nullable CommandSender sender) {
+        return getPlugin().getLanguageConfig(sender).loadSection(getPathLang());
     }
 
 
     /**
      * Returns language section for selected sub command.
+     *
      * @param sender language target
-     * @param id sub command id
+     * @param subId  sub command id
      * @return language section for selected sub command.
      */
-    public YMLSection getSubCommandLang(CommandSender sender, String id) {
-        return getCommandLang(sender).loadSection("subCommand." + id);
+    public YMLSection getSubCommandLang(@Nullable CommandSender sender, @NotNull String subId) {
+        return getCommandLang(sender).loadSection(getPathSubCommandLang(subId));
+    }
+
+    protected @NotNull String getPathLang() {
+        return "command." + getID();
+    }
+
+    protected @NotNull String getPathErrorLang() {
+        return getPathLang("error");
+    }
+
+    protected @NotNull String getPathLang(@NotNull String subPath) {
+        return getPathLang() + "." + subPath;
+    }
+
+    protected @NotNull String getPathSubCommandLang(@NotNull String subId) {
+        return getPathLang("subCommand." + subId);
+    }
+
+    protected @NotNull String getPathSubCommandLang(@NotNull String subId,String subPath) {
+        return getPathLang("subCommand." + subId+"."+subPath);
     }
 
 }
