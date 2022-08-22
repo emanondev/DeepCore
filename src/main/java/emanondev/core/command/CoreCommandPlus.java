@@ -70,7 +70,7 @@ public class CoreCommandPlus extends CoreCommand {
      * @param exec consumer responsible to handle the command, arguments are sender, alias, arguments
      * @param tab function responsible to return completable results, arguments are sender, alias, arguments
      */
-    protected void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
+    public void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
                                         @Nullable TriFunction<CommandSender, String, String[], List<String>> tab) {
         addSubCommandHandler(id, exec, tab, getCommandPermission() == null ? null : PermissionBuilder.asSubPermission(getCommandPermission(), id).buildAndRegister(getPlugin()));
     }
@@ -83,7 +83,7 @@ public class CoreCommandPlus extends CoreCommand {
      * @param tab function responsible to return completable results, arguments are sender, alias, arguments
      * @param perm the permission required to sender to execute or tab this sub command
      */
-    protected void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
+    public void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
                                         @Nullable TriFunction<CommandSender, String, String[], List<String>> tab, @Nullable Permission perm) {
         if (!UtilsString.isValidID(id)) {
             this.logProblem("invalid sub command id &e" + id + "&f, sub command not registered");
