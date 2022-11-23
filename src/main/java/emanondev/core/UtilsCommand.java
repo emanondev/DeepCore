@@ -11,10 +11,7 @@ import org.bukkit.permissions.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 public final class UtilsCommand {
@@ -87,7 +84,7 @@ public final class UtilsCommand {
     public static @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
                                                             @Nullable Collection<? extends Player> players) {
         if (prefix != null)
-            prefix = prefix.toLowerCase();
+            prefix = prefix.toLowerCase(Locale.ENGLISH);
         else
             prefix = "";
         List<String> list = new ArrayList<>();
@@ -96,11 +93,11 @@ public final class UtilsCommand {
 
         if (Hooks.isVanishEnabled() && (sender instanceof Player)) {
             for (Player p : players)
-                if (p.getName().toLowerCase().startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
+                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
                     list.add(p.getName());
         } else
             for (Player p : players)
-                if (p.getName().toLowerCase().startsWith(prefix))
+                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                     list.add(p.getName());
         return list;
     }
@@ -118,12 +115,12 @@ public final class UtilsCommand {
                 }
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K val : values)
             try {
                 if (isValid == null || isValid.apply(val)) {
                     String value = eval.apply(val);
-                    if (value.toLowerCase().startsWith(prefix))
+                    if (value.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                         results.add(value);
                 }
             } catch (Exception e) {
@@ -143,13 +140,13 @@ public final class UtilsCommand {
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (Enum<K> e : type.getEnumConstants())
-                results.add(e.toString().toLowerCase());
+                results.add(e.toString().toLowerCase(Locale.ENGLISH));
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K e : type.getEnumConstants())
-            if (e.toString().toLowerCase().startsWith(prefix))
-                results.add(e.toString().toLowerCase());
+            if (e.toString().toLowerCase(Locale.ENGLISH).startsWith(prefix))
+                results.add(e.toString().toLowerCase(Locale.ENGLISH));
         return results;
     }
 
@@ -167,14 +164,14 @@ public final class UtilsCommand {
         if (prefix == null || prefix.isEmpty()) {
             for (K e : type.getEnumConstants())
                 if (predicate.apply(e))
-                    results.add(e.toString().toLowerCase());
+                    results.add(e.toString().toLowerCase(Locale.ENGLISH));
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K e : type.getEnumConstants())
-            if (e.toString().toLowerCase().startsWith(prefix))
+            if (e.toString().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 if (predicate.apply(e))
-                    results.add(e.toString().toLowerCase());
+                    results.add(e.toString().toLowerCase(Locale.ENGLISH));
         return results;
     }
 
@@ -188,10 +185,10 @@ public final class UtilsCommand {
             return new ArrayList<>();
         if (prefix == null || prefix.isEmpty())
             return new ArrayList<>(elements);
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         List<String> results = new ArrayList<>();
         for (String e : elements)
-            if (e.toLowerCase().startsWith(prefix))
+            if (e.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 results.add(e);
         return results;
     }
@@ -204,12 +201,12 @@ public final class UtilsCommand {
     public static @NotNull List<String> complete(@Nullable String prefix, @Nullable String[] elements) {
         if (prefix == null || prefix.isEmpty())
             return Arrays.asList(elements);
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         List<String> results = new ArrayList<>();
         if (elements == null)
             return results;
         for (String e : elements)
-            if (e != null && e.toLowerCase().startsWith(prefix))
+            if (e != null && e.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 results.add(e);
         return results;
     }

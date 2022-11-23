@@ -186,20 +186,22 @@ public final class WorldEditUtility {
         BlockVector3 pos1 = BlockVector3.at(area.getMinX(), Math.max(w.getMinHeight(), area.getMinY()), area.getMinZ());
         BlockVector3 pos2 = BlockVector3.at(area.getMaxX() - 1, Math.min(w.getMaxHeight(), area.getMaxY() - 1), area.getMaxZ() - 1);
         CuboidRegion region = new CuboidRegion(world, pos1, pos2);
-        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
-        BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
-        if (async && mayAsync())
-            Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {
-                try {
-                    editSession.setBlocks((Region) region, block);
-                } catch (MaxChangedBlocksException e) {
-                    e.printStackTrace();
-                }
-            });
-        else try {
-            editSession.setBlocks((Region) region, block);
-        } catch (MaxChangedBlocksException e) {
-            e.printStackTrace();
+        try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
+            //EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+            BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
+            if (async && mayAsync())
+                Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {
+                    try {
+                        editSession.setBlocks((Region) region, block);
+                    } catch (MaxChangedBlocksException e) {
+                        e.printStackTrace();
+                    }
+                });
+            else try {
+                editSession.setBlocks((Region) region, block);
+            } catch (MaxChangedBlocksException e) {
+                e.printStackTrace();
+            }
         }
     }
 

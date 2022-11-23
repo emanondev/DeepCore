@@ -64,6 +64,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
+    public String getDefaultLocale(){
+        return defaultLocale;
+    }
+
+    public boolean useMultiLanguage(){
+        return useMultiLanguage;
+    }
+
     /**
      * @return Unmodifiable set of commands registered by this
      */
@@ -180,7 +188,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         }
         persistentCounterApiMap.forEach((k, v) -> {
             v.save();
-            logDone("Saved &aCounterAPI " + k.name().toLowerCase() + " &fcache");
+            logDone("Saved &aCounterAPI " + k.name().toLowerCase(Locale.ENGLISH) + " &fcache");
         });
 
         modules.values().forEach(m -> {
@@ -309,7 +317,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             bukkitCommandMap.setAccessible(true);
             CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
             command.unregister(commandMap);
-            if (!commandMap.register(this.getName().toLowerCase(), command))
+            if (!commandMap.register(this.getName().toLowerCase(Locale.ENGLISH), command))
                 throw new IllegalArgumentException("Unable to register the command '" + command.getName() + "'");
             registeredCommands.add(command);
             logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));

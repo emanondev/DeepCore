@@ -89,7 +89,7 @@ public class CoreCommandPlus extends CoreCommand {
             this.logProblem("invalid sub command id &e" + id + "&f, sub command not registered");
             return;
         }
-        id = id.toLowerCase();
+        id = id.toLowerCase(Locale.ENGLISH);
         ids.add(id);
         if (perm != null)
             subPerms.put(id, perm);
@@ -104,7 +104,7 @@ public class CoreCommandPlus extends CoreCommand {
             this.logProblem("invalid sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
             return;
         }
-        nick = nick.toLowerCase();
+        nick = nick.toLowerCase(Locale.ENGLISH);
         if (subNicks.containsKey(nick))
             this.logProblem("already used sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
 
@@ -119,7 +119,7 @@ public class CoreCommandPlus extends CoreCommand {
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         if (args.length != 0) {
-            String id = subNicks.get(args[0].toLowerCase());
+            String id = subNicks.get(args[0].toLowerCase(Locale.ENGLISH));
             if (id != null) {
                 if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id)))
                     subExecutors.get(id).consume(sender, alias, args);
@@ -137,12 +137,13 @@ public class CoreCommandPlus extends CoreCommand {
         ComponentBuilder comp = new ComponentBuilder();
         comp.append(lang.getTrackMessage("prefix", sender, "%alias%", alias));
         ids.forEach(id -> {
+            if (id==null)
+                throw new IllegalStateException("Null id");
             if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id))) {
-                String nick = this.getConfig().loadString("subCommands." + id + ".nick", id);
-                if (nick == null)
+                String nick = this.getConfig().loadString("subCommands." + id + ".nick", id).toLowerCase(Locale.ENGLISH);
+                if (nick.isEmpty()||nick.contains(" "))
                     return;
-                nick = nick.toLowerCase();
-                if (!subNicks.get(nick.toLowerCase()).equals(id))
+                if (!subNicks.get(nick).equals(id))
                     return;
 
                 String msg = lang.getTrackMessage(id + "_message", sender, "%alias%", alias, "%sub_name%", nick);
@@ -166,7 +167,7 @@ public class CoreCommandPlus extends CoreCommand {
     @Override
     public List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location loc) {
         if (args.length > 1) {
-            String id = subNicks.get(args[0].toLowerCase());
+            String id = subNicks.get(args[0].toLowerCase(Locale.ENGLISH));
             if (id != null)
                 if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id)))
                     return subCompleter.get(id)==null?Collections.emptyList():subCompleter.get(id).apply(sender, alias, args);
@@ -191,7 +192,7 @@ public class CoreCommandPlus extends CoreCommand {
                 this.logProblem("invalid sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
                 return;
             }
-            nick = nick.toLowerCase();
+            nick = nick.toLowerCase(Locale.ENGLISH);
             if (subNicks.containsKey(nick))
                 this.logProblem("already used sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
         });

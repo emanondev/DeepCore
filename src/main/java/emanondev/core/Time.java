@@ -2,6 +2,8 @@ package emanondev.core;
 
 import org.bukkit.command.CommandSender;
 
+import java.util.Locale;
+
 public enum Time {
     WEEK(604800),
     DAY(86400),
@@ -15,10 +17,10 @@ public enum Time {
     }
 
     public String getSingleName(CommandSender sender) {
-        return CoreMain.get().getLanguageConfig(sender).loadString("time.single." + this.name().toLowerCase(), this.name().toLowerCase());
+        return CoreMain.get().getLanguageConfig(sender).loadString("time.single." + this.name().toLowerCase(Locale.ENGLISH), this.name().toLowerCase(Locale.ENGLISH));
     }
 
     public String getMultipleName(CommandSender sender) {
-        return CoreMain.get().getLanguageConfig(sender).loadString("time.multi." + this.name().toLowerCase(), this.name().toLowerCase() + "s");
+        return CoreMain.get().getLanguageConfig(sender).loadString("time.multi." + this.name().toLowerCase(Locale.ENGLISH), this.name().toLowerCase(Locale.ENGLISH) + "s");
     }
 }

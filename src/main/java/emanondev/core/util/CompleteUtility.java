@@ -36,18 +36,18 @@ public interface CompleteUtility {
         if (players == null)
             return Collections.emptyList();
         if (prefix != null)
-            prefix = prefix.toLowerCase();
+            prefix = prefix.toLowerCase(Locale.ENGLISH);
         else
             prefix = "";
         List<String> list = new ArrayList<>();
 
         if (Hooks.isVanishEnabled() && (sender instanceof Player)) {
             for (Player p : players)
-                if (p.getName().toLowerCase().startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
+                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
                     list.add(p.getName());
         } else
             for (Player p : players)
-                if (p.getName().toLowerCase().startsWith(prefix))
+                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                     list.add(p.getName());
         return list;
     }
@@ -88,12 +88,12 @@ public interface CompleteUtility {
                 }
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K val : values)
             try {
                 if (isValid == null || isValid.test(val)) {
                     String value = eval.apply(val);
-                    if (value != null && value.toLowerCase().startsWith(prefix))
+                    if (value != null && value.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                         results.add(value);
                 }
             } catch (Exception e) {
@@ -113,13 +113,13 @@ public interface CompleteUtility {
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (Enum<K> e : type.getEnumConstants())
-                results.add(e.toString().toLowerCase());
+                results.add(e.toString().toLowerCase(Locale.ENGLISH));
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K e : type.getEnumConstants())
-            if (e.toString().toLowerCase().startsWith(prefix))
-                results.add(e.toString().toLowerCase());
+            if (e.toString().toLowerCase(Locale.ENGLISH).startsWith(prefix))
+                results.add(e.toString().toLowerCase(Locale.ENGLISH));
         return results;
     }
 
@@ -137,14 +137,14 @@ public interface CompleteUtility {
         if (prefix == null || prefix.isEmpty()) {
             for (K e : type.getEnumConstants())
                 if (predicate.test(e))
-                    results.add(e.name().toLowerCase());
+                    results.add(e.name().toLowerCase(Locale.ENGLISH));
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (K e : type.getEnumConstants())
-            if (e.name().toLowerCase().startsWith(prefix))
+            if (e.name().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 if (predicate.test(e))
-                    results.add(e.name().toLowerCase());
+                    results.add(e.name().toLowerCase(Locale.ENGLISH));
         return results;
     }
 
@@ -158,10 +158,10 @@ public interface CompleteUtility {
             return Collections.emptyList();
         if (prefix == null || prefix.isEmpty())
             return new ArrayList<>(elements);
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         List<String> results = new ArrayList<>();
         for (String e : elements)
-            if (e.toLowerCase().startsWith(prefix))
+            if (e.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 results.add(e);
         return results;
     }
@@ -183,9 +183,9 @@ public interface CompleteUtility {
                     results.add(e);
             return results;
         }
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         for (String e : elements)
-            if (e.toLowerCase().startsWith(prefix) && predicate.test(e))
+            if (e.toLowerCase(Locale.ENGLISH).startsWith(prefix) && predicate.test(e))
                 results.add(e);
         return results;
     }
@@ -200,10 +200,10 @@ public interface CompleteUtility {
             return new ArrayList<>();
         if (prefix == null || prefix.isEmpty())
             return Arrays.asList(elements);
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         List<String> results = new ArrayList<>();
         for (String e : elements)
-            if (e != null && e.toLowerCase().startsWith(prefix))
+            if (e != null && e.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 results.add(e);
         return results;
     }
@@ -216,7 +216,7 @@ public interface CompleteUtility {
         if (prefix == null || prefix.isEmpty())
             return List.of("false", "true");
         List<String> results = new ArrayList<>();
-        prefix = prefix.toLowerCase();
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
         if ("true".startsWith(prefix))
             results.add("true");
         if ("false".startsWith(prefix))

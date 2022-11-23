@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PermissionBuilder {
@@ -93,7 +94,7 @@ public class PermissionBuilder {
     private void setName(@NotNull String name) {
         if (name.isEmpty() || name.contains(" ") || name.startsWith(".") || name.endsWith("."))
             throw new IllegalArgumentException(name + " is invalid permission name");
-        this.name = name.toLowerCase();
+        this.name = name.toLowerCase(Locale.ENGLISH);
     }
 
     /**
@@ -135,7 +136,7 @@ public class PermissionBuilder {
     @Contract("_, _ -> this")
     @NotNull
     public PermissionBuilder addChild(String name, boolean value) {
-        children.put(name.toLowerCase(), value);
+        children.put(name.toLowerCase(Locale.ENGLISH), value);
         return this;
     }
 
@@ -161,7 +162,7 @@ public class PermissionBuilder {
     @Contract(" -> new")
     @NotNull
     public Permission build() {
-        return new Permission(name.toLowerCase(), description, def, children);
+        return new Permission(name.toLowerCase(Locale.ENGLISH), description, def, children);
     }
 
     /**
@@ -186,7 +187,7 @@ public class PermissionBuilder {
     @Contract("_, _ -> new")
     @NotNull
     public Permission buildAndRegister(@NotNull CorePlugin plugin, boolean silent) {
-        Permission perm = new Permission(name.toLowerCase(), description, def, children);
+        Permission perm = new Permission(name.toLowerCase(Locale.ENGLISH), description, def, children);
         plugin.registerPermission(perm, silent);
         return perm;
     }

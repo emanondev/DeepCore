@@ -94,7 +94,7 @@ public class LoggerManager {
             throw new IllegalArgumentException();
         if (!fileName.endsWith(".log"))
             fileName = fileName + ".log";
-        fileName = fileName.toLowerCase();
+        fileName = fileName.toLowerCase(Locale.ENGLISH);
         Logger result = loggers.get(fileName);
         if (result == null) {
             result = new Logger(fileName);
@@ -192,7 +192,7 @@ public class LoggerManager {
                 throw new IllegalArgumentException();
             if (!fileName.endsWith(".log"))
                 fileName = fileName + ".log";
-            fileName = fileName.toLowerCase();
+            fileName = fileName.toLowerCase(Locale.ENGLISH);
             file = new File(plugin.getDataFolder(), fileName);
             if (!file.exists()) {
                 if (!file.getParentFile().exists()) { // Create parent folders if they don't exist

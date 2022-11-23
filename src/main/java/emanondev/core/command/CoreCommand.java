@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompleteUtility, ReadUtility, ConsoleLogger, FileLogger {
 
@@ -106,10 +107,10 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      */
     public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
                        @Nullable String defaultDescription, @Nullable List<String> defaultAliases) {
-        super(plugin.getConfig("Commands/" + id.toLowerCase()).loadString("info.name", id.toLowerCase()).toLowerCase());
+        super(plugin.getConfig("Commands/" + id.toLowerCase(Locale.ENGLISH)).loadString("info.name", id.toLowerCase(Locale.ENGLISH)).toLowerCase(Locale.ENGLISH));
         if (id.isEmpty() || id.contains(" "))
             throw new IllegalArgumentException("Invalid id");
-        this.id = id.toLowerCase();
+        this.id = id.toLowerCase(Locale.ENGLISH);
 
         this.plugin = plugin;
         this.config = this.plugin.getConfig("Commands/" + this.id);
@@ -124,12 +125,12 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                 new IllegalArgumentException(
                         "Invalid alias '" + alias + "' while creating command '" + id + "' (" + getName() + ")")
                         .printStackTrace();
-            else if (tempAliases.contains(alias.toLowerCase()))
+            else if (tempAliases.contains(alias.toLowerCase(Locale.ENGLISH)))
                 new IllegalArgumentException(
                         "Alias used twice '" + alias + "' while creating command '" + id + "' (" + getName() + ")")
                         .printStackTrace();
             else
-                tempAliases.add(alias.toLowerCase());
+                tempAliases.add(alias.toLowerCase(Locale.ENGLISH));
         }
         this.setAliases(tempAliases);
         this.setDescription(config.loadMessage("info.description", defaultDescription == null ? "" : defaultDescription, true));
@@ -227,12 +228,27 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender Source object which is executing this command
      * @param alias  the alias being used
      * @param args   All arguments passed to the command, split via ' '
+     * @return a list of tab-completions for the specified arguments. May be null.
+     * @throws IllegalArgumentException if sender, alias, or args is null
+     */
+    public @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
+                                             @NotNull String[] args) {
+        return onComplete(sender, alias, args, null);
+    }
+
+    /**
+     * Executed on tab completion for this command, returning a list of options the
+     * player can tab through.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  the alias being used
+     * @param args   All arguments passed to the command, split via ' '
      * @param loc    sender location
      * @return a list of tab-completions for the specified arguments. May be null.
      * @throws IllegalArgumentException if sender, alias, or args is null
      */
     public abstract @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
-                                            @NotNull String[] args, @Nullable Location loc);
+                                                      @NotNull String[] args, @Nullable Location loc);
 
     /**
      * @param sender     the sender
@@ -281,7 +297,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender who
      */
     protected void playerOnlyNotify(CommandSender sender) {
-        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only",                ""
+        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only", ""
                 , "%plugin%", getPlugin().getName()));
     }
 
@@ -421,8 +437,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     public void reload() {
     }
 
-    ;
-
 
     /**
      * Returns language section for this command.
@@ -462,8 +476,8 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         return getPathLang("subCommand." + subId);
     }
 
-    protected @NotNull String getPathSubCommandLang(@NotNull String subId,String subPath) {
-        return getPathLang("subCommand." + subId+"."+subPath);
+    protected @NotNull String getPathSubCommandLang(@NotNull String subId, String subPath) {
+        return getPathLang("subCommand." + subId + "." + subPath);
     }
 
 }

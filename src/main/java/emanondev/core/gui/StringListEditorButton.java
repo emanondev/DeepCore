@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class StringListEditorButton extends AGuiButton {
 
@@ -223,12 +224,12 @@ public abstract class StringListEditorButton extends AGuiButton {
 
         private String getSymbol(CommandSender sender) {
             return CoreMain.get().getLanguageConfig(sender)
-                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase() + ".symbol", "@");
+                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase(Locale.ENGLISH) + ".symbol", "@");
         }
 
         private String getDescription(CommandSender sender) {
             return CoreMain.get().getLanguageConfig(sender)
-                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase() + ".desc", "description");
+                    .loadString("gui_button.string_list_editor." + this.name().toLowerCase(Locale.ENGLISH) + ".desc", "description");
         }
 
     }
