@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.actions.*;
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.ItemUtility;
@@ -36,6 +37,14 @@ public final class CoreMain extends CorePlugin {
         this.logDone("Enabled &aSpawnReasonTracker");
         this.registerListener(new EquipChangeListener());
         this.logDone("Enabled &aEquipmentChangeEvent");
+        ActionHandler.clearActions(); //required for plugman reload
+        ActionHandler.registerAction(new DelayedAction());
+        ActionHandler.registerAction(new PermissionAction());
+        ActionHandler.registerAction(new PlayerCommandAction());
+        ActionHandler.registerAction(new PlayerAsOpCommandAction());
+        ActionHandler.registerAction(new ServerCommandAction());
+        ActionHandler.registerAction(new SoundAction());
+        this.logDone("Enabled &aActionAPI");
         ItemUtility.inizialize();
     }
 
