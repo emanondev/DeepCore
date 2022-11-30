@@ -1,6 +1,6 @@
 package emanondev.core;
 
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
@@ -45,11 +45,11 @@ public class YMLSubSection extends MemorySection implements YMLSection {
     @SuppressWarnings("deprecation")
     @NotNull
     public YMLSection createSection(@NotNull String path) {
-        Validate.notEmpty(path, "Cannot create section at empty path");
+        if (path.isEmpty())
+            throw new IllegalArgumentException("Cannot create section at empty path");
         Configuration root = getRoot();
-        if (root == null) {
+        if (root == null)
             throw new IllegalStateException("Cannot create section without a root");
-        }
 
         char separator = root.options().pathSeparator();
 

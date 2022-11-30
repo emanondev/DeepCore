@@ -1,7 +1,7 @@
 package emanondev.core;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public final class UtilsExp {
 
@@ -11,7 +11,8 @@ public final class UtilsExp {
 
     // Calculate amount of EXP needed to level up
     public static int getExpToLevelUp(int level) {
-        Validate.isTrue(level >= 0, "level must be positive");
+        if (level < 0)
+            throw new IllegalArgumentException("level must be positive");
         // 1.8+
         if (level <= 15)
             return 2 * level + 7;
@@ -23,7 +24,8 @@ public final class UtilsExp {
 
     // Calculate total experience up to a level
     public static int getExpAtLevel(int level) {
-        Validate.isTrue(level >= 0, "level must be positive");
+        if (level < 0)
+            throw new IllegalArgumentException("level must be positive");
         // 1.8+
         if (level == 0)
             return 0;
@@ -45,8 +47,7 @@ public final class UtilsExp {
     }
 
     // Calculate player's current EXP amount
-    public static int getExp(Player player) {
-        Validate.notNull(player, "player is null");
+    public static int getExp(@NotNull Player player) {
         int level = player.getLevel();
 
         // Get the amount of XP in past levels
@@ -60,7 +61,8 @@ public final class UtilsExp {
 
     // Give or take EXP
     public static void setExp(Player player, int exp) {
-        Validate.isTrue(exp >= 0, "exp must be positive");
+        if (exp < 0)
+            throw new IllegalArgumentException("exp must be positive");
         int level = getLevelAtExp(exp);
         // Reset player's current exp to 0
         player.setExp(0);
@@ -73,7 +75,8 @@ public final class UtilsExp {
     }
 
     public static boolean hasExp(Player player, int exp) {
-        Validate.isTrue(exp >= 0, "exp must be positive");
+        if (exp < 0)
+            throw new IllegalArgumentException("exp must be positive");
         return getExp(player) >= exp;
     }
 

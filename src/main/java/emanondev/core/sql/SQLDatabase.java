@@ -1,8 +1,8 @@
 package emanondev.core.sql;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -19,14 +19,7 @@ public class SQLDatabase {
     private final String database;
     private final int port;
 
-    public SQLDatabase(SQLType type, String host, String user, String password, String database, int port) throws ClassNotFoundException, SQLException {
-        // Validate.notNull(plugin, "null plugin");
-        Validate.notNull(type, "null sql type");
-        Validate.notNull(host, "null value");
-        Validate.notNull(user, "null value");
-        Validate.notNull(password, "null value");
-        Validate.isTrue(port >= 0, "invalid port");
-        // this.plugin = plugin;
+    public SQLDatabase(@NotNull SQLType type, @NotNull String host,@NotNull  String user, @NotNull String password, String database, int port) throws ClassNotFoundException, SQLException {
         this.type = type;
         this.host = host;
         this.user = user;

@@ -1,8 +1,10 @@
 package emanondev.core;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -136,7 +138,8 @@ public final class UtilsString {
             return null;
 
         // holders
-        Validate.isTrue(holders == null || holders.length % 2 == 0, "holder without replacer");
+        if (holders != null && holders.length % 2 != 0)
+            throw new IllegalArgumentException("holder without replacer");
         if (holders != null && holders.length > 0)
             for (int i = 0; i < holders.length; i += 2)
                 text = text.replace(holders[i], holders[i + 1]);
@@ -148,7 +151,7 @@ public final class UtilsString {
         // color
         if (color)
             text = ChatColor.translateAlternateColorCodes('&', text);
-        try {
+        /*try {
             int from = 0;
             while (text.indexOf("&#", from) >= 0) {
                 from = text.indexOf("&#", from) + 1;
@@ -156,9 +159,8 @@ public final class UtilsString {
                         net.md_5.bungee.api.ChatColor.of(text.substring(from, from + 7)).toString());
             }
         } catch (Throwable ignored) {
-        }
-
-
+        }*/// pretty useless
+        // MiniMessage
         return text;
     }
 

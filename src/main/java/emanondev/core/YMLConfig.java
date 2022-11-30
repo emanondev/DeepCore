@@ -5,7 +5,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -57,7 +56,8 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     @Deprecated
     @NotNull
     public YMLSection createSection(@NotNull String path) {
-        Validate.notEmpty(path, "Cannot create section at empty path");
+        if (path.isEmpty())
+            throw new IllegalArgumentException("Cannot create section at empty path");
         Configuration root = getRoot();
         if (root == null) {
             throw new IllegalStateException("Cannot create section without a root");
@@ -151,7 +151,8 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @throws IllegalArgumentException if name is empty
      */
     public static String fixName(@NotNull String name) {
-        Validate.notEmpty(name, "YAML file must have a name!");
+        if (name.isEmpty())
+            throw new IllegalArgumentException("YAML file must have a name!");
         if (!name.endsWith(".yml"))
             name += ".yml";
         return name;

@@ -9,6 +9,7 @@ import emanondev.core.sql.SQLType;
 import emanondev.core.util.ConsoleLogger;
 import emanondev.core.command.CoreCommand;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -20,6 +21,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +48,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     private PacketManager packetManager = null;
     private final Map<String, Module> modules = new HashMap<>();
     private final Set<Module> enabledModules = new HashSet<>();
+    private BukkitAudiences adventure;
+
+    public @NonNull BukkitAudiences adventure() {
+        if(this.adventure == null) {
+            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
+        }
+        return this.adventure;
+    }
 
     /**
      * Enable the plugin. <br>
@@ -57,6 +67,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     public final void onEnable() {
         long now = System.currentTimeMillis();
 
+        this.adventure = BukkitAudiences.create(this);
         setupLanguageConfig();
 
         if (registerReloadCommand()) registerCommand(new ReloadCommand(this));
@@ -219,6 +230,11 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         for (String permission : registeredPermissions)
             Bukkit.getPluginManager().removePermission(permission);
         if (loggerManager != null) loggerManager.disable();
+
+        if(this.adventure != null) {
+            this.adventure.close();
+            this.adventure = null;
+        }
         logPentaStar(ChatColor.YELLOW, "Disabled  (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
