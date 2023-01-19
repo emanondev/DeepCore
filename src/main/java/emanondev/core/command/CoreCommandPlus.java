@@ -1,6 +1,9 @@
 package emanondev.core.command;
 
-import emanondev.core.*;
+import emanondev.core.CorePlugin;
+import emanondev.core.PermissionBuilder;
+import emanondev.core.UtilsString;
+import emanondev.core.YMLSection;
 import emanondev.core.util.TriConsumer;
 import emanondev.core.util.TriFunction;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -66,25 +69,25 @@ public class CoreCommandPlus extends CoreCommand {
      * Add a subCommand
      * a permission is generated as default from command permission plus the id
      *
-     * @param id default id of the sub command
+     * @param id   default id of the sub command
      * @param exec consumer responsible to handle the command, arguments are sender, alias, arguments
-     * @param tab function responsible to return completable results, arguments are sender, alias, arguments
+     * @param tab  function responsible to return completable results, arguments are sender, alias, arguments
      */
     public void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
-                                        @Nullable TriFunction<CommandSender, String, String[], List<String>> tab) {
+                                     @Nullable TriFunction<CommandSender, String, String[], List<String>> tab) {
         addSubCommandHandler(id, exec, tab, getCommandPermission() == null ? null : PermissionBuilder.asSubPermission(getCommandPermission(), id).buildAndRegister(getPlugin()));
     }
 
     /**
      * Add a subCommand
      *
-     * @param id default id of the sub command
+     * @param id   default id of the sub command
      * @param exec consumer responsible to handle the command, arguments are sender, alias, arguments
-     * @param tab function responsible to return completable results, arguments are sender, alias, arguments
+     * @param tab  function responsible to return completable results, arguments are sender, alias, arguments
      * @param perm the permission required to sender to execute or tab this sub command
      */
     public void addSubCommandHandler(@NotNull String id, @NotNull TriConsumer<CommandSender, String, String[]> exec,
-                                        @Nullable TriFunction<CommandSender, String, String[], List<String>> tab, @Nullable Permission perm) {
+                                     @Nullable TriFunction<CommandSender, String, String[], List<String>> tab, @Nullable Permission perm) {
         if (!UtilsString.isValidID(id)) {
             this.logProblem("invalid sub command id &e" + id + "&f, sub command not registered");
             return;
@@ -94,7 +97,7 @@ public class CoreCommandPlus extends CoreCommand {
         if (perm != null)
             subPerms.put(id, perm);
         subExecutors.put(id, exec);
-        if (tab!=null)
+        if (tab != null)
             subCompleter.put(id, tab);
         this.getConfig().loadInteger("subCommands." + id + ".display_order", ids.size() + 1);
         ids.sort(Comparator.comparingInt(commandId -> this.getConfig().loadInteger("subCommands." + commandId + ".display_order", 1)));
@@ -137,11 +140,11 @@ public class CoreCommandPlus extends CoreCommand {
         ComponentBuilder comp = new ComponentBuilder();
         comp.append(lang.getTrackMessage("prefix", sender, "%alias%", alias));
         ids.forEach(id -> {
-            if (id==null)
+            if (id == null)
                 throw new IllegalStateException("Null id");
             if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id))) {
                 String nick = this.getConfig().loadString("subCommands." + id + ".nick", id).toLowerCase(Locale.ENGLISH);
-                if (nick.isEmpty()||nick.contains(" "))
+                if (nick.isEmpty() || nick.contains(" "))
                     return;
                 if (!subNicks.get(nick).equals(id))
                     return;
@@ -170,7 +173,7 @@ public class CoreCommandPlus extends CoreCommand {
             String id = subNicks.get(args[0].toLowerCase(Locale.ENGLISH));
             if (id != null)
                 if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id)))
-                    return subCompleter.get(id)==null?Collections.emptyList():subCompleter.get(id).apply(sender, alias, args);
+                    return subCompleter.get(id) == null ? Collections.emptyList() : subCompleter.get(id).apply(sender, alias, args);
                 else
                     return Collections.emptyList();
             return Collections.emptyList();

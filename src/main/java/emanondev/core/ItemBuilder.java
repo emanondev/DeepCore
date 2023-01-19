@@ -1,11 +1,15 @@
 package emanondev.core;
 
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -18,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ItemBuilder {
     private final ItemStack result;
@@ -97,7 +103,7 @@ public class ItemBuilder {
     public ItemBuilder addLore(String line) {
         if (line == null)
             return this;
-        List<String> lore = this.resultMeta.hasLore() ? this.resultMeta.getLore() : new ArrayList<>();
+        List<String> lore = this.resultMeta.hasLore() ? new ArrayList<>(this.resultMeta.getLore()) : new ArrayList<>();
         lore.add(line);
         this.resultMeta.setLore(lore);
         return this;
@@ -247,8 +253,7 @@ public class ItemBuilder {
 
     @Contract("_ -> this")
     public ItemBuilder setCustomModelData(Integer data) {
-        if (this.resultMeta.hasCustomModelData())
-            this.resultMeta.setCustomModelData(data);
+        this.resultMeta.setCustomModelData(data);
         return this;
     }
 
@@ -298,8 +303,7 @@ public class ItemBuilder {
      */
     @Contract("_, _ -> this")
     public ItemBuilder setDescription(List<String> description, String... holders) {
-        setDescription(description, true, null, holders);
-        return this;
+        return setDescription(description, true, null, holders);
     }
 
     /**
@@ -313,8 +317,56 @@ public class ItemBuilder {
      */
     @Contract("_, _, _ -> this")
     public ItemBuilder setDescription(List<String> description, boolean color, String... holders) {
-        setDescription(description, color, null, holders);
+        return setDescription(description, color, null, holders);
+    }
+
+    @Contract("_, _ -> this")
+    public ItemBuilder setMiniDescription(List<String> description, String... holders) {
+        return setMiniDescription(description, null, holders);
+    }
+
+    @Contract("_, _, _ -> this")
+    public ItemBuilder setMiniDescription(List<String> description, Player player, String... holders) {
+        List<String> list = UtilsString.fix(description, player, false, holders);
+        if (list == null || list.isEmpty()) {
+            this.resultMeta.setDisplayName(null);
+            this.resultMeta.setLore(null);
+        } else if (list.size() == 1) {
+            this.resultMeta.setLore(null);
+            Map<String, Object> map = resultMeta.serialize();
+            map.put("display-name", format(list.get(0)));
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+        } else {
+            Map<String, Object> map = resultMeta.serialize();
+            map.put("display-name", format(list.remove(0)));
+            for (int i = 0; i < list.size(); i++)
+                list.set(i, format(list.get(i)));
+            map.put("lore", list);
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+        }
         return this;
+    }
+
+    private String format(String text) {
+        if (text == null)
+            return null;
+        text = UtilsString.fix(text, null, false);
+        text = text.replace('§', '&');
+        for (ChatColor color : ChatColor.values())
+            text = text.replace("&" + color.toString().charAt(1),
+                    (color.getColor() == null ? "" : "<reset>") +
+                            "<" + color.getName()
+                            .toLowerCase(Locale.ENGLISH) + ">");
+        try {
+            int from = 0;
+            while (text.indexOf("&#", from) >= 0) {
+                from = text.indexOf("&#", from) + 1;
+                text = text.replace(text.substring(from - 1, from + 7),
+                        "<reset><#" + text.substring(from, from + 7) + ">");
+            }
+        } catch (Throwable ignored) {
+        }
+        return GsonComponentSerializer.gson().serialize(MiniMessage.miniMessage().deserialize(text));
     }
 
     /**

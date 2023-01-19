@@ -39,7 +39,7 @@ public class ItemUtility {
         converters.add(converter);
     }
 
-    public static void inizialize() {
+    public static void initialize() {
         if (Hooks.isEnabled("ItemEdit"))
             converters.add(new ItemEditItemConverter());
         if (Hooks.isEnabled("DracarysGUI"))

@@ -198,7 +198,7 @@ public class PacketArmorStand extends PacketEntity {
         if (UtilsInventory.isAirOrNull(item))
             equip.remove(slot);
         else
-            equip.put(slot,item);
+            equip.put(slot, item);
         return this;
     }
 
@@ -216,10 +216,10 @@ public class PacketArmorStand extends PacketEntity {
     }
 
     public WrappedDataWatcher getWrappedDataWatcher() {
-        if (getDataWatcher()==null)
-            dataWatcher = WatchableCollection.getWatchableCollection(this,getDataWatcher());
+        if (getDataWatcher() == null)
+            dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
         else
-            WatchableCollection.getWatchableCollection(this,getDataWatcher());
+            WatchableCollection.getWatchableCollection(this, getDataWatcher());
         return dataWatcher;
     }
 

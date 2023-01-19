@@ -2,16 +2,13 @@ package emanondev.core.actions;
 
 import emanondev.core.CoreMain;
 import emanondev.core.YMLConfig;
-import emanondev.itemedit.Util;
 import emanondev.itemedit.UtilsString;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,13 +63,6 @@ public class PlayerAsOpCommandAction extends Action {
             player.setOp(false);
             data.set(player.getUniqueId().toString(), null);
         }
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, List<String> params) {
-        if (params.get(params.size() - 1).startsWith("%"))
-            return Util.complete(params.get(params.size() - 1), Collections.singletonList("%player%"));
-        return Collections.emptyList();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.command.CoreCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;

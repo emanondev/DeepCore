@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -85,6 +84,7 @@ public class GuiHandler implements Listener {
             for (Player p : Bukkit.getOnlinePlayers())
                 if (p.getOpenInventory().getTopInventory() instanceof Gui gui &&
                         gui.isTimerUpdated()) {
+                    gui.onTimerUpdate();
                     gui.updateInventory();
                     counter++;
                 }

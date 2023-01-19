@@ -1,6 +1,5 @@
 package emanondev.core;
 
-import com.google.gson.reflect.TypeToken;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -41,7 +40,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     private Float walkSpeed;
     private Boolean flying;
     private List<ItemStack> extraContents;
-    private Boolean invisible;
+    //private Boolean invisible;
     private Integer heldItemSlot;
     private Integer freezeTicks;
     private Boolean glowing;
@@ -121,8 +120,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             map.put("walkSpeed", walkSpeed);
         if (flying != null)
             map.put("flying", flying);
-        if (invisible != null)
-            map.put("invisible", invisible);
+        //if (invisible != null)
+        //    map.put("invisible", invisible);
         if (heldItemSlot != null)
             map.put("heldItemSlot", heldItemSlot);
         if (freezeTicks != null)
@@ -171,7 +170,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         snapshot.remainingAir = map.containsKey("remainingAir") ? (Integer) map.get("remainingAir") : null;
         snapshot.walkSpeed = map.containsKey("walkSpeed") ? ((Number) map.get("walkSpeed")).floatValue() : null;
         snapshot.flying = map.containsKey("flying") ? (Boolean) map.get("flying") : null;
-        snapshot.invisible = map.containsKey("invisible") ? (Boolean) map.get("invisible") : null;
+        //snapshot.invisible = map.containsKey("invisible") ? (Boolean) map.get("invisible") : null;
         snapshot.heldItemSlot = map.containsKey("heldItemSlot") ? (Integer) map.get("heldItemSlot") : null;
         snapshot.freezeTicks = map.containsKey("freezeTicks") ? (Integer) map.get("freezeTicks") : null;
         snapshot.glowing = map.containsKey("glowing") ? (Boolean) map.get("glowing") : null;
@@ -188,7 +187,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             FieldType.ABSORBITION, FieldType.ARMOR, FieldType.EXTRACONTENTS, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
             FieldType.EXPERIENCE, FieldType.FOODLEVEL, FieldType.EXHAUSTION, FieldType.HEALTH, FieldType.ALLOWFLIGHT,
             FieldType.GOD, FieldType.GAMEMODE, FieldType.FLYSPEED, FieldType.FIRETICKS, FieldType.AIR,
-            FieldType.WALKSPEED, FieldType.SATURATION, FieldType.INVISIBLE, FieldType.COLLIDABLE, FieldType.CANPICKUPITEMS,
+            FieldType.WALKSPEED, FieldType.SATURATION, /*FieldType.INVISIBLE,*/ FieldType.COLLIDABLE, FieldType.CANPICKUPITEMS,
             FieldType.HELDITEMSLOT, FieldType.FREEZETICKS, FieldType.GLOWING};
 
     public void apply(Player who) {
@@ -233,7 +232,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             }
             case EFFECTS -> {
                 if (this.effects != null) {
-                    for (PotionEffect value:new ArrayList<>(who.getActivePotionEffects())) //TODO maybe no need of copy, test this
+                    for (PotionEffect value : new ArrayList<>(who.getActivePotionEffects())) //TODO maybe no need of copy, test this
                         who.removePotionEffect(value.getType());
                     who.addPotionEffects(effects);
                 }
@@ -304,10 +303,10 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
                 if (this.walkSpeed != null)
                     who.setWalkSpeed(walkSpeed);
             }
-            case INVISIBLE -> {
+            /*case INVISIBLE -> {
                 if (this.invisible != null)
                     who.setInvisible(this.invisible);
-            }
+            }*/
             case HELDITEMSLOT -> {
                 if (this.heldItemSlot != null)
                     who.getInventory().setHeldItemSlot(this.heldItemSlot);
@@ -416,7 +415,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             }
             case SATURATION -> this.saturation = who.getSaturation();
             case WALKSPEED -> this.walkSpeed = who.getWalkSpeed();
-            case INVISIBLE -> this.invisible = who.isInvisible();
+            //case INVISIBLE -> this.invisible = who.isInvisible();
             case HELDITEMSLOT -> this.heldItemSlot = who.getInventory().getHeldItemSlot();
             case FREEZETICKS -> this.freezeTicks = who.getFreezeTicks();
             case GLOWING -> this.glowing = who.isGlowing();
@@ -449,7 +448,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case LOCATION -> getLocation();
             case SATURATION -> getSaturation();
             case WALKSPEED -> getWalkSpeed();
-            case INVISIBLE -> getInvisible();
+            //case INVISIBLE -> getInvisible();
             case HELDITEMSLOT -> getHeldItemSlot();
             case FREEZETICKS -> getFreezeTicks();
             case GLOWING -> getGlowing();
@@ -481,9 +480,10 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         return heldItemSlot;
     }
 
+    /*
     public Boolean getInvisible() {
         return invisible;
-    }
+    }*/
 
     @SuppressWarnings("unchecked")
     public void set(FieldType type, Object value) {
@@ -509,7 +509,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case LOCATION -> setLocation((Location) value);
             case SATURATION -> setSaturation((Float) value);
             case WALKSPEED -> setWalkSpeed((Float) value);
-            case INVISIBLE -> setInvisible((Boolean) value);
+            //case INVISIBLE -> setInvisible((Boolean) value);
             case HELDITEMSLOT -> setHeldItemSlot((Integer) value);
             case FREEZETICKS -> setFreezeTicks((Integer) value);
             case GLOWING -> setGlowing((Boolean) value);
@@ -535,9 +535,9 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         this.heldItemSlot = value;
     }
 
-    public void setInvisible(Boolean value) {
+    /*public void setInvisible(Boolean value) {
         this.invisible = value;
-    }
+    }*/
 
     public void setGlowing(Boolean value) {
         this.glowing = value;
@@ -624,12 +624,14 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     }
 
     public void setLocation(Location value) {
-        this.locationWorldName = value.getWorld().getName();
-        this.locationX = value.getX();
-        this.locationY = value.getY();
-        this.locationZ = value.getZ();
-        this.locationYaw = value.getYaw();
-        this.locationPitch = value.getPitch();
+        World w = value == null ? null : value.getWorld();
+        boolean isNull = value == null || w == null;
+        this.locationWorldName = isNull ? null : w.getName();
+        this.locationX = isNull ? null : value.getX();
+        this.locationY = isNull ? null : value.getY();
+        this.locationZ = isNull ? null : value.getZ();
+        this.locationYaw = isNull ? null : value.getYaw();
+        this.locationPitch = isNull ? null : value.getPitch();
     }
 
     public void setSaturation(Float value) {
@@ -746,7 +748,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public enum FieldType {
         LOCATION, ARMOR, INVENTORY, ENDERCHEST, LEVEL, EXPERIENCE, EFFECTS, FOODLEVEL, EXHAUSTION, HEALTH, ABSORBITION,
-        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, INVISIBLE, HELDITEMSLOT,
+        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, /*INVISIBLE,*/ HELDITEMSLOT,
         FREEZETICKS, COLLIDABLE, CANPICKUPITEMS, GLOWING
     }
 
@@ -784,7 +786,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case LOCATION -> this.locationWorldName != null;
             case SATURATION -> this.saturation != null;
             case WALKSPEED -> this.walkSpeed != null;
-            case INVISIBLE -> this.invisible != null;
+            //case INVISIBLE -> this.invisible != null;
             case GLOWING -> this.glowing != null;
             case FREEZETICKS -> this.freezeTicks != null;
             case HELDITEMSLOT -> this.heldItemSlot != null;
@@ -826,7 +828,7 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             }
             case SATURATION -> this.saturation = (Float) getDefault(type);
             case WALKSPEED -> this.walkSpeed = (Float) getDefault(type);
-            case INVISIBLE -> this.invisible = (Boolean) getDefault(type);
+            //case INVISIBLE -> this.invisible = (Boolean) getDefault(type);
             case GLOWING -> this.glowing = (Boolean) getDefault(type);
             case COLLIDABLE -> this.collidable = (Boolean) getDefault(type);
             case CANPICKUPITEMS -> this.canPickupItems = (Boolean) getDefault(type);
@@ -838,20 +840,21 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public Object getDefault(FieldType type) {
         return switch (type) {
-            case ABSORBITION, FIRETICKS, LEVEL, FREEZETICKS -> 0;
+            case ABSORBITION -> 0D;
+            case FIRETICKS, LEVEL, FREEZETICKS -> 0;
             case EXPERIENCE -> 0F;
-            case EXHAUSTION -> 1F;
+            case EXHAUSTION, SATURATION -> 1F;
             case HEALTH -> 20D;
             case AIR -> 300;
             case FOODLEVEL -> 20;
-            case ALLOWFLIGHT, GOD, FLYING, GLOWING, INVISIBLE -> false;
+            case ALLOWFLIGHT, GOD, FLYING, GLOWING/*, INVISIBLE*/ -> false;
             case COLLIDABLE, CANPICKUPITEMS -> true;
             case ARMOR -> Collections.nCopies(4, (ItemStack) null);
             case EXTRACONTENTS -> Collections.nCopies(1, (ItemStack) null);
             case EFFECTS -> new ArrayList<PotionEffect>(0);
             case ENDERCHEST -> Collections.nCopies(9 * 3, (ItemStack) null);
             case WALKSPEED, FLYSPEED -> 0.2F;
-            case SATURATION, HELDITEMSLOT -> 1;
+            case HELDITEMSLOT -> 1;
             case GAMEMODE -> GameMode.SURVIVAL;
             case INVENTORY -> Collections.nCopies(9 * 4, (ItemStack) null);
             case LOCATION -> null;// TODO fallback?

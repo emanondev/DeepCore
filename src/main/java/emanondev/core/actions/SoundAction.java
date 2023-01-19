@@ -1,11 +1,11 @@
 package emanondev.core.actions;
 
-import emanondev.itemedit.Util;
 import org.bukkit.Sound;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class SoundAction extends Action {
 
@@ -20,8 +20,7 @@ public class SoundAction extends Action {
         String[] args = text.split(" ");
         if (args.length > 4)
             throw new IllegalStateException();
-        if (Sound.valueOf(args[0].toUpperCase()) == null)
-            throw new IllegalStateException();
+        Sound.valueOf(args[0].toUpperCase());
         if (args.length >= 2) {
             if (Float.parseFloat(args[1]) <= 0)
                 throw new IllegalStateException();
@@ -58,21 +57,6 @@ public class SoundAction extends Action {
             player.playSound(player.getLocation(), sound, volume, pitch);
         else
             player.getLocation().getWorld().playSound(player.getLocation(), sound, volume, pitch);
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, List<String> params) {
-        switch (params.size()) {
-            case 1:
-                return Util.complete(params.get(0), Sound.class);
-            case 2:
-                return Util.complete(params.get(1), Arrays.asList("0.5", "1"));
-            case 3:
-                return Util.complete(params.get(2), Arrays.asList("1", "2", "5", "10"));
-            case 4:
-                return Util.complete(params.get(3), Arrays.asList("true", "false"));
-        }
-        return Collections.emptyList();
     }
 
     @Override

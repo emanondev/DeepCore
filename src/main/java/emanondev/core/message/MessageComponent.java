@@ -7,6 +7,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,7 +31,11 @@ public class MessageComponent {
     }
 
     public MessageComponent(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget) {
-        this.base = Component.text();
+        this(plugin, target, papiTarget, Component.text());
+    }
+
+    private MessageComponent(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget, TextComponent.Builder text) {
+        this.base = text;
         this.plugin = plugin;
         this.target = target;
         this.papiTarget = papiTarget;
@@ -51,8 +56,16 @@ public class MessageComponent {
     @NotNull
     public MessageComponent append(@Nullable String text, String... holders) {
         if (text != null)
-            base.append(format(text));
+            base.append(format(text, holders));
         return this;
+    }
+
+    public String toGson() {
+        return GsonComponentSerializer.gson().serialize(base.build());
+    }
+
+    public static MessageComponent fromGson(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget, String gson) {
+        return new MessageComponent(plugin, target, papiTarget, Component.text().append(GsonComponentSerializer.gson().deserialize(gson)));
     }
 
     @NotNull
@@ -61,9 +74,9 @@ public class MessageComponent {
         text = text.replace('§', '&');
         for (ChatColor color : ChatColor.values())
             text = text.replace("&" + color.toString().charAt(1),
-                    (color.getColor()==null?"":"<reset>")+
-                    "<" + color.getName()
-                    .toLowerCase(Locale.ENGLISH) + ">");
+                    (color.getColor() == null ? "" : "<reset>") +
+                            "<" + color.getName()
+                            .toLowerCase(Locale.ENGLISH) + ">");
         try {
             int from = 0;
             while (text.indexOf("&#", from) >= 0) {
@@ -87,31 +100,33 @@ public class MessageComponent {
     @Contract("_, _, _ -> this")
     @NotNull
     public MessageComponent appendConfigurable(@NotNull String path, @Nullable List<String> text, String... holders) {
-        if (text != null)
-            append(plugin.getLanguageConfig(this.target).loadMessage(path,text,holders), holders);
+        String txt = plugin.getLanguageConfig(this.target).loadMessage(path, text, holders);
+        if (txt != null)
+            append(txt);
         return this;
     }
 
     @Contract("_, _, _ -> this")
     @NotNull
     public MessageComponent appendConfigurable(@NotNull String path, @Nullable String text, String... holders) {
+        text = plugin.getLanguageConfig(this.target).loadMessage(path, text, holders);
         if (text != null)
-            append(plugin.getLanguageConfig(this.target).loadMessage(path,text,holders), holders);
+            append(text);
         return this;
     }
 
     @Contract("_, _ -> this")
     @NotNull
     public MessageComponent hoverText(@Nullable String text, String... holders) {
-        if (text != null)
-            base.hoverEvent(HoverEvent.showText(format(text)));
+        if (text != null && !text.isEmpty())
+            base.hoverEvent(HoverEvent.showText(format(text, holders)));
         return this;
     }
 
     @Contract("_, _ -> this")
     @NotNull
     public MessageComponent hoverText(@Nullable List<String> text, String... holders) {
-        if (text != null)
+        if (text != null && !text.isEmpty())
             hoverText(String.join("\n", text), holders);
         return this;
     }
@@ -119,7 +134,7 @@ public class MessageComponent {
     @Contract("_, _ -> this")
     @NotNull
     public MessageComponent clickRunCommand(@Nullable String text, String... holders) {
-        if (text != null)
+        if (text != null && !text.isEmpty())
             base.clickEvent(ClickEvent.runCommand(UtilsString.fix(text, papiTarget, false, holders)));
         return this;
     }

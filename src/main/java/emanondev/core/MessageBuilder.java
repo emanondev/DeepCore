@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.command.CoreCommand;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.ComponentBuilder.FormatRetention;

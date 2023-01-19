@@ -1,5 +1,7 @@
 package emanondev.core;
 
+import emanondev.core.command.CoreCommand;
+import emanondev.core.command.ReloadCommand;
 import emanondev.core.gui.Gui;
 import emanondev.core.packetentity.PacketManager;
 import emanondev.core.spigot.Metrics;
@@ -7,8 +9,6 @@ import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
 import emanondev.core.util.ConsoleLogger;
-import emanondev.core.command.CoreCommand;
-
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -51,7 +51,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     private BukkitAudiences adventure;
 
     public @NonNull BukkitAudiences adventure() {
-        if(this.adventure == null) {
+        if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
@@ -75,11 +75,11 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
-    public String getDefaultLocale(){
+    public String getDefaultLocale() {
         return defaultLocale;
     }
 
-    public boolean useMultiLanguage(){
+    public boolean useMultiLanguage() {
         return useMultiLanguage;
     }
 
@@ -195,7 +195,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         }
         if (persistentCooldownApi != null) {
             persistentCooldownApi.save();
-            logDone("Saved &aCooldownAPI &fcache");
+            logDone("Saved &aCooldownAPI&f cache");
         }
         persistentCounterApiMap.forEach((k, v) -> {
             v.save();
@@ -231,7 +231,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             Bukkit.getPluginManager().removePermission(permission);
         if (loggerManager != null) loggerManager.disable();
 
-        if(this.adventure != null) {
+        if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
         }

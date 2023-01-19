@@ -1,6 +1,7 @@
-package emanondev.core;
+package emanondev.core.events;
 
-import emanondev.core.events.EquipmentChangeEvent;
+import emanondev.core.CoreMain;
+import emanondev.core.UtilsInventory;
 import emanondev.core.events.EquipmentChangeEvent.EquipMethod;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-class EquipChangeListener implements Listener {
+public class EquipChangeListener implements Listener {
     private final HashMap<Player, EnumMap<EquipmentSlot, ItemStack>> equips = new HashMap<>();
     private static final long timerCheckFrequencyTicks = 40; // at least 20;
     private static final int maxCheckedPlayerPerTick = 6;//not too low to avoid Thread switch overprice
@@ -35,7 +36,7 @@ class EquipChangeListener implements Listener {
     private final HashSet<Player> clickDrop = new HashSet<>();
     private final CoreMain plugin;
 
-    EquipChangeListener() {
+    public EquipChangeListener() {
         this.plugin = CoreMain.get();
         this.load();
     }

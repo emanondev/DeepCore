@@ -1,11 +1,8 @@
 package emanondev.core.actions;
 
-import emanondev.itemedit.Util;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class PermissionAction extends Action {
@@ -37,25 +34,6 @@ public class PermissionAction extends Action {
         ActionHandler.handleAction(player, args[1], text.substring(args[0].length() + args[1].length() + 2));
 
     }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, List<String> params) {
-        switch (params.size()) {
-            case 1:
-                return Collections.emptyList();
-            case 2:
-                return Util.complete(params.get(1), ActionHandler.getTypes());
-            default: {
-                Action sub = ActionHandler.getAction(params.get(1));
-                if (sub == null)
-                    return Collections.emptyList();
-                params.remove(0);
-                params.remove(0);
-                return sub.tabComplete(sender, params);
-            }
-        }
-    }
-
 
     @Override
     public List<String> getInfo() {

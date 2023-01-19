@@ -1,13 +1,10 @@
 package emanondev.core.actions;
 
-import emanondev.itemedit.Util;
 import emanondev.itemedit.UtilsString;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ServerCommandAction extends Action {
@@ -25,13 +22,6 @@ public class ServerCommandAction extends Action {
     @Override
     public void execute(Player player, String text) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), UtilsString.fix(text, player, true, "%player%", player.getName()));
-    }
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, List<String> params) {
-        if (params.get(params.size() - 1).startsWith("%"))
-            return Util.complete(params.get(params.size() - 1), Collections.singletonList("%player%"));
-        return Collections.emptyList();
     }
 
 

@@ -19,7 +19,7 @@ public class SQLDatabase {
     private final String database;
     private final int port;
 
-    public SQLDatabase(@NotNull SQLType type, @NotNull String host,@NotNull  String user, @NotNull String password, String database, int port) throws ClassNotFoundException, SQLException {
+    public SQLDatabase(@NotNull SQLType type, @NotNull String host, @NotNull String user, @NotNull String password, String database, int port) throws ClassNotFoundException, SQLException {
         this.type = type;
         this.host = host;
         this.user = user;

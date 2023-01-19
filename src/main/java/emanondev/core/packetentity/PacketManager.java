@@ -7,7 +7,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import emanondev.core.CoreMain;
 import emanondev.core.MCVersion;
 import emanondev.core.util.GameVersion;
 import org.bukkit.Bukkit;
@@ -149,7 +148,7 @@ public class PacketManager {
         packet3.getIntegers().write(0, entity.getEntityId());
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack item = entity.getItem(slot);
-            data.add(new Pair<>(equipmentSlotToWrapper(slot), item==null?new ItemStack(Material.AIR):item));
+            data.add(new Pair<>(equipmentSlotToWrapper(slot), item == null ? new ItemStack(Material.AIR) : item));
         }
         packet3.getSlotStackPairLists().write(0, data);
 
@@ -207,7 +206,7 @@ public class PacketManager {
         packet1.getIntegers().write(0, entity.getEntityId());
         if (packet1.getUUIDs().size() > 0)
             packet1.getUUIDs().write(0, entity.getUniqueId());
-        if (GameVersion.isNewerEqualsTo(1,19,0)) {
+        if (GameVersion.isNewerEqualsTo(1, 19, 0)) {
             int i = 1;
             packet1.getEntityTypeModifier().write(0, entity.getType());
             packet1.getIntegers().write(i++, (int) (entity.getVelocity().getX() * 8000.0D));

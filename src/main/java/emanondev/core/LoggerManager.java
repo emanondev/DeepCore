@@ -111,18 +111,10 @@ public class LoggerManager {
             Logger logger = getLogger(req.fileName);
 
             switch (req.type) {
-                case LOG_ARRAY_OF_TEXT -> {
-                    logger.log(req.timestamp, (String[]) req.log);
-                }
-                case LOG_LIST_OF_TEXT -> {
-                    logger.log(req.timestamp, (List<String>) req.log);
-                }
-                case LOG_TEXT -> {
-                    logger.log(req.timestamp, (String) req.log);
-                }
-                default -> {
-                    new IllegalArgumentException().printStackTrace();
-                }
+                case LOG_ARRAY_OF_TEXT -> logger.log(req.timestamp, (String[]) req.log);
+                case LOG_LIST_OF_TEXT -> logger.log(req.timestamp, (List<String>) req.log);
+                case LOG_TEXT -> logger.log(req.timestamp, (String) req.log);
+                default -> new IllegalArgumentException().printStackTrace();
             }
         } catch (Exception e) {
             e.printStackTrace();

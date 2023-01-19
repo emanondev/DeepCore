@@ -40,12 +40,13 @@ gui_button:
 
 command:
   reload:
-    success: "&9[&f%plugin%&9]&a Plugin reloaded"
-    fail: "&4[&c%plugin%&4]&c Plugin reload failed!"
-  players_only: "&4[&c%plugin%&4]&c Command for players only"
-  lack_permission: "&4[&c%plugin%&4]&c You lack of permission &6%permission%"
+    success: "<blue>[<white>%plugin%<blue>]<green> Plugin reloaded"
+    fail: "<dark_red>[<red>%plugin%<dark_red>]<red> Plugin reload failed!"
+  players_only: "<dark_red>[<red>%plugin%<dark_red>]<red> Command for players only"
+  lack_permission: "<dark_red>[<red>%plugin%<dark_red>]<red> You lack of permission <gold>%permission%"
 conjunction:
-  and: e
+  and: and
+  or: or
 time:
   multi:
     second: s

@@ -1388,7 +1388,7 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getMaterial(String,Material)} but also keep tracks of null objects:
+     * This method works like {@link #getMaterial(String, Material)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
      * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
@@ -1402,7 +1402,7 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getEntityType(String,EntityType)} but also keep tracks of null objects:
+     * This method works like {@link #getEntityType(String, EntityType)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
      * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
@@ -1416,7 +1416,7 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getEnum(String,T,Class<T>)} but also keep tracks of null objects:
+     * This method works like {@link #getEnum(String, T, Class<T>)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
      * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
@@ -1435,7 +1435,7 @@ public interface YMLSection extends ConfigurationSection {
                 if (this.getPlugin() instanceof CorePlugin plugin) {
                     plugin.logProblem("value invalid at " + getFile().getPath() + " " +
                             (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path);
-                    plugin.logOnFile("undefined_configs", getFile().getPath() + " " + (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path+" (invalid enum value)");
+                    plugin.logOnFile("undefined_configs", getFile().getPath() + " " + (this.getCurrentPath() == null || this.getCurrentPath().isEmpty() ? "" : this.getCurrentPath() + ".") + path + " (invalid enum value)");
                 }
             }
         }

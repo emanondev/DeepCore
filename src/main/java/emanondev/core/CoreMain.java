@@ -2,6 +2,7 @@ package emanondev.core;
 
 import emanondev.core.actions.*;
 import emanondev.core.events.CustomEventListener;
+import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.ItemUtility;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -45,7 +46,7 @@ public final class CoreMain extends CorePlugin {
         ActionHandler.registerAction(new ServerCommandAction());
         ActionHandler.registerAction(new SoundAction());
         this.logDone("Enabled &aActionAPI");
-        ItemUtility.inizialize();
+        ItemUtility.initialize();
     }
 
     public void reload() {
@@ -58,6 +59,6 @@ public final class CoreMain extends CorePlugin {
     @Override
     public void disable() {
         ConfigurationSerialization.unregisterClass(SoundInfo.class);
-        this.logDone("Unregistered &eSoundInfo &ffrom ConfigurationSerializables");
+        this.logDone("Unregistered &eSoundInfo&f from ConfigurationSerialization");
     }
 }

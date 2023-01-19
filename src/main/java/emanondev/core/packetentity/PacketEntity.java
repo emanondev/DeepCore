@@ -19,7 +19,7 @@ public abstract class PacketEntity {
     private final PacketManager manager;
     protected WrappedDataWatcher dataWatcher;
 
-    public WrappedDataWatcher getDataWatcher(){
+    public WrappedDataWatcher getDataWatcher() {
         return dataWatcher;
     }
 

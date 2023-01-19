@@ -5,7 +5,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 
 public class Hooks {
+    @Deprecated
     public static boolean isVault() {
+        return isEnabled("Vault");
+    }
+
+    public static boolean isVaultEnabled() {
         return isEnabled("Vault");
     }
 

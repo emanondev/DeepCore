@@ -1,6 +1,5 @@
 package emanondev.core;
 
-import com.google.common.base.Predicate;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public final class UtilsCommand {
 
@@ -102,8 +102,9 @@ public final class UtilsCommand {
         return list;
     }
 
+    @Deprecated
     public static @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
-                                                     @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
+                                                     @NotNull Function<K, String> eval, @Nullable com.google.common.base.Predicate<K> isValid) {
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (K val : values)
@@ -119,6 +120,33 @@ public final class UtilsCommand {
         for (K val : values)
             try {
                 if (isValid == null || isValid.apply(val)) {
+                    String value = eval.apply(val);
+                    if (value.toLowerCase(Locale.ENGLISH).startsWith(prefix))
+                        results.add(value);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return results;
+    }
+
+    public static @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
+                                                     @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
+        List<String> results = new ArrayList<>();
+        if (prefix == null || prefix.isEmpty()) {
+            for (K val : values)
+                try {
+                    if (isValid == null || isValid.test(val))
+                        results.add(eval.apply(val));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            return results;
+        }
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
+        for (K val : values)
+            try {
+                if (isValid == null || isValid.test(val)) {
                     String value = eval.apply(val);
                     if (value.toLowerCase(Locale.ENGLISH).startsWith(prefix))
                         results.add(value);
@@ -158,8 +186,9 @@ public final class UtilsCommand {
      * @return a list of low-cased string from enums of class type matching prefix
      * and predicate.apply() is true (ignoring caps)
      */
+    @Deprecated
     public static @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type,
-                                                                     @NotNull Predicate<K> predicate) {
+                                                                     @NotNull com.google.common.base.Predicate<K> predicate) {
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
             for (K e : type.getEnumConstants())
@@ -171,6 +200,31 @@ public final class UtilsCommand {
         for (K e : type.getEnumConstants())
             if (e.toString().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                 if (predicate.apply(e))
+                    results.add(e.toString().toLowerCase(Locale.ENGLISH));
+        return results;
+    }
+
+    /**
+     * @param <K>       the class of the enum
+     * @param prefix    prefix to match, case-insensitive
+     * @param type      class of enums
+     * @param predicate filter
+     * @return a list of low-cased string from enums of class type matching prefix
+     * and predicate.apply() is true (ignoring caps)
+     */
+    public static @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type,
+                                                                     @NotNull Predicate<K> predicate) {
+        List<String> results = new ArrayList<>();
+        if (prefix == null || prefix.isEmpty()) {
+            for (K e : type.getEnumConstants())
+                if (predicate.test(e))
+                    results.add(e.toString().toLowerCase(Locale.ENGLISH));
+            return results;
+        }
+        prefix = prefix.toLowerCase(Locale.ENGLISH);
+        for (K e : type.getEnumConstants())
+            if (e.toString().toLowerCase(Locale.ENGLISH).startsWith(prefix))
+                if (predicate.test(e))
                     results.add(e.toString().toLowerCase(Locale.ENGLISH));
         return results;
     }

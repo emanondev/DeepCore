@@ -1,5 +1,9 @@
-package emanondev.core;
+package emanondev.core.command;
 
+import emanondev.core.CoreMain;
+import emanondev.core.CorePlugin;
+import emanondev.core.PermissionBuilder;
+import emanondev.core.message.MessageComponent;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -9,10 +13,18 @@ import java.util.List;
 
 public class ReloadCommand extends CoreCommand {
 
-    public ReloadCommand(CorePlugin plugin) {
+    /**
+     * Create a command for the plugin to call reload()
+     * the command is named by default /{pluginname}reload
+     * required permission for the command is {pluginname}.command.reload
+     *
+     * @param plugin the plugin
+     */
+    public ReloadCommand(@NotNull CorePlugin plugin) {
         super(plugin.getName() + "reload", plugin,
                 PermissionBuilder.ofCommand(plugin, "reload").setDescription("Allows to reload " + plugin.getName()).build(),
                 "reload " + plugin.getName(), null);
+        assert getCommandPermission() != null; //<pluginname>.command.reload
         getPlugin().registerPermission(getCommandPermission());
     }
 
@@ -20,14 +32,14 @@ public class ReloadCommand extends CoreCommand {
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         try {
             getPlugin().onReload();
-            UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender)
-                    .loadMessage("command.reload.success", "&9[&f%plugin%&9]&a reloaded", true,
-                            "%plugin%", getPlugin().getName()));
+            new MessageComponent(CoreMain.get(), sender).appendConfigurable(
+                    "command.reload.success", "",
+                    "%plugin%", getPlugin().getName()).send();
         } catch (Exception e) {
             e.printStackTrace();
-            UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender)
-                    .loadMessage("command.reload.fail", "&4[&c%plugin%&4]&c reload failed", true,
-                            "%plugin%", getPlugin().getName()));
+            new MessageComponent(CoreMain.get(), sender).appendConfigurable(
+                    "command.reload.fail", "",
+                    "%plugin%", getPlugin().getName()).send();
         }
     }
 

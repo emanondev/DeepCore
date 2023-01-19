@@ -55,19 +55,19 @@ public class CounterAPI {
                 case DAY:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.DATE, -1);
-                    return (long) cal.get(1) * 512L + (long) cal.get(6);
+                    return (long) cal.get(Calendar.YEAR) * 512L + (long) cal.get(Calendar.DAY_OF_YEAR);
                 case MONTH:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.MONTH, -1);
-                    return (long) cal.get(1) * 16L + (long) cal.get(2);
+                    return (long) cal.get(Calendar.YEAR) * 16L + (long) cal.get(Calendar.MONTH);
                 case PERMANENT:
                     return 0L;
                 case WEEK:
                     cal = Calendar.getInstance();
                     cal.add(Calendar.WEEK_OF_YEAR, -1);
-                    return (long) cal.get(1) * 64L + (long) cal.get(3);
+                    return (long) cal.get(Calendar.YEAR) * 64L + (long) cal.get(Calendar.WEEK_OF_YEAR);
                 case YEAR:
-                    return (long) Calendar.getInstance().get(1) - 1;
+                    return (long) Calendar.getInstance().get(Calendar.YEAR) - 1;
                 default:
                     throw new IllegalStateException();
             }

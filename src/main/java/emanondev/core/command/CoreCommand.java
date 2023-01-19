@@ -1,6 +1,7 @@
 package emanondev.core.command;
 
 import emanondev.core.*;
+import emanondev.core.message.MessageComponent;
 import emanondev.core.util.CompleteUtility;
 import emanondev.core.util.ConsoleLogger;
 import emanondev.core.util.FileLogger;
@@ -286,9 +287,9 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param perm   lacking permission
      */
     protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
-        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.lack_permission",
-                "", "%permission%", perm.getName()
-                , "%plugin%", getPlugin().getName()));
+        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
+                "command.lack_permission", "",
+                "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
     }
 
     /**
@@ -297,8 +298,9 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender who
      */
     protected void playerOnlyNotify(CommandSender sender) {
-        UtilsMessages.sendMessage(sender, CoreMain.get().getLanguageConfig(sender).loadMessage("command.players_only", ""
-                , "%plugin%", getPlugin().getName()));
+        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
+                "command.players_only", "",
+                "%plugin%", getPlugin().getName()).send();
     }
 
     /**
@@ -310,6 +312,10 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      */
     public @NotNull YMLSection getLanguageSection(@Nullable CommandSender who) {
         return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
+    }
+
+    public @NotNull String getLanguagePath(@NotNull String subPath) {
+        return "command." + this.getID() + "." + subPath;
     }
 
     /**
@@ -443,7 +449,9 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      *
      * @param sender language target
      * @return language section for this command.
+     * @see #getLanguageSection(CommandSender)
      */
+    @Deprecated
     public YMLSection getCommandLang(@Nullable CommandSender sender) {
         return getPlugin().getLanguageConfig(sender).loadSection(getPathLang());
     }
@@ -456,10 +464,12 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param subId  sub command id
      * @return language section for selected sub command.
      */
+    @Deprecated
     public YMLSection getSubCommandLang(@Nullable CommandSender sender, @NotNull String subId) {
         return getCommandLang(sender).loadSection(getPathSubCommandLang(subId));
     }
 
+    @Deprecated
     protected @NotNull String getPathLang() {
         return "command." + getID();
     }

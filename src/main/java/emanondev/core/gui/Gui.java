@@ -211,4 +211,6 @@ public interface Gui extends InventoryHolder, FileLogger {
         new UnsupportedOperationException("This gui doesnt support timer updated option").printStackTrace();
     }
 
+    default void onTimerUpdate(){}
+
 }

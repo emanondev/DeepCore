@@ -12,6 +12,9 @@ database:
   # database type
   # only MYSQL is supported actually
   type: MYSQL
+actions:
+  player_command:
+    fires_playercommandpreprocessevent: true
 updates:
   notify_admin: true
 language:

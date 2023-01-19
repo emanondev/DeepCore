@@ -1,6 +1,5 @@
 package emanondev.core.actions;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -37,18 +36,16 @@ public class ActionHandler {
         actions.get(type.toLowerCase(Locale.ENGLISH)).validateInfo(text);
     }
 
-    public static List<String> tabComplete(CommandSender sender, String type, List<String> params) {
-        if (actions.containsKey(type.toLowerCase(Locale.ENGLISH)))
-            return actions.get(type.toLowerCase(Locale.ENGLISH)).tabComplete(sender, params);
-        return new ArrayList<>();
-    }
-
     public static List<String> getTypes() {
         return new ArrayList<>(actions.keySet());
     }
 
     public static Action getAction(String type) {
         return actions.get(type.toLowerCase(Locale.ENGLISH));
+    }
+
+    public static void executeAction(String wholeLine) {
+
     }
 
 }
