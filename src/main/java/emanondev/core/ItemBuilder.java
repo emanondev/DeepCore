@@ -20,10 +20,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class ItemBuilder {
     private final ItemStack result;
@@ -335,14 +332,20 @@ public class ItemBuilder {
             this.resultMeta.setLore(null);
             Map<String, Object> map = resultMeta.serialize();
             map.put("display-name", format(list.get(0)));
-            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map,ItemMeta.class);
         } else {
-            Map<String, Object> map = resultMeta.serialize();
-            map.put("display-name", format(list.remove(0)));
+            Map<String, Object> map = new HashMap<>(resultMeta.serialize());
+            try {
+                map.put("display-name", format(list.remove(0)));
+            }catch (UnsupportedOperationException e){
+                list = new ArrayList<>(list);
+                map.put("display-name", format(list.remove(0)));
+            }
             for (int i = 0; i < list.size(); i++)
                 list.set(i, format(list.get(i)));
             map.put("lore", list);
-            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+            //map.put("==","ItemMeta");
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map,ItemMeta.class);
         }
         return this;
     }
@@ -389,7 +392,12 @@ public class ItemBuilder {
             this.resultMeta.setDisplayName(list.get(0));
             this.resultMeta.setLore(null);
         } else {
-            this.resultMeta.setDisplayName(list.remove(0));
+            try {
+                this.resultMeta.setDisplayName(list.remove(0));
+            }catch (UnsupportedOperationException e){
+                list = new ArrayList<>(list);
+                this.resultMeta.setDisplayName(list.remove(0));
+            }
             this.resultMeta.setLore(list);
         }
         return this;
