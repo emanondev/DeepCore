@@ -8,17 +8,19 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public final class UtilsMessages {
 
     private UtilsMessages() {
-        throw new AssertionError();
+
     }
 
     /**
      * @param target  Who will receive the message
      * @param message Message to send. If it is empty ("") the actionbar is
      *                cleared.
-     */
+     * @see emanondev.core.message.DMessage
+     */@Deprecated
     public static void sendActionbar(@NotNull Player target, @Nullable String message) {
         if (message == null)
             return;
@@ -32,7 +34,8 @@ public final class UtilsMessages {
      *
      * @param target  Who will receive the message
      * @param message Message to send
-     */
+     * @see emanondev.core.message.DMessage
+     */@Deprecated
     public static void sendMessage(@NotNull CommandSender target, @Nullable String message) {
         if (message == null || message.isEmpty())
             return;
@@ -44,7 +47,8 @@ public final class UtilsMessages {
      *
      * @param target  Who will receive the message
      * @param message Message to send
-     */
+     * @see emanondev.core.message.DMessage
+     */@Deprecated
     public static void sendMessage(@NotNull CommandSender target, @Nullable BaseComponent[] message) {
         if (message == null || message.length == 0)
             return;

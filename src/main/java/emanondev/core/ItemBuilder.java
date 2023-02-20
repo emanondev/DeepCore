@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.message.DMessage;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -326,26 +327,27 @@ public class ItemBuilder {
     public ItemBuilder setMiniDescription(List<String> description, Player player, String... holders) {
         List<String> list = UtilsString.fix(description, player, false, holders);
         if (list == null || list.isEmpty()) {
-            this.resultMeta.setDisplayName(null);
+            this.resultMeta.setDisplayName("");
             this.resultMeta.setLore(null);
         } else if (list.size() == 1) {
             this.resultMeta.setLore(null);
             Map<String, Object> map = resultMeta.serialize();
             map.put("display-name", format(list.get(0)));
-            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map,ItemMeta.class);
+            map.put("==", "ItemMeta");
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
         } else {
             Map<String, Object> map = new HashMap<>(resultMeta.serialize());
             try {
                 map.put("display-name", format(list.remove(0)));
-            }catch (UnsupportedOperationException e){
+            } catch (UnsupportedOperationException e) {
                 list = new ArrayList<>(list);
                 map.put("display-name", format(list.remove(0)));
             }
             for (int i = 0; i < list.size(); i++)
                 list.set(i, format(list.get(i)));
             map.put("lore", list);
-            //map.put("==","ItemMeta");
-            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map,ItemMeta.class);
+            map.put("==", "ItemMeta");
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
         }
         return this;
     }
@@ -394,7 +396,7 @@ public class ItemBuilder {
         } else {
             try {
                 this.resultMeta.setDisplayName(list.remove(0));
-            }catch (UnsupportedOperationException e){
+            } catch (UnsupportedOperationException e) {
                 list = new ArrayList<>(list);
                 this.resultMeta.setDisplayName(list.remove(0));
             }
@@ -402,4 +404,59 @@ public class ItemBuilder {
         }
         return this;
     }
+
+    @Contract("_ -> this")
+    public ItemBuilder setDescription(DMessage message) {
+        List<String> list = message.toJsonMulti();
+        if (list == null || list.isEmpty()) {
+            this.resultMeta.setDisplayName("");
+            this.resultMeta.setLore(null);
+            return this;
+        }
+        if (list.size() == 1) {
+            this.resultMeta.setLore(null);
+            Map<String, Object> map = resultMeta.serialize();
+            map.put("display-name", list.get(0));
+            map.put("==", "ItemMeta");
+            this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+            return this;
+        }
+        list = new ArrayList<>(list);
+        Map<String, Object> map = new HashMap<>(resultMeta.serialize());
+        map.put("display-name", list.remove(0));
+        map.put("lore", list);
+        map.put("==", "ItemMeta");
+        this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+        return this;
+    }
+
+    @Contract("_, _ -> this")
+    public ItemBuilder setPage(int page,@NotNull DMessage message) {
+        if (this.resultMeta instanceof BookMeta)
+            ((BookMeta) this.resultMeta).spigot().setPage(page, message.toBaseComponent());
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public ItemBuilder addPage(@NotNull DMessage message) {
+        if (this.resultMeta instanceof BookMeta)
+            ((BookMeta) this.resultMeta).spigot().addPage(message.toBaseComponent());
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
+    @Contract("_ -> this")
+
+    public ItemBuilder setPages(DMessage... messages) {
+        if (this.resultMeta instanceof BookMeta)
+            for (DMessage message : messages)
+                addPage(message);
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
 }

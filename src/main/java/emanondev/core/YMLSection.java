@@ -412,6 +412,28 @@ public interface YMLSection extends ConfigurationSection {
         }
     }
 
+    @Contract("_, _, _, _ -> !null")
+    default @Nullable List<String> getMultiMessage(@NotNull String path, boolean color,
+                                                   @Nullable CommandSender target, String... holders) {
+        return getMultiMessage(path, Collections.emptyList(), color, target, holders);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Contract("_, !null, _, _, _ -> !null")
+    default @Nullable List<String> getMultiMessage(@NotNull String path, @Nullable List<String> def,
+                                                   boolean color, @Nullable CommandSender target, String... holders) {
+        holdersCheck(path, holders);
+
+        try {
+            return UtilsString.fix(get(path, def, List.class), target instanceof Player ? ((Player) target) : null,
+                    color, holders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def == null ? null
+                    : UtilsString.fix(def, target instanceof Player ? ((Player) target) : null, color, holders);
+        }
+    }
+
     @Deprecated
     default @Nullable ComponentBuilder loadMessage(@NotNull String path, @Nullable String defMessage,
                                                    @Nullable String defHover, @Nullable String defClick, boolean color, @Nullable CommandSender target,

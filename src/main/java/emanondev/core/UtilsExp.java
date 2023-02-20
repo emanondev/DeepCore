@@ -60,7 +60,7 @@ public final class UtilsExp {
     }
 
     // Give or take EXP
-    public static void setExp(Player player, int exp) {
+    public static void setExp(@NotNull Player player, int exp) {
         if (exp < 0)
             throw new IllegalArgumentException("exp must be positive");
         int level = getLevelAtExp(exp);
@@ -70,11 +70,11 @@ public final class UtilsExp {
         player.giveExp(exp - getExpAtLevel(level));
     }
 
-    public static void removeExp(Player player, int exp) {
+    public static void removeExp(@NotNull Player player, int exp) {
         setExp(player, Math.max(0, getExp(player) - exp));
     }
 
-    public static boolean hasExp(Player player, int exp) {
+    public static boolean hasExp(@NotNull Player player, int exp) {
         if (exp < 0)
             throw new IllegalArgumentException("exp must be positive");
         return getExp(player) >= exp;

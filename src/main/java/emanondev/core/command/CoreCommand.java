@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginIdentifiableCommand;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -256,6 +257,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param permission the permission
      * @return true if permission is null or sender has permission
      */
+    @Contract("_, null -> true")
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable Permission permission) {
         return permission == null || sender.hasPermission(permission);
     }
@@ -267,6 +269,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @see #hasPermission(Permissible, Permission)
      */
     @Deprecated
+    @Contract("_, null -> true")
     protected boolean hasPermission(@NotNull Permissible sender, @Nullable String permission) {
         return permission == null || sender.hasPermission(permission);
     }

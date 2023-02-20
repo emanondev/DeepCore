@@ -110,7 +110,7 @@ public class CoreCommandPlus extends CoreCommand {
         nick = nick.toLowerCase(Locale.ENGLISH);
         if (subNicks.containsKey(nick))
             this.logProblem("already used sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
-
+        subNicks.put(nick,id);
     }
 
     private final HashMap<String, TriConsumer<CommandSender, String, String[]>> subExecutors = new HashMap<>();
@@ -124,7 +124,7 @@ public class CoreCommandPlus extends CoreCommand {
         if (args.length != 0) {
             String id = subNicks.get(args[0].toLowerCase(Locale.ENGLISH));
             if (id != null) {
-                if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id)))
+                if (hasPermission(sender,subPerms.get(id)))
                     subExecutors.get(id).consume(sender, alias, args);
                 else
                     permissionLackNotify(sender, subPerms.get(id));
@@ -139,17 +139,20 @@ public class CoreCommandPlus extends CoreCommand {
         YMLSection lang = getLanguageSection(sender).loadSection("onHelp");
         ComponentBuilder comp = new ComponentBuilder();
         comp.append(lang.getTrackMessage("prefix", sender, "%alias%", alias));
+        for (String id:ids){
+            this.logProblem("id: "+id);
+        }
         ids.forEach(id -> {
-            if (id == null)
+            if (id == null || id.isEmpty())
                 throw new IllegalStateException("Null id");
-            if (subPerms.get(id) == null || sender.hasPermission(subPerms.get(id))) {
+            if (hasPermission(sender,subPerms.get(id))) {
                 String nick = this.getConfig().loadString("subCommands." + id + ".nick", id).toLowerCase(Locale.ENGLISH);
                 if (nick.isEmpty() || nick.contains(" "))
                     return;
                 if (!subNicks.get(nick).equals(id))
                     return;
 
-                String msg = lang.getTrackMessage(id + "_message", sender, "%alias%", alias, "%sub_name%", nick);
+                String msg = lang.loadMessage(id + "_message", "/%alias% %sub_name%" ,sender, "%alias%", alias, "%sub_name%", nick);
                 if (!msg.isEmpty()) {
                     comp.retain(ComponentBuilder.FormatRetention.NONE).append(msg);
                     msg = String.join("\n", lang.getTrackMultiMessage(id + "_description", sender,
@@ -161,7 +164,6 @@ public class CoreCommandPlus extends CoreCommand {
                             comp.event(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, msg));
                     }
                 }
-
             }
         });
         comp.retain(ComponentBuilder.FormatRetention.NONE).append(lang.getTrackMessage("postfix", sender, "%alias%", alias));

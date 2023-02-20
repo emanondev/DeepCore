@@ -15,7 +15,7 @@ import java.util.List;
 public final class UtilsWorld {
 
     private UtilsWorld() {
-        throw new AssertionError();
+
     }
 
     /**

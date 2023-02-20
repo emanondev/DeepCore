@@ -3,7 +3,6 @@ package emanondev.core;
 public final class UtilsMath {
 
     private UtilsMath() {
-        throw new AssertionError();
     }
 
     /**

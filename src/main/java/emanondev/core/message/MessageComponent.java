@@ -19,6 +19,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+@Deprecated
+/**
+ * @see DMessage
+ */
 public class MessageComponent {
 
     private final TextComponent.Builder base;

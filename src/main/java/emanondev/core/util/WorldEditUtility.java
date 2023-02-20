@@ -1,6 +1,5 @@
 package emanondev.core.util;
 
-import com.fastasyncworldedit.core.FaweAPI;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
@@ -21,6 +20,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import emanondev.core.CoreMain;
+import emanondev.core.CorePlugin;
 import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -30,6 +30,8 @@ import org.bukkit.util.BoundingBox;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public final class WorldEditUtility {
 
@@ -45,19 +47,22 @@ public final class WorldEditUtility {
         return copy(w, area, copyEntity, copyBiomes, true);
     }
 
+    @Deprecated
     public static boolean paste(Location dest, Clipboard clip) {
         return paste(dest, clip, true);
     }
 
-
+    @Deprecated
     public static boolean paste(Location dest, Clipboard clip, double rotationDegree) {
         return paste(dest, clip, rotationDegree, true);
     }
 
+    @Deprecated
     public static void clearArea(Location corner1, Location corner2) {
         clearArea(corner1, corner2, true);
     }
 
+    @Deprecated
     public static void clearArea(World w, BoundingBox area) {
         clearArea(w, area, true);
     }
@@ -101,8 +106,9 @@ public final class WorldEditUtility {
         return clipboard;
     }
 
+    @Deprecated
     public static boolean paste(Location dest, Clipboard clip, boolean async) {
-        if (async && mayAsync())
+        /*if (async && mayAsync())
             FaweAPI.getTaskManager().async(() -> {
                 try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                         .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
@@ -114,7 +120,7 @@ public final class WorldEditUtility {
                     e.printStackTrace();
                 }
             });
-        else
+        else*/
             try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                     .world(BukkitAdapter.adapt(dest.getWorld())).maxBlocks(-1).build()) {
                 Operation operation = new ClipboardHolder(clip).createPaste(editSession)
@@ -129,6 +135,7 @@ public final class WorldEditUtility {
     }
 
 
+    @Deprecated
     public static boolean paste(Location dest, Clipboard clip, double rotationDegree, boolean async) {
         if (async && mayAsync())
             Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {
@@ -175,12 +182,14 @@ public final class WorldEditUtility {
     }
 
 
+    @Deprecated
     public static void clearArea(Location corner1, Location corner2, boolean async) {
         if (!corner1.getWorld().equals(corner2.getWorld()))
             throw new IllegalArgumentException();
         clearArea(corner1.getWorld(), BoundingBox.of(corner1, corner2));
     }
 
+    @Deprecated
     public static void clearArea(World w, BoundingBox area, boolean async) {
         BukkitWorld world = new BukkitWorld(w);
         BlockVector3 pos1 = BlockVector3.at(area.getMinX(), Math.max(w.getMinHeight(), area.getMinY()), area.getMinZ());
@@ -206,6 +215,53 @@ public final class WorldEditUtility {
     }
 
     public static boolean mayAsync() {
-        return Hooks.isEnabled("FastAsyncWorldEdit");
+        return Hooks.isEnabled("FastAsyncWorldEdit") || Hooks.isEnabled("AsyncWorldEdit");
+    }
+
+    public static CompletableFuture<EditSession> paste(Location location, Clipboard clipboard, boolean async, CorePlugin plugin,
+                                                         boolean ignoreAir,boolean copyEntities, boolean copyBiomes) {
+        CompletableFuture<EditSession> future = new CompletableFuture<>();
+        Runnable pasteTask = () -> {
+            try {
+                EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(location.getWorld()), -1);
+                Operation operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
+                        .copyBiomes(copyBiomes).copyEntities(copyEntities).ignoreAirBlocks(ignoreAir).build();
+                Operations.complete(operation);
+                future.complete(editSession);
+                Optional.ofNullable(editSession).ifPresent(EditSession::close);
+            } catch (WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        if (mayAsync() && async) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin,pasteTask);
+        } else {
+            Bukkit.getScheduler().runTask(plugin,pasteTask);
+        }
+        return future;
+    }
+
+    public static CompletableFuture<EditSession> pasteAir(BoundingBox box, World world, boolean async, CorePlugin plugin) {
+        CompletableFuture<EditSession> future = new CompletableFuture<>();
+        Runnable pasteTask = () -> {
+            try {
+                EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1);
+                BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
+                Region region = new CuboidRegion(new BukkitWorld(world),
+                        BlockVector3.at(box.getMinX(), box.getMinY(), box.getMinZ()),
+                        BlockVector3.at(box.getMaxX(), box.getMaxY(), box.getMaxZ()));
+                editSession.setBlocks(region,block);
+                future.complete(editSession);
+                Optional.ofNullable(editSession).ifPresent(EditSession::close);
+            } catch (WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        if (mayAsync() && async) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin,pasteTask);
+        } else {
+            Bukkit.getScheduler().runTask(plugin,pasteTask);
+        }
+        return future;
     }
 }

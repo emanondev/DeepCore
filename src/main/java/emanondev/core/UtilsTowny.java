@@ -18,7 +18,7 @@ import java.util.Collection;
 public final class UtilsTowny {
 
     private UtilsTowny() {
-        throw new AssertionError();
+
     }
 
     public static @Nullable Resident getResident(@NotNull OfflinePlayer p) {

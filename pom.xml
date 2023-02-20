@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>emanondev.core</groupId>
     <artifactId>DeepCore</artifactId>
-    <version>3.7.1</version>
+    <version>3.8.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -46,6 +46,10 @@
                                 <relocation>
                                     <pattern>io.papermc.lib</pattern>
                                     <shadedPattern>emanondev.shade.paperlib</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.kyori.adventure</pattern>
+                                    <shadedPattern>emanondev.shade.kyori.adventure</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -124,7 +128,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
@@ -153,8 +157,7 @@
         <dependency>
             <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
-            <version>6.2.6-2</version>
-            <scope>provided</scope>
+            <version>6.2.12</version>
         </dependency>
         <!-- JetBrains Annotations -->
         <dependency>
@@ -206,31 +209,31 @@
         </dependency>
 
         <!-- FAWE Bukkit API -->
-        <dependency>
-            <groupId>com.fastasyncworldedit</groupId>
-            <artifactId>FastAsyncWorldEdit-Core</artifactId>
-            <version>2.5.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fastasyncworldedit</groupId>
-            <artifactId>FastAsyncWorldEdit-Bukkit</artifactId>
-            <version>2.5.0</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>FastAsyncWorldEdit-Core</artifactId>
-                    <groupId>*</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- This depends on the Bukkit API, Use this if you need BukkitAdapter
+        <!-- <dependency>
+           <groupId>com.fastasyncworldedit</groupId>
+           <artifactId>FastAsyncWorldEdit-Core</artifactId>
+           <version>2.5.0</version>
+           <scope>provided</scope>
+       </dependency>
+       <dependency>
+           <groupId>com.fastasyncworldedit</groupId>
+           <artifactId>FastAsyncWorldEdit-Bukkit</artifactId>
+           <version>2.5.0</version>
+           <scope>provided</scope>
+           <exclusions>
+               <exclusion>
+                   <artifactId>FastAsyncWorldEdit-Core</artifactId>
+                   <groupId>*</groupId>
+               </exclusion>
+           </exclusions>
+       </dependency>
+      This depends on the Bukkit API, Use this if you need BukkitAdapter -->
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency> -->
+        </dependency>
         <!-- ItemEdit -->
         <dependency>
             <groupId>emanondev.itemedit</groupId>
@@ -252,6 +255,12 @@
             <artifactId>MythicMobs</artifactId>
             <version>4.9.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations-java5</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public final class UtilsString {
 
     private UtilsString() {
-        throw new AssertionError();
+
     }
 
     /**

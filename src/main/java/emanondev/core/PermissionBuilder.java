@@ -21,7 +21,7 @@ public class PermissionBuilder {
     private final Map<String, Boolean> children = new LinkedHashMap<>();
 
     /**
-     * Build a permission with name plugin.getName()+"."+subName.
+     * Build a permission with name {@code plugin.getName()+"."+subName} .
      *
      * @param plugin  plugin responsible for this permission
      * @param subName permission subName
@@ -40,7 +40,7 @@ public class PermissionBuilder {
     }
 
     /**
-     * Build a permission with name plugin.getName()+".command."+command.getID()+"."+subName.
+     * Build a permission with name  {@code command.getPlugin().getName()+".command."+command.getID()+"."+subName} .
      *
      * @param command command
      * @param subName sub-path
@@ -51,11 +51,26 @@ public class PermissionBuilder {
         return new PermissionBuilder(command.getPlugin().getName() + ".command." + command.getID() + "." + subName);
     }
 
+    /**
+     * Build a permission with name  {@code plugin.getName()+".command."+commandName+"."+subName} .
+     *
+     * @param plugin plugin
+     * @param commandName command name
+     * @param subName sub-path
+     * @return a permission builder
+     */
     @NotNull
     public static PermissionBuilder ofCommand(@NotNull Plugin plugin, @NotNull String commandName, @NotNull String subName) {
         return new PermissionBuilder(plugin.getName() + ".command." + commandName + "." + subName);
     }
 
+    /**
+     * Build a permission with name  {@code plugin.getName()+".command."+commandName} .
+     *
+     * @param plugin plugin
+     * @param commandName command name
+     * @return a permission builder
+     */
     @NotNull
     public static PermissionBuilder ofCommand(@NotNull Plugin plugin, @NotNull String commandName) {
         return new PermissionBuilder(plugin.getName() + ".command." + commandName);

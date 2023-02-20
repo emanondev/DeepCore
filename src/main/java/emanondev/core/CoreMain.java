@@ -1,12 +1,24 @@
 package emanondev.core;
 
 import emanondev.core.actions.*;
+import emanondev.core.command.CoreCommand;
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
+import emanondev.core.message.DMessage;
+import emanondev.core.message.Translations;
 import emanondev.core.util.ItemUtility;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.*;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public final class CoreMain extends CorePlugin {
 
@@ -47,6 +59,34 @@ public final class CoreMain extends CorePlugin {
         ActionHandler.registerAction(new SoundAction());
         this.logDone("Enabled &aActionAPI");
         ItemUtility.initialize();
+
+        this.registerCommand(new TestCommand());
+    }
+
+    class TestCommand extends CoreCommand {//TODO
+
+        public TestCommand() {
+            super("test", inst, null);
+        }
+
+        @Override
+        public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+            ItemStack item = new ItemStack(Material.WRITABLE_BOOK);
+            BookMeta meta = (BookMeta) item.getItemMeta();
+            meta.spigot().addPage(new ComponentBuilder("text").event(
+                    new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/somecommand")).append("testo2").create());
+            item.setItemMeta(meta);
+            CoreMain.this.getConfig("file.yml").set("test", item);
+            new DMessage(getPlugin(), sender).append(Translations.get(Material.ANVIL))
+                    .append(DyeColor.BLUE).append(" is damaged ").append(Color.fromRGB(255, 255, 0))
+                    .append(Translations.getItemDurability(20, 30)).append(" ciao ").newLine()
+                    .append(ChatColor.BLUE).append("aaaaa").send();
+        }
+
+        @Override
+        public @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location loc) {
+            return null;
+        }
     }
 
     public void reload() {
