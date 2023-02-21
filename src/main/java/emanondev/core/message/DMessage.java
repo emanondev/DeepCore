@@ -541,7 +541,7 @@ public class DMessage {
     public List<String> toJsonMulti() {
         String[] lines = raw.toString().replaceAll("(?i)<newline>", "\n").split("\n");
         for (int i = 0; i < lines.length; i++)
-            lines[i] = GsonComponentSerializer.gson().serialize(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize("<italic:false><white>"+lines[i]));
+            lines[i] = GsonComponentSerializer.gson().serialize(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(lines[i].isEmpty()?"":("<!i><white>"+lines[i])));
         return List.of(lines);
     }
 

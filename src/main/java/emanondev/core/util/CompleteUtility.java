@@ -1,10 +1,12 @@
 package emanondev.core.util;
 
 import de.myzelyam.api.vanish.VanishAPI;
+import de.myzelyam.supervanish.SuperVanish;
 import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +45,25 @@ public interface CompleteUtility {
 
         if (Hooks.isVanishEnabled() && (sender instanceof Player)) {
             for (Player p : players)
-                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
-                    list.add(p.getName());
+                try {
+                    if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
+                        list.add(p.getName());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    boolean vanished = false;
+                    for (MetadataValue meta : p.getMetadata("vanished")) {
+                        if (meta.asBoolean())
+                            vanished = true;
+                    }
+                    if (!vanished)
+                        list.add(p.getName());
+                    try { //HOTFIX
+                        VanishAPI.setPlugin((SuperVanish) (Bukkit.getPluginManager().getPlugin("SuperVanish") != null ? Bukkit.getPluginManager().getPlugin("SuperVanish")
+                                                        : Bukkit.getPluginManager().getPlugin("PremiumVanish")));
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                    }
+                }
         } else
             for (Player p : players)
                 if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix))

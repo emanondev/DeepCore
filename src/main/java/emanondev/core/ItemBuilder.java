@@ -331,12 +331,12 @@ public class ItemBuilder {
             this.resultMeta.setLore(null);
         } else if (list.size() == 1) {
             this.resultMeta.setLore(null);
-            Map<String, Object> map = resultMeta.serialize();
+            Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
             map.put("display-name", format(list.get(0)));
             map.put("==", "ItemMeta");
             this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
         } else {
-            Map<String, Object> map = new HashMap<>(resultMeta.serialize());
+            Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
             try {
                 map.put("display-name", format(list.remove(0)));
             } catch (UnsupportedOperationException e) {
@@ -415,14 +415,14 @@ public class ItemBuilder {
         }
         if (list.size() == 1) {
             this.resultMeta.setLore(null);
-            Map<String, Object> map = resultMeta.serialize();
+            Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
             map.put("display-name", list.get(0));
             map.put("==", "ItemMeta");
             this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
             return this;
         }
         list = new ArrayList<>(list);
-        Map<String, Object> map = new HashMap<>(resultMeta.serialize());
+        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
         map.put("display-name", list.remove(0));
         map.put("lore", list);
         map.put("==", "ItemMeta");
