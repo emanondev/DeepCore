@@ -1,13 +1,28 @@
 package emanondev.core.gui;
 
 import emanondev.core.CorePlugin;
+import emanondev.core.message.DMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
+/**
+ * @see PagedMapGui
+ */
 public class MapGui extends ChestGui {
+
+    /**
+     * @param title
+     * @param rows
+     * @param p
+     * @param previousHolder
+     * @param plugin
+     */
+    public MapGui(DMessage title, int rows, Player p, Gui previousHolder, CorePlugin plugin) {
+        super(title, rows, p, previousHolder, plugin);
+    }
 
     /**
      * @param title

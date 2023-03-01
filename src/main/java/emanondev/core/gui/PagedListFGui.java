@@ -16,6 +16,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * @see PagedMapGui
+ */
 public class PagedListFGui<T> extends ChestGui implements PagedGui {
 
     private final BiFunction<InventoryClickEvent, T, Boolean> onClick;

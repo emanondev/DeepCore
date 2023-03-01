@@ -9,6 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Deprecated
+/**
+ * @see emanondev.core.message.DMessage
+ */
 public final class UtilsMessages {
 
     private UtilsMessages() {
@@ -26,7 +29,6 @@ public final class UtilsMessages {
             return;
         //1.10+
         target.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
-
     }
 
     /**

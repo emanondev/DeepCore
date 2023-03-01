@@ -1,6 +1,7 @@
 package emanondev.core.command;
 
 import emanondev.core.*;
+import emanondev.core.message.DMessage;
 import emanondev.core.message.MessageComponent;
 import emanondev.core.util.CompleteUtility;
 import emanondev.core.util.ConsoleLogger;

@@ -7,7 +7,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import emanondev.core.MCVersion;
 import emanondev.core.util.GameVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,7 +27,7 @@ public class PacketManager {
             throw new NullPointerException();
         this.plugin = plugin;
         WatchableCollection.setup();
-        if (!MCVersion.getCurrentVersion().isNewerOrEqualTo(MCVersion.V1_16))
+        if (!GameVersion.isNewerEqualsTo(1,16,0))
             throw new IllegalStateException("unsupported version");
     }
 

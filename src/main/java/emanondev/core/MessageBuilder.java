@@ -14,6 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+@Deprecated
+/**
+ * @see emanondev.core.message.DMessage
+ */
 public class MessageBuilder {
 
     private final ComponentBuilder base;

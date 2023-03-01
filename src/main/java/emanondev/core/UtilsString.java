@@ -389,4 +389,13 @@ public final class UtilsString {
         return val;
     }
 
+    public static String[] merge(String[] firstArray, String... secondArray){
+        int fal = firstArray.length;        //determines length of firstArray
+        int sal = secondArray.length;   //determines length of secondArray
+        String[] result = new String[fal + sal];  //resultant array of size first array and second array
+        System.arraycopy(firstArray, 0, result, 0, fal);
+        System.arraycopy(secondArray, 0, result, fal, sal);
+        return result;
+    }
+
 }

@@ -314,16 +314,19 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_, _, _ -> this")
+    @Deprecated
     public ItemBuilder setDescription(List<String> description, boolean color, String... holders) {
         return setDescription(description, color, null, holders);
     }
 
     @Contract("_, _ -> this")
+    @Deprecated
     public ItemBuilder setMiniDescription(List<String> description, String... holders) {
         return setMiniDescription(description, null, holders);
     }
 
     @Contract("_, _, _ -> this")
+    @Deprecated
     public ItemBuilder setMiniDescription(List<String> description, Player player, String... holders) {
         List<String> list = UtilsString.fix(description, player, false, holders);
         if (list == null || list.isEmpty()) {
@@ -406,7 +409,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setDescription(DMessage message) {
+    public ItemBuilder setDescription(@NotNull DMessage message) {
         List<String> list = message.toJsonMulti();
         if (list == null || list.isEmpty()) {
             this.resultMeta.setDisplayName("");
@@ -430,8 +433,22 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract("_ -> this")
+    public ItemBuilder addDescription(@NotNull DMessage message) {
+        List<String> list = message.toJsonMulti();
+        if (list == null || list.isEmpty())
+            return this;
+        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
+        List<String> lore = map.containsKey("lore") ? new ArrayList<>((List<String>) map.get("lore")) : new ArrayList<>();
+        lore.addAll(list);
+        map.put("lore", lore);
+        map.put("==", "ItemMeta");
+        this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
+        return this;
+    }
+
     @Contract("_, _ -> this")
-    public ItemBuilder setPage(int page,@NotNull DMessage message) {
+    public ItemBuilder setPage(int page, @NotNull DMessage message) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).spigot().setPage(page, message.toBaseComponent());
         else
@@ -457,6 +474,24 @@ public class ItemBuilder {
         else
             new IllegalStateException("meta is not BookMeta").printStackTrace();
         return this;
+    }
+
+    public DMessage getDescription(CorePlugin plugin) {
+        DMessage msg = new DMessage(plugin, null);
+        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
+        if (map.containsKey("display-name"))
+            msg.append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize((String) map.get("display-name"))));
+        msg.append("\n");
+        if (map.containsKey("lore"))
+            for (String line : (List<String>) map.get("lore"))
+                msg.append("\n").append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize(line)));
+        return msg;
+    }
+
+    public ItemBuilder applyPlaceholders(CorePlugin plugin,Player target,String... placeholders){
+        DMessage msg = getDescription(plugin);
+        msg.applyHolders(target,placeholders);
+        return setDescription(msg);
     }
 
 }

@@ -2,6 +2,7 @@ package emanondev.core.gui;
 
 import emanondev.core.CorePlugin;
 import emanondev.core.UtilsString;
+import emanondev.core.message.DMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -18,6 +19,22 @@ public abstract class AnvilGui implements TextGui {
     private final CorePlugin plugin;
     private boolean updateOnOpen = true;
     private boolean timerUpdated = false;
+
+    /**
+     * Create a anvil-type gui
+     *
+     * @param title          the raw title
+     * @param p              target player
+     * @param previousHolder previously used gui
+     * @param plugin         the plugin responsible for this gui
+     */
+    public AnvilGui(@Nullable DMessage title, @Nullable Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin) {
+        this.previousHolder = previousHolder;
+        this.player = p;
+        this.inv = Bukkit.createInventory(this, InventoryType.ANVIL, title == null ? "" : title.toLegacy());
+        this.plugin = plugin;
+    }
+
 
     /**
      * Create a anvil-type gui

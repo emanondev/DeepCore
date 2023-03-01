@@ -1,10 +1,12 @@
 package emanondev.core.gui;
 
 import emanondev.core.CorePlugin;
+import emanondev.core.message.DMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -20,6 +22,39 @@ public class PagedMapGui extends ChestGui implements PagedGui {
 
     private final GuiButton[] controlButtons = new GuiButton[9];
 
+    /**
+     * This implementation uses the last row for pages buttons, those buttons won't
+     * change position changing gui page
+     *
+     * @param title
+     * @param rows
+     * @param p
+     * @param previousHolder
+     * @param plugin
+     */
+    public PagedMapGui(@Nullable DMessage title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin) {
+        this(title, rows, p, previousHolder, plugin, 0);
+    }
+
+    /**
+     * This implementation uses the last row for pages buttons, those buttons won't
+     * change position changing gui page
+     *
+     * @param title
+     * @param rows
+     * @param p
+     * @param previousHolder
+     * @param plugin
+     */
+    public PagedMapGui(DMessage title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, int page) {
+        super(title, rows, p, previousHolder, plugin);
+        if (rows == 1)
+            throw new IllegalArgumentException("at least 2 rows");
+        this.page = Math.max(1, page);
+        this.setControlGuiButton(previousPageSlot, prevB);
+        this.setControlGuiButton(backGuiSlot, backB);
+        this.setControlGuiButton(nextPageSlot, nextB);
+    }
 
     /**
      * This implementation uses the last row for pages buttons, those buttons won't

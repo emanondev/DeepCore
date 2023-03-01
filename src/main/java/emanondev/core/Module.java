@@ -55,7 +55,7 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
      *
      * @return module plugin
      */
-    public final CorePlugin getPlugin() {
+    public final @NotNull CorePlugin getPlugin() {
         return this.plugin;
     }
 

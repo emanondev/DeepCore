@@ -3,6 +3,7 @@ package emanondev.core.gui;
 import emanondev.core.CorePlugin;
 import emanondev.core.PlayerSnapshot;
 import emanondev.core.PlayerSnapshot.FieldType;
+import emanondev.core.message.DMessage;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -57,6 +58,31 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         controlButtons[previousPageSlot] = prevB;
         controlButtons[backGuiSlot] = backB;
     }
+
+    /**
+     * @param title          title of the gui
+     * @param base           base item
+     * @param player         target player
+     * @param previousHolder previous gui
+     * @param plugin         plugin of the gui
+     */
+    public AdvancedResearchGui(@Nullable DMessage title, Player player, @Nullable Gui previousHolder,
+                               @NotNull CorePlugin plugin, ItemStack base) {
+        super(title, player, previousHolder, plugin);
+        this.page = Math.max(1, page);
+        lastText = "";
+        if (base == null || base.getType() == Material.AIR)
+            base = new ItemStack(Material.SPYGLASS);
+        ItemMeta meta = base.getItemMeta();
+        meta.setDisplayName(">");
+        base.setItemMeta(meta);
+        this.base = base;
+        this.getInventory().setItem(0, base);
+        this.setControlGuiButton(previousPageSlot, prevB);
+        this.setControlGuiButton(backGuiSlot, backB);
+        this.setControlGuiButton(nextPageSlot, nextB);
+    }
+
 
     /**
      * @param title          title of the gui

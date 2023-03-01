@@ -22,9 +22,11 @@ public interface Gui extends InventoryHolder, FileLogger {
      * Returns language section for the command sender<br>
      * (load language config and go to sub pattern 'guis')
      *
+     * @see emanondev.core.message.DMessage
      * @param who may be null
      * @return language section for the command sender
      */
+    @Deprecated
     @NotNull
     default YMLSection getLanguageSection(@Nullable CommandSender who) {
         return getPlugin().getLanguageConfig(who).loadSection("guis");
@@ -208,7 +210,7 @@ public interface Gui extends InventoryHolder, FileLogger {
     }
 
     default void setTimerUpdated(boolean value) {
-        new UnsupportedOperationException("This gui doesnt support timer updated option").printStackTrace();
+        new UnsupportedOperationException("This gui doesn't support timer updated option").printStackTrace();
     }
 
     default void onTimerUpdate(){}

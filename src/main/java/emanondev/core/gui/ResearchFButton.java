@@ -18,12 +18,14 @@ import java.util.function.Supplier;
 public class ResearchFButton<T> extends AGuiButton {
 
     private final Supplier<ItemStack> getItem;
+    @Deprecated
     private final Function<InventoryClickEvent, Boolean> shouldOverrideClick;
     private final BiFunction<String, T, Boolean> match;
     private final BiFunction<InventoryClickEvent, T, Boolean> elementClick;
     private final Function<T, ItemStack> elementItem;
     private final Supplier<Collection<T>> getElements;
     private final Comparator<T> sort;
+    @Deprecated
     private final Function<InventoryClickEvent, Boolean> overrideClick;
 
     /**
@@ -63,14 +65,15 @@ public class ResearchFButton<T> extends AGuiButton {
     /**
      * @param parent
      * @param getItem             create the item for this button
-     * @param shouldOverrideClick true if shoudl override override click
-     * @param overrideClick       if overrideclick handle click
+     * @param shouldOverrideClick true if should override override click
+     * @param overrideClick       if override click handle click
      * @param match               select which string match which elements
      * @param elementClick        what happens when clicked
      * @param elementItem         create the item for element
      * @param getElements         get allowed values
      * @param sort                how to sort entities
      */
+    @Deprecated
     public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
                            Function<InventoryClickEvent, Boolean> shouldOverrideClick, Function<InventoryClickEvent, Boolean> overrideClick, @NotNull BiFunction<String, T, Boolean> match,
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
@@ -99,10 +102,11 @@ public class ResearchFButton<T> extends AGuiButton {
             return defaultOnClick(event);
     }
 
+    @Deprecated
     public boolean defaultOnClick(InventoryClickEvent event) {
         if (event.getClick() != ClickType.LEFT)
             return false;
-        AdvancedResearchGui<T> gui = new AdvancedResearchGui<>("Research",
+        AdvancedResearchGui<T> gui = new AdvancedResearchGui<>("Research",//TODO
                 new ItemBuilder(Material.PAPER).setGuiProperty().build(), (Player) event.getWhoClicked(), getGui(),
                 getGui().getPlugin()) {
 

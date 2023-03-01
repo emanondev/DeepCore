@@ -3,6 +3,7 @@ package emanondev.core.gui;
 import emanondev.core.CorePlugin;
 import emanondev.core.UtilsMessages;
 import emanondev.core.UtilsString;
+import emanondev.core.message.DMessage;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
@@ -17,6 +18,26 @@ import java.util.List;
 
 
 public abstract class ChestGui implements Gui {
+
+
+
+
+    /**
+     * Create a chest-type gui
+     *
+     * @param title          the raw title, may be null
+     * @param rows           amount of rows [1:9]
+     * @param player         target player, may be null
+     * @param previousHolder previously used gui, may be null
+     * @param plugin         the plugin responsible for this gui
+     */
+    public ChestGui(@Nullable DMessage title, int rows, Player player, Gui previousHolder, @NotNull CorePlugin plugin) {        if (rows < 1 || rows > 9)
+        throw new IllegalArgumentException("invalid rows size '" + rows + "'");
+        this.previousHolder = previousHolder;
+        this.player = player;
+        this.inv = Bukkit.createInventory(this, rows * 9, title==null?"": title.toLegacy());
+        this.plugin = plugin;
+    }
 
     private final Gui previousHolder;
     private final Player player;

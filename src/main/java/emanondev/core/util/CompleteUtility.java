@@ -48,7 +48,7 @@ public interface CompleteUtility {
                 try {
                     if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
                         list.add(p.getName());
-                } catch (Exception e) {
+                } catch (Exception e) {//HOTFIX
                     e.printStackTrace();
                     boolean vanished = false;
                     for (MetadataValue meta : p.getMetadata("vanished")) {
@@ -57,12 +57,6 @@ public interface CompleteUtility {
                     }
                     if (!vanished)
                         list.add(p.getName());
-                    try { //HOTFIX
-                        VanishAPI.setPlugin((SuperVanish) (Bukkit.getPluginManager().getPlugin("SuperVanish") != null ? Bukkit.getPluginManager().getPlugin("SuperVanish")
-                                                        : Bukkit.getPluginManager().getPlugin("PremiumVanish")));
-                    } catch (Exception e2) {
-                        e2.printStackTrace();
-                    }
                 }
         } else
             for (Player p : players)

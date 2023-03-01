@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +22,21 @@ public interface ReadUtility {
         Player p = Bukkit.getPlayer(arg);
         if (p == null)
             return null;
-        if (Hooks.isVanishEnabled())
-            return VanishAPI.isInvisible(p) ? null : p;
+        if (Hooks.isVanishEnabled()) {
+            try {
+                return VanishAPI.isInvisible(p) ? null : p;
+            } catch (Exception e) {//HOTFIX
+                e.printStackTrace();
+                boolean vanished = false;
+                for (MetadataValue meta : p.getMetadata("vanished")) {
+                    if (meta.asBoolean())
+                        vanished = true;
+                }
+                if (!vanished)
+                    return null;
+            }
+            return null;
+        }
         return p;
     }
 
@@ -36,9 +50,19 @@ public interface ReadUtility {
         if (p == null)
             return null;
         if (Hooks.isVanishEnabled()) {
-            if (sender instanceof Player)
-                return VanishAPI.canSee((Player) sender, p) ? p : null;
-            return VanishAPI.isInvisible(p) ? null : p;
+            try {
+                if (sender instanceof Player)
+                    return VanishAPI.canSee((Player) sender, p) ? p : null;
+                return VanishAPI.isInvisible(p) ? null : p;
+            }catch (Exception e){
+                e.printStackTrace();
+                boolean vanished = false;
+                for (MetadataValue meta : p.getMetadata("vanished")) {
+                    if (meta.asBoolean())
+                        vanished = true;
+                }
+                return vanished?null:p;
+            }
         }
         return p;
     }

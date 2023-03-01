@@ -120,8 +120,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             map.put("walkSpeed", walkSpeed);
         if (flying != null)
             map.put("flying", flying);
-        //if (invisible != null)
-        //    map.put("invisible", invisible);
         if (heldItemSlot != null)
             map.put("heldItemSlot", heldItemSlot);
         if (freezeTicks != null)
@@ -303,10 +301,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
                 if (this.walkSpeed != null)
                     who.setWalkSpeed(walkSpeed);
             }
-            /*case INVISIBLE -> {
-                if (this.invisible != null)
-                    who.setInvisible(this.invisible);
-            }*/
             case HELDITEMSLOT -> {
                 if (this.heldItemSlot != null)
                     who.getInventory().setHeldItemSlot(this.heldItemSlot);
@@ -480,11 +474,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         return heldItemSlot;
     }
 
-    /*
-    public Boolean getInvisible() {
-        return invisible;
-    }*/
-
     @SuppressWarnings("unchecked")
     public void set(FieldType type, Object value) {
         switch (type) {
@@ -534,10 +523,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     public void setHeldItemSlot(Integer value) { //check on number validity
         this.heldItemSlot = value;
     }
-
-    /*public void setInvisible(Boolean value) {
-        this.invisible = value;
-    }*/
 
     public void setGlowing(Boolean value) {
         this.glowing = value;

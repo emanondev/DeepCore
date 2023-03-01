@@ -35,7 +35,7 @@ public class SpawnReasonTracker implements Listener {
     /**
      * @param entity - target entity
      * @return the reason why this entity was spawned, when there is no trace of
-     * spawning reason SpawnReason.DEFAULT is returned
+     * spawning reason {@code SpawnReason.DEFAULT} is returned
      */
     public static SpawnReason getSpawnReason(Entity entity) {
         try {
