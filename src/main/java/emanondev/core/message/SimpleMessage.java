@@ -1,7 +1,6 @@
 package emanondev.core.message;
 
 import emanondev.core.CorePlugin;
-import emanondev.core.UtilsMessages;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
