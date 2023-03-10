@@ -54,14 +54,14 @@ public interface ReadUtility {
                 if (sender instanceof Player)
                     return VanishAPI.canSee((Player) sender, p) ? p : null;
                 return VanishAPI.isInvisible(p) ? null : p;
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 boolean vanished = false;
                 for (MetadataValue meta : p.getMetadata("vanished")) {
                     if (meta.asBoolean())
                         vanished = true;
                 }
-                return vanished?null:p;
+                return vanished ? null : p;
             }
         }
         return p;

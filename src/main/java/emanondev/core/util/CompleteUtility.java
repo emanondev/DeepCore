@@ -1,7 +1,6 @@
 package emanondev.core.util;
 
 import de.myzelyam.api.vanish.VanishAPI;
-import de.myzelyam.supervanish.SuperVanish;
 import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;

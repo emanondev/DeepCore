@@ -54,9 +54,9 @@ public class PermissionBuilder {
     /**
      * Build a permission with name  {@code plugin.getName()+".command."+commandName+"."+subName} .
      *
-     * @param plugin plugin
+     * @param plugin      plugin
      * @param commandName command name
-     * @param subName sub-path
+     * @param subName     sub-path
      * @return a permission builder
      */
     @NotNull
@@ -67,7 +67,7 @@ public class PermissionBuilder {
     /**
      * Build a permission with name  {@code plugin.getName()+".command."+commandName} .
      *
-     * @param plugin plugin
+     * @param plugin      plugin
      * @param commandName command name
      * @return a permission builder
      */

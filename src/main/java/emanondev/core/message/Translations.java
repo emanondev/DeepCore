@@ -20,7 +20,8 @@ import java.util.Locale;
  */
 public class Translations {
 
-    private Translations() {}
+    private Translations() {
+    }
 
     public static @NotNull String get(@NotNull Block block) {
         return get(block.getType());

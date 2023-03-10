@@ -40,9 +40,9 @@ public class RandomItemContainer<T> {
         addItem(item, 100);
     }
 
-    public int getWeight(T item){
+    public int getWeight(T item) {
         int index = items.indexOf(item);
-        if (index==-1)
+        if (index == -1)
             return 0;
         return weights.get(index);
     }
@@ -50,19 +50,19 @@ public class RandomItemContainer<T> {
 
     public void addItem(T item, int weight) {
         int before = getWeight(item);
-        int after = Math.max(before+weight,0);
+        int after = Math.max(before + weight, 0);
         int index = items.indexOf(item);
-        if (after==0){
+        if (after == 0) {
             deleteItem(item);
             return;
         }
-        if (index==-1) {
+        if (index == -1) {
             items.add(item);
             weights.add(after);
             fullWeight += after;
-        }else{
-            weights.set(index,after);
-            fullWeight += (after-before);
+        } else {
+            weights.set(index, after);
+            fullWeight += (after - before);
         }
     }
 

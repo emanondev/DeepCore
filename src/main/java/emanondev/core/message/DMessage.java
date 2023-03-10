@@ -3,7 +3,6 @@ package emanondev.core.message;
 import emanondev.core.CorePlugin;
 import emanondev.core.UtilsString;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -172,13 +171,12 @@ public class DMessage {
     }
 
 
-
     @Contract("_, _, _ -> this")
     @NotNull
     public DMessage appendHover(@Nullable List<String> hoverText, @Nullable String message, String... holders) {
         if (message != null && !message.isEmpty())
             if (hoverText != null)
-                appendDirectly("<hover:show_text:\"").append(String.join("\n",hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message, holders).appendDirectly("</hover>");
+                appendDirectly("<hover:show_text:\"").append(String.join("\n", hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message, holders).appendDirectly("</hover>");
             else
                 append(message);
         return this;
@@ -189,7 +187,7 @@ public class DMessage {
     public DMessage appendHover(@Nullable List<String> hoverText, @Nullable List<String> message, String... holders) {
         if (message != null && !message.isEmpty())
             if (hoverText != null)
-                appendDirectly("<hover:show_text:\"").append(String.join("\n",hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message, holders).appendDirectly("</hover>");
+                appendDirectly("<hover:show_text:\"").append(String.join("\n", hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message, holders).appendDirectly("</hover>");
             else
                 append(message);
         return this;
@@ -200,7 +198,7 @@ public class DMessage {
     public DMessage appendHover(@Nullable List<String> hoverText, @Nullable DMessage message, String... holders) {
         if (message != null && !message.raw.isEmpty())
             if (hoverText != null)
-                appendDirectly("<hover:show_text:\"").append(String.join("\n",hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message).appendDirectly("</hover>");
+                appendDirectly("<hover:show_text:\"").append(String.join("\n", hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message).appendDirectly("</hover>");
             else
                 append(message);
         return this;
@@ -611,7 +609,7 @@ public class DMessage {
     }
 
     @Contract(pure = true)
-    public Component toMiniComponent(){
+    public Component toMiniComponent() {
         return MiniMessage.miniMessage().deserialize(raw.toString());
     }
 
@@ -625,7 +623,6 @@ public class DMessage {
     }
 
     /**
-     *
      * @param forceFormat force Non-Italic White text
      */
     @Contract(pure = true)
@@ -633,7 +630,7 @@ public class DMessage {
         String[] lines = raw.toString().replaceAll("(?i)<newline>", "\n").split("\n");
         for (int i = 0; i < lines.length; i++)
             lines[i] = GsonComponentSerializer.gson().serialize(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()
-                    .deserialize((lines[i].isEmpty()||!forceFormat||lines[i].startsWith("<!i><white>")?"":"<!i><white>")+lines[i]));
+                    .deserialize((lines[i].isEmpty() || !forceFormat || lines[i].startsWith("<!i><white>") ? "" : "<!i><white>") + lines[i]));
         return List.of(lines);
     }
 
@@ -652,17 +649,17 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage applyHolders(@Nullable Player target,String... placeholders){ //TODO may do better
-        String str = UtilsString.fix(raw.toString(),target,false,placeholders);
-        raw.delete(0,raw.length());
+    public DMessage applyHolders(@Nullable Player target, String... placeholders) { //TODO may do better
+        String str = UtilsString.fix(raw.toString(), target, false, placeholders);
+        raw.delete(0, raw.length());
         raw.append(str);
         return this;
     }
 
     @Contract("_ -> this")
     @NotNull
-    public DMessage applyHolders(String... placeholders){
-        return applyHolders(null,placeholders);
+    public DMessage applyHolders(String... placeholders) {
+        return applyHolders(null, placeholders);
     }
 
 }

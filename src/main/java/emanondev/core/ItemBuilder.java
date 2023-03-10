@@ -488,9 +488,9 @@ public class ItemBuilder {
         return msg;
     }
 
-    public ItemBuilder applyPlaceholders(CorePlugin plugin,Player target,String... placeholders){
+    public ItemBuilder applyPlaceholders(CorePlugin plugin, Player target, String... placeholders) {
         DMessage msg = getDescription(plugin);
-        msg.applyHolders(target,placeholders);
+        msg.applyHolders(target, placeholders);
         return setDescription(msg);
     }
 

@@ -27,7 +27,7 @@ public class PacketManager {
             throw new NullPointerException();
         this.plugin = plugin;
         WatchableCollection.setup();
-        if (!GameVersion.isNewerEqualsTo(1,16,0))
+        if (!GameVersion.isNewerEqualsTo(1, 16, 0))
             throw new IllegalStateException("unsupported version");
     }
 

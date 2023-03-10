@@ -20,8 +20,6 @@ import java.util.List;
 public abstract class ChestGui implements Gui {
 
 
-
-
     /**
      * Create a chest-type gui
      *
@@ -31,11 +29,12 @@ public abstract class ChestGui implements Gui {
      * @param previousHolder previously used gui, may be null
      * @param plugin         the plugin responsible for this gui
      */
-    public ChestGui(@Nullable DMessage title, int rows, Player player, Gui previousHolder, @NotNull CorePlugin plugin) {        if (rows < 1 || rows > 9)
-        throw new IllegalArgumentException("invalid rows size '" + rows + "'");
+    public ChestGui(@Nullable DMessage title, int rows, Player player, Gui previousHolder, @NotNull CorePlugin plugin) {
+        if (rows < 1 || rows > 9)
+            throw new IllegalArgumentException("invalid rows size '" + rows + "'");
         this.previousHolder = previousHolder;
         this.player = player;
-        this.inv = Bukkit.createInventory(this, rows * 9, title==null?"": title.toLegacy());
+        this.inv = Bukkit.createInventory(this, rows * 9, title == null ? "" : title.toLegacy());
         this.plugin = plugin;
     }
 
