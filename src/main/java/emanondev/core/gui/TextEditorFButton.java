@@ -14,6 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+
+@Deprecated
+/**
+ *
+ * @see StringEditorFButton
+ */
 public class TextEditorFButton extends AGuiButton {
 
     private final Supplier<String> getValue;

@@ -13,9 +13,7 @@ public abstract class AGuiButton implements GuiButton {
 
     private final Gui parent;
 
-    public AGuiButton(Gui parent) {
-        if (parent == null)
-            throw new NullPointerException();
+    public AGuiButton(@NotNull Gui parent) {
         this.parent = parent;
     }
 

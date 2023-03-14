@@ -164,7 +164,7 @@ public class DoubleEditorFButton extends AGuiButton {
     }
 
     public void setChangeAmount(double changeAmount) {
-        if (changeAmount < 1)
+        if (changeAmount <=0)
             throw new IllegalArgumentException();
         this.changeAmount = changeAmount;
     }
