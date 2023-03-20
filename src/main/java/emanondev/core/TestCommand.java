@@ -1,32 +1,21 @@
 package emanondev.core;
 
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.regions.Region;
 import emanondev.core.command.CoreCommand;
-import emanondev.core.message.DMessage;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class TestCommand extends CoreCommand {//TODO
 
-    private final HashMap<String, Integer> counter = new HashMap<>();
+    //private final HashMap<String, Integer> counter = new HashMap<>();
 
     public TestCommand() {
         super("test", CoreMain.get(), null);
-        for (String category : List.of("barche", "alberi", "casamedioevale", "castello", "organic", "hub-spawn", "minigamearena", "statua"))
-            counter.put(category, 0);
+        // for (String category : List.of("barche", "alberi", "casamedioevale", "castello", "organic", "hub-spawn", "minigamearena", "statua"))
+        //     counter.put(category, 0);
         /*new BukkitRunnable() {
             @Override
             public void run() {
@@ -40,6 +29,10 @@ public class TestCommand extends CoreCommand {//TODO
 
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+
+
+    }
+    /*
         if (!(sender instanceof Player player)) {
 
             return;
@@ -107,7 +100,7 @@ public class TestCommand extends CoreCommand {//TODO
         for (String cat : counter.keySet())
             msg.append(DyeColor.LIGHT_BLUE).appendRunCommand("/test " + cat, "[" + cat + "]").append(" ");
         msg.send();
-    }
+    }*/
 
 
     @Override

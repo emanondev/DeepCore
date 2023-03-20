@@ -31,19 +31,19 @@ public class FWrapperButton extends AGuiButton {
 
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
-        return onClick == null || !shouldOverrideOnClick.apply(event)? button.onClick(event) : onClick.apply(event);
+        return onClick == null || !shouldOverrideOnClick.apply(event) ? button.onClick(event) : onClick.apply(event);
     }
 
     @Override
     public @Nullable ItemStack getItem() {
-        return getItem == null || !shouldOverrideGetItem.get()? button.getItem() : getItem.get();
+        return getItem == null || !shouldOverrideGetItem.get() ? button.getItem() : getItem.get();
     }
 
-    public boolean nestedOnClick(InventoryClickEvent event){
+    public boolean nestedOnClick(InventoryClickEvent event) {
         return button.onClick(event);
     }
 
-    public ItemStack nestedGetItem(){
+    public ItemStack nestedGetItem() {
         return button.getItem();
     }
 }

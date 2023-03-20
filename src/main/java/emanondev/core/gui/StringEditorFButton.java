@@ -28,8 +28,8 @@ public class StringEditorFButton extends AGuiButton {
      * @param addInstructions
      */
     public StringEditorFButton(@NotNull Gui parent, @NotNull Supplier<String> getValue, @NotNull Consumer<String> setValue,
-                             @Nullable Supplier<ItemStack> baseItem,
-                              boolean addInstructions) {
+                               @Nullable Supplier<ItemStack> baseItem,
+                               boolean addInstructions) {
         super(parent);
         this.getValue = getValue;
         this.setValue = setValue;
@@ -76,7 +76,7 @@ public class StringEditorFButton extends AGuiButton {
     }
 
     public DMessage getInstructionsDescription() {
-        return new DMessage(CoreMain.get(),getTargetPlayer()).appendLangList("textEditor.Instructions");
+        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLangList("textEditor.Instructions");
         //, List.of("&7[&fClick&7] &9Any &7> &9Change Text"))
     }
 
