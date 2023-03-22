@@ -37,6 +37,17 @@ public class Hooks {
         return isEnabled("Citizens");
     }
 
+    public static boolean isAnyWorldEditEnabled() {
+        return isEnabled("WorldEdit") || isWorldEditAsync();
+    }
+    public static boolean isWorldEditAsync() {
+        return isFAWEEnabled() || isEnabled("AsyncWorldEdit");
+    }
+
+    public static boolean isFAWEEnabled() {
+        return isEnabled("FastAsyncWorldEdit");
+    }
+
     public static boolean isVirginBlockPluginEnabled() {
         return isEnabled("VirginBlock");
     }
