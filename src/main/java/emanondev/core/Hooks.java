@@ -40,6 +40,7 @@ public class Hooks {
     public static boolean isAnyWorldEditEnabled() {
         return isEnabled("WorldEdit") || isWorldEditAsync();
     }
+
     public static boolean isWorldEditAsync() {
         return isFAWEEnabled() || isEnabled("AsyncWorldEdit");
     }

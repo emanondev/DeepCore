@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -186,8 +187,6 @@ public final class WorldEditUtility {
                 EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
                         .world(new BukkitWorld(location.getWorld())).actor(getActor(persistent))
                         .maxBlocks(-1).build();
-
-                //EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(location.getWorld()), -1);
                 Operation operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
                         .copyBiomes(copyBiomes).copyEntities(copyEntities).ignoreAirBlocks(ignoreAir).build();
                 Operations.complete(operation);
@@ -195,6 +194,8 @@ public final class WorldEditUtility {
                 Optional.ofNullable(editSession).ifPresent(EditSession::close);
             } catch (WorldEditException e) {
                 throw new RuntimeException(e);
+            } catch (NullPointerException e) {
+                plugin.logIssue("WorldEdit (pasting clipboard) was aborted, is server turning offline?");
             }
         };
         if (Hooks.isWorldEditAsync() && async) {
@@ -222,6 +223,11 @@ public final class WorldEditUtility {
                 Optional.ofNullable(editSession).ifPresent(EditSession::close);
             } catch (WorldEditException e) {
                 throw new RuntimeException(e);
+            } catch (NullPointerException e) {
+                if (e.getMessage().contains(".getHandle()\" because \"chunk\" is null"))
+                    plugin.logIssue("WorldEdit (paste air) was aborted, is server turning offline?");
+                else
+                    throw new RuntimeException(e);
             }
         };
         if (Hooks.isWorldEditAsync() && async) {
@@ -308,7 +314,7 @@ public final class WorldEditUtility {
 
     @Deprecated
     public static void clearArea(Location corner1, Location corner2, boolean async) {
-        if (!corner1.getWorld().equals(corner2.getWorld()))
+        if (!Objects.equals(corner1.getWorld(), corner2.getWorld()))
             throw new IllegalArgumentException();
         clearArea(corner1.getWorld(), BoundingBox.of(corner1, corner2));
     }
@@ -320,7 +326,6 @@ public final class WorldEditUtility {
         BlockVector3 pos2 = BlockVector3.at(area.getMaxX() - 1, Math.min(w.getMaxHeight(), area.getMaxY() - 1), area.getMaxZ() - 1);
         CuboidRegion region = new CuboidRegion(world, pos1, pos2);
         try (EditSession editSession = WorldEdit.getInstance().newEditSession(world)) {
-            //EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
             BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
             if (async && Hooks.isWorldEditAsync())
                 Bukkit.getScheduler().runTaskAsynchronously(CoreMain.get(), () -> {

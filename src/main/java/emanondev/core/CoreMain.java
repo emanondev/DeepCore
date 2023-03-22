@@ -4,6 +4,7 @@ import emanondev.core.actions.*;
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
+import emanondev.core.util.FAWECleaner;
 import emanondev.core.util.ItemUtility;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
@@ -67,5 +68,10 @@ public final class CoreMain extends CorePlugin {
     public void disable() {
         ConfigurationSerialization.unregisterClass(SoundInfo.class);
         this.logDone("Unregistered &eSoundInfo&f from ConfigurationSerialization");
+        if (Hooks.isFAWEEnabled()) {
+            this.logDone("Cleaning WorldEditCache");
+            FAWECleaner.cleanAll();
+            this.logDone("Cleaned");
+        }
     }
 }

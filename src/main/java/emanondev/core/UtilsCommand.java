@@ -1,6 +1,6 @@
 package emanondev.core;
 
-import de.myzelyam.api.vanish.VanishAPI;
+import emanondev.core.util.VanishApi;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -14,6 +14,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+
+/**
+ * @see emanondev.core.util.CompleteUtility
+ * @see emanondev.core.util.ReadUtility
+ */
+@Deprecated
 public final class UtilsCommand {
 
     private UtilsCommand() {
@@ -93,7 +99,7 @@ public final class UtilsCommand {
 
         if (Hooks.isVanishEnabled() && (sender instanceof Player)) {
             for (Player p : players)
-                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishAPI.canSee((Player) sender, p))
+                if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishApi.canSee(sender, p))
                     list.add(p.getName());
         } else
             for (Player p : players)
