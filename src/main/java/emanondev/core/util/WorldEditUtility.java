@@ -30,6 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,20 +49,6 @@ public final class WorldEditUtility {
     }
 
     @Deprecated
-    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes) {
-        return copy(corner1, corner2, copyEntity, copyBiomes, true);
-    }
-
-    @Deprecated
-    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes) {
-        return copy(w, area, copyEntity, copyBiomes, true);
-    }
-
-    @Deprecated
-    public static Clipboard load(@NotNull File dest) {
-        return load(dest, CoreMain.get());
-    }
-
     public static Clipboard load(@NotNull File dest, @NotNull Plugin plugin) {
         ClipboardFormat format = ClipboardFormats.findByFile(dest);
         try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
@@ -72,18 +59,25 @@ public final class WorldEditUtility {
         return null;
     }
 
-    @Deprecated
-    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
-        if (!corner1.getWorld().equals(corner2.getWorld()))
-            throw new IllegalArgumentException();
-        return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
+    public static CompletableFuture<Clipboard> load(@NotNull File dest, @NotNull Plugin plugin, boolean async) {
+        CompletableFuture<Clipboard> future = new CompletableFuture<>();
+        BukkitRunnable loadTask = new BukkitRunnable() {
+            public void run() {
+                ClipboardFormat format = ClipboardFormats.findByFile(dest);
+                try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
+                    future.complete(new ClipboardContainer(reader.read()));
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+            }
+        };
+        if (Hooks.isWorldEditAsync() && async) {
+            loadTask.runTaskAsynchronously(plugin);
+        } else {
+            loadTask.runTask(plugin);
+        }
+        return future;
     }
-
-    @Deprecated
-    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async) {
-        return copy(w, area, copyEntity, copyBiomes, async, CoreMain.get());
-    }
-
 
     public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async, @NotNull Plugin plugin) {
         if (!corner1.getWorld().equals(corner2.getWorld()))
@@ -97,7 +91,7 @@ public final class WorldEditUtility {
         CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(w), min,
                 BlockVector3.at((int) area.getMaxX(), (int) area.getMaxY(), (int) area.getMaxZ()));
         Clipboard clipboard = new ClipboardContainer(new BlockArrayClipboard(region));
-        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(w))
+        EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().fastMode(true).world(BukkitAdapter.adapt(w))
                 .maxBlocks(-1).actor(getActor(false)).build();
         ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clipboard,
                 region.getMinimumPoint());
@@ -160,19 +154,7 @@ public final class WorldEditUtility {
                 };
             }
         };
-
     }
-
-    /*
-    /**
-     * rimuove il file associato alla clipboard se presente
-     *
-     * @param clip
-     *//*
-    public static void cleanFawe(Clipboard clip) {
-        FAWECleaner.clean(clip);
-    }*/
-
 
     public static CompletableFuture<EditSession> paste(Location location, Clipboard clipboard, boolean async, CorePlugin plugin,
                                                        boolean ignoreAir, boolean copyEntities, boolean copyBiomes) {
@@ -185,7 +167,7 @@ public final class WorldEditUtility {
         Runnable pasteTask = () -> {
             try {
                 EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-                        .world(new BukkitWorld(location.getWorld())).actor(getActor(persistent))
+                        .world(new BukkitWorld(location.getWorld())).actor(getActor(persistent)).fastMode(true)
                         .maxBlocks(-1).build();
                 Operation operation = new ClipboardHolder(clipboard).createPaste(editSession).to(BlockVector3.at(location.getX(), location.getY(), location.getZ()))
                         .copyBiomes(copyBiomes).copyEntities(copyEntities).ignoreAirBlocks(ignoreAir).build();
@@ -211,7 +193,7 @@ public final class WorldEditUtility {
         Runnable pasteTask = () -> {
             try {
                 EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-                        .world(new BukkitWorld(world)).actor(getActor(false))
+                        .world(new BukkitWorld(world)).actor(getActor(false)).fastMode(true)
                         .maxBlocks(-1).build();
                 //EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(new BukkitWorld(world), -1);
                 BaseBlock block = BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -341,5 +323,32 @@ public final class WorldEditUtility {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Deprecated
+    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes) {
+        return copy(corner1, corner2, copyEntity, copyBiomes, true);
+    }
+
+    @Deprecated
+    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes) {
+        return copy(w, area, copyEntity, copyBiomes, true);
+    }
+
+    @Deprecated
+    public static Clipboard load(@NotNull File dest) {
+        return load(dest, CoreMain.get());
+    }
+
+    @Deprecated
+    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
+        if (!corner1.getWorld().equals(corner2.getWorld()))
+            throw new IllegalArgumentException();
+        return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
+    }
+
+    @Deprecated
+    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async) {
+        return copy(w, area, copyEntity, copyBiomes, async, CoreMain.get());
     }
 }

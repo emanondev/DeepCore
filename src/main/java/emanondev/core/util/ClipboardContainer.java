@@ -46,7 +46,7 @@ import java.util.function.Consumer;
 
 public final class ClipboardContainer implements Clipboard {
 
-    private final Clipboard parent; //TODO, should i save the file instead?
+    private final Clipboard parent;
 
     public ClipboardContainer(Clipboard contained) {
         this.parent = contained;

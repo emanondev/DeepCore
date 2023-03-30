@@ -51,7 +51,6 @@ public final class UtilsCommand {
      * @return target player or null if player never joined the server
      */
     public static @Nullable OfflinePlayer readOfflinePlayer(@NotNull String arg) {
-        @SuppressWarnings("deprecation")
         OfflinePlayer player = Bukkit.getOfflinePlayer(arg);
         if (player.getLastPlayed() == 0)
             return null;
@@ -112,6 +111,8 @@ public final class UtilsCommand {
     public static @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
                                                      @NotNull Function<K, String> eval, @Nullable com.google.common.base.Predicate<K> isValid) {
         List<String> results = new ArrayList<>();
+        if (values == null)
+            return results;
         if (prefix == null || prefix.isEmpty()) {
             for (K val : values)
                 try {
@@ -139,6 +140,8 @@ public final class UtilsCommand {
     public static @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
                                                      @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
         List<String> results = new ArrayList<>();
+        if (values == null)
+            return results;
         if (prefix == null || prefix.isEmpty()) {
             for (K val : values)
                 try {
