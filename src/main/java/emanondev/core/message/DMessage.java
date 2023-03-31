@@ -158,14 +158,32 @@ public class DMessage {
         return this;
     }
 
+    /**
+     * Append the language text at give path
+     *
+     * Works for both Strings and Lists of Strings
+     * @param path
+     * @param holders
+     * @return this
+     */
     @Contract("_, _ -> this")
     @NotNull
     public DMessage appendLang(@NotNull String path, String... holders) {
+        if (plugin.getLanguageConfig(target).isList(path))
+            return append(plugin.getLanguageConfig(target).getMultiMessage(path, false, null, holders));
         return append(plugin.getLanguageConfig(target).getMessage(path, false, null, holders));
     }
 
+    /**
+     *
+     * @param path
+     * @param holders
+     * @return this
+     * @see #appendLang(String, String...)
+     */
     @Contract("_, _ -> this")
     @NotNull
+    @Deprecated
     public DMessage appendLangList(@NotNull String path, String... holders) {
         return append(plugin.getLanguageConfig(target).getMultiMessage(path, false, null, holders));
     }
