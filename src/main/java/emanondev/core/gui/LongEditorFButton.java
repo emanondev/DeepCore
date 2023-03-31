@@ -125,7 +125,7 @@ public class LongEditorFButton extends AGuiButton {
     }
 
     public DMessage getInstructionsDescription() {
-        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLangList("gui_button.number_editor.instructions");
+        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("gui_button.number_editor.instructions");
     }
 
     public long getValue() {

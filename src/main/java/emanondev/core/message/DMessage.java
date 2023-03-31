@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Predicate;
 
 public class DMessage {
 
@@ -160,8 +161,9 @@ public class DMessage {
 
     /**
      * Append the language text at give path
-     *
+     * <p>
      * Works for both Strings and Lists of Strings
+     *
      * @param path
      * @param holders
      * @return this
@@ -175,7 +177,6 @@ public class DMessage {
     }
 
     /**
-     *
      * @param path
      * @param holders
      * @return this
@@ -585,7 +586,7 @@ public class DMessage {
 
     @Contract(pure = true)
     public void send(CommandSender target) {
-        if (target != null)
+        if (target != null && !raw.isEmpty())
             if (target instanceof Player player)
                 plugin.adventure().player(player).sendMessage(toMiniComponent());
             else //???
@@ -593,8 +594,15 @@ public class DMessage {
     }
 
     @Contract(pure = true)
-    public void send(Collection<? extends CommandSender> targets) {
+    public void send(@NotNull Collection<? extends CommandSender> targets) {
         targets.forEach(this::send);
+    }
+
+    @Contract(pure = true)
+    public <T extends CommandSender> void send(@NotNull Collection<T> targets, @NotNull Predicate<T> shouldSend) {
+        targets.forEach((t) -> {
+            if (shouldSend.test(t)) send(t);
+        });
     }
 
     @Contract(pure = true)
@@ -604,7 +612,7 @@ public class DMessage {
 
     @Contract(pure = true)
     public void sendActionBar(CommandSender target) {
-        if (target != null)
+        if (target != null && !raw.isEmpty())
             if (target instanceof Player player)
                 plugin.adventure().player(player).sendActionBar(toMiniComponent());
             else //???
@@ -612,8 +620,15 @@ public class DMessage {
     }
 
     @Contract(pure = true)
-    public void sendActionBar(Collection<? extends CommandSender> targets) {
+    public void sendActionBar(@NotNull Collection<? extends CommandSender> targets) {
         targets.forEach(this::sendActionBar);
+    }
+
+    @Contract(pure = true)
+    public <T extends CommandSender> void sendActionBar(@NotNull Collection<T> targets, @NotNull Predicate<T> shouldSend) {
+        targets.forEach((t) -> {
+            if (shouldSend.test(t)) send(t);
+        });
     }
 
     @Contract(pure = true)

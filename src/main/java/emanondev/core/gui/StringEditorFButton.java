@@ -76,7 +76,7 @@ public class StringEditorFButton extends AGuiButton {
     }
 
     public DMessage getInstructionsDescription() {
-        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLangList("textEditor.Instructions");
+        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("textEditor.Instructions");
         //, List.of("&7[&fClick&7] &9Any &7> &9Change Text"))
     }
 
