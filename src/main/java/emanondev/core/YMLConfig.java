@@ -82,7 +82,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         if (section == this) {
             YMLSection result = new YMLSubSection(this, key);
             this.set(key, result);
-            //this.map.put(key, result);//TODO i wanna die
+            //this.map.put(key, result);//TODO ?
             return result;
         }
         return section.createSection(key);

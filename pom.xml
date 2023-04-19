@@ -51,6 +51,10 @@
                                     <pattern>net.kyori.adventure</pattern>
                                     <shadedPattern>emanondev.shade.kyori.adventure</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>net.kyori.examination</pattern>
+                                    <shadedPattern>emanondev.shade.kyori.examination</shadedPattern><!-- TODO remove later -->
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -158,6 +162,7 @@
             <groupId>com.github.LeonMangler</groupId>
             <artifactId>SuperVanish</artifactId>
             <version>6.2.12</version>
+            <scope>provided</scope>
         </dependency>
         <!-- JetBrains Annotations -->
         <dependency>

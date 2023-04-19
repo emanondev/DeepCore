@@ -4,10 +4,7 @@ import emanondev.core.message.DMessage;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -16,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -492,6 +490,11 @@ public class ItemBuilder {
         DMessage msg = getDescription(plugin);
         msg.applyHolders(target, placeholders);
         return setDescription(msg);
+    }
+
+    public <T,Z> ItemBuilder addNamespacedKey(NamespacedKey key, PersistentDataType<T,Z> type,Z value){
+        resultMeta.getPersistentDataContainer().set(key,type,value);
+        return this;
     }
 
 }

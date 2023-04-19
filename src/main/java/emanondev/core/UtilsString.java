@@ -190,7 +190,7 @@ public final class UtilsString {
     public static String getTimeStringSeconds(CommandSender sender, long cooldown) {
         String and = " " + CoreMain.get().getLanguageConfig(sender).loadString("conjunction.and", "and") + " ";
         StringBuilder result = new StringBuilder();
-        if (cooldown >= Time.WEEK.seconds) {// week
+        /*if (cooldown >= Time.WEEK.seconds) {// week
             int val = (int) (cooldown / Time.WEEK.seconds);
             if (val > 1)
                 result.append(val).append(" ").append(Time.WEEK.getMultipleName(sender));
@@ -202,7 +202,7 @@ public final class UtilsString {
             else if (val == 1)
                 result.append(and).append(val).append(" ").append(Time.DAY.getSingleName(sender));
             return result.toString();
-        }
+        }*/
         if (cooldown >= Time.DAY.seconds) {// day
             int val = (int) (cooldown / Time.DAY.seconds);
             if (val > 1)
@@ -360,9 +360,9 @@ public final class UtilsString {
 
         int wordCounter = 0;
         StringBuilder line = new StringBuilder();
-        for (int index = 0; index < words.length; index++) {
+        for (String word : words) {
             if (wordCounter > 0 && ChatColor.stripColor(line.toString()).length() + 1
-                    + ChatColor.stripColor(words[index]).length() > maxLength) {
+                    + ChatColor.stripColor(word).length() > maxLength) {
                 val.add(format + line.toString());
                 int start = 0;
                 while (start < line.toString().length()) {
@@ -380,9 +380,9 @@ public final class UtilsString {
                 wordCounter = 0;
             }
             if (wordCounter == 0)
-                line.append(words[index]);
+                line.append(word);
             else
-                line.append(" ").append(words[index]);
+                line.append(" ").append(word);
             wordCounter++;
         }
         val.add(format.toString() + line);
