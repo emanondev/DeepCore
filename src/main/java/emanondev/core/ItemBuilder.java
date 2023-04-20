@@ -464,7 +464,6 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-
     public ItemBuilder setPages(DMessage... messages) {
         if (this.resultMeta instanceof BookMeta)
             for (DMessage message : messages)
@@ -474,7 +473,7 @@ public class ItemBuilder {
         return this;
     }
 
-    public DMessage getDescription(CorePlugin plugin) {
+    public DMessage getDescription(@NotNull CorePlugin plugin) {
         DMessage msg = new DMessage(plugin, null);
         Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
         if (map.containsKey("display-name"))
@@ -486,14 +485,45 @@ public class ItemBuilder {
         return msg;
     }
 
-    public ItemBuilder applyPlaceholders(CorePlugin plugin, Player target, String... placeholders) {
+    @Contract("_, _, _ -> this")
+    public ItemBuilder applyPlaceholders(@NotNull CorePlugin plugin, @Nullable Player target, String... placeholders) {
         DMessage msg = getDescription(plugin);
         msg.applyHolders(target, placeholders);
         return setDescription(msg);
     }
 
-    public <T,Z> ItemBuilder addNamespacedKey(NamespacedKey key, PersistentDataType<T,Z> type,Z value){
-        resultMeta.getPersistentDataContainer().set(key,type,value);
+    @Contract("_, _, _ -> this")
+    public <T, Z> ItemBuilder addNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        resultMeta.getPersistentDataContainer().set(key, type, value);
+        return this;
+    }
+
+    @Contract(" -> this")
+    public ItemBuilder clearEnchantments() {
+        for (Enchantment enchantment : resultMeta.getEnchants().keySet())
+            resultMeta.removeEnchant(enchantment);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public ItemBuilder setColor(DyeColor color) {
+        if (resultMeta instanceof LeatherArmorMeta meta) {
+            meta.setColor(color.getColor());
+            return this;
+        } else if (resultMeta instanceof PotionMeta meta) {
+            meta.setColor(color.getColor());
+            return this;
+        }
+        int index = result.getType().name().indexOf("_", result.getType().name().startsWith("LIGHT_") ? 7 : 1);
+        if (index > 0)
+            try {
+                switch (result.getType().name().substring(index)) {
+                    case "_BANNER", "_BED", "_CANDLE", "_CARPET", "_CONCRETE", "_CONCRETE_POWDER", "_DYE", "_GLAZED_TERRACOTTA", "_SHULKER_BOX", "_STAINED_GLASS",
+                            "_STAINED_GLASS_PANE", "_TERRACOTTA", "_WOOL" -> result.setType(Material.getMaterial(color.name() + result.getType().name().substring(index)));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         return this;
     }
 
