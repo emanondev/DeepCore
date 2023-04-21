@@ -37,28 +37,6 @@ public class VaultEconomyHandler {
     }
 
     /**
-     * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS
-     *
-     * @param player to deposit to
-     * @param amount Amount to deposit
-     * @return True if operation was successful
-     */
-    public boolean addMoney(@NotNull OfflinePlayer player, double amount) {
-        return economy.depositPlayer(player, amount).transactionSuccess();
-    }
-
-    /**
-     * Withdraw an amount from a player - DO NOT USE NEGATIVE AMOUNTS
-     *
-     * @param player to withdraw from
-     * @param amount Amount to withdraw
-     * @return True if operation was successful
-     */
-    public boolean removeMoney(@NotNull OfflinePlayer player, double amount) {
-        return economy.withdrawPlayer(player, amount).transactionSuccess();
-    }
-
-    /**
      * Transfers an amount from a player to another - DO NOT USE NEGATIVE AMOUNTS
      *
      * @param from   to withdraw from
@@ -79,6 +57,28 @@ public class VaultEconomyHandler {
         CoreMain.get().logOnFile("economy_errors.txt", "Transaction failed multiple times &e" + from.getName()
                 + "&f (&e" + from.getUniqueId() + "&f) lost &e" + amount + "&f $");
         return false;
+    }
+
+    /**
+     * Withdraw an amount from a player - DO NOT USE NEGATIVE AMOUNTS
+     *
+     * @param player to withdraw from
+     * @param amount Amount to withdraw
+     * @return True if operation was successful
+     */
+    public boolean removeMoney(@NotNull OfflinePlayer player, double amount) {
+        return economy.withdrawPlayer(player, amount).transactionSuccess();
+    }
+
+    /**
+     * Deposit an amount to a player - DO NOT USE NEGATIVE AMOUNTS
+     *
+     * @param player to deposit to
+     * @param amount Amount to deposit
+     * @return True if operation was successful
+     */
+    public boolean addMoney(@NotNull OfflinePlayer player, double amount) {
+        return economy.depositPlayer(player, amount).transactionSuccess();
     }
 
     /**

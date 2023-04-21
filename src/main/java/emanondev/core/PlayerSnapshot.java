@@ -11,13 +11,22 @@ import java.util.*;
 
 public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
+    /**
+     * LOCATION should be loaded before anything else for compatibility with plugins
+     * which do manage inventory, EFFECTS should be loaded before ABSORBITION and HEALTH
+     */
+    private final FieldType[] LOAD_ORDER = new FieldType[]{FieldType.LOCATION, FieldType.EFFECTS,
+            FieldType.ABSORBITION, FieldType.ARMOR, FieldType.EXTRACONTENTS, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
+            FieldType.EXPERIENCE, FieldType.FOODLEVEL, FieldType.EXHAUSTION, FieldType.HEALTH, FieldType.ALLOWFLIGHT,
+            FieldType.GOD, FieldType.GAMEMODE, FieldType.FLYSPEED, FieldType.FIRETICKS, FieldType.AIR,
+            FieldType.WALKSPEED, FieldType.SATURATION, /*FieldType.INVISIBLE,*/ FieldType.COLLIDABLE, FieldType.CANPICKUPITEMS,
+            FieldType.HELDITEMSLOT, FieldType.FREEZETICKS, FieldType.GLOWING};
     private String locationWorldName;
     private Double locationX;
     private Double locationY;
     private Double locationZ;
     private Float locationYaw;
     private Float locationPitch;
-
     private List<ItemStack> armor;
     private List<ItemStack> inventory;
     private List<ItemStack> enderChest;
@@ -58,6 +67,140 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     public PlayerSnapshot(Player p, FieldType... types) {
         loadFrom(p, types);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static PlayerSnapshot deserialize(Map<String, Object> map) {
+        PlayerSnapshot snapshot = new PlayerSnapshot();
+        snapshot.locationWorldName = (String) map.get("locationWorldName");
+        snapshot.locationX = map.containsKey("locationX") ? ((Number) map.get("locationX")).doubleValue() : null;
+        snapshot.locationY = map.containsKey("locationY") ? ((Number) map.get("locationY")).doubleValue() : null;
+        snapshot.locationZ = map.containsKey("locationZ") ? ((Number) map.get("locationZ")).doubleValue() : null;
+        snapshot.locationYaw = map.containsKey("locationYaw") ? ((Number) map.get("locationYaw")).floatValue() : null;
+        snapshot.locationPitch = map.containsKey("locationPitch") ? ((Number) map.get("locationPitch")).floatValue()
+                : null;
+        snapshot.armor = (List<ItemStack>) map.get("armor");
+        snapshot.extraContents = (List<ItemStack>) map.get("extraContents");
+        snapshot.inventory = (List<ItemStack>) map.get("inventory");
+        snapshot.enderChest = (List<ItemStack>) map.get("enderChest");
+        snapshot.level = (Integer) map.get("level");
+        snapshot.experience = map.containsKey("experience") ? ((Number) map.get("experience")).floatValue() : null;
+        snapshot.effects = (Collection<PotionEffect>) map.get("effects");
+        snapshot.foodLevel = (Integer) map.get("foodLevel");
+        snapshot.exhaustion = map.containsKey("exhaustion") ? ((Number) map.get("exhaustion")).floatValue() : null;
+        snapshot.saturation = map.containsKey("saturation") ? ((Number) map.get("saturation")).floatValue() : null;
+        snapshot.health = (Double) map.get("health");
+        snapshot.absorbition = (Double) map.get("absorbition");
+        snapshot.allowFlight = (Boolean) map.get("allowFlight");
+        snapshot.god = (Boolean) map.get("god");
+        try {
+            String tmp = (String) map.get("gameMode");
+            snapshot.gameMode = tmp == null ? null : GameMode.valueOf(tmp);
+        } catch (Exception e) {
+            snapshot.gameMode = null;
+        }
+        snapshot.flySpeed = map.containsKey("flySpeed") ? ((Number) map.get("flySpeed")).floatValue() : null;
+        snapshot.fireTicks = (Integer) map.get("fireTicks");
+        snapshot.remainingAir = map.containsKey("remainingAir") ? (Integer) map.get("remainingAir") : null;
+        snapshot.walkSpeed = map.containsKey("walkSpeed") ? ((Number) map.get("walkSpeed")).floatValue() : null;
+        snapshot.flying = map.containsKey("flying") ? (Boolean) map.get("flying") : null;
+        //snapshot.invisible = map.containsKey("invisible") ? (Boolean) map.get("invisible") : null;
+        snapshot.heldItemSlot = map.containsKey("heldItemSlot") ? (Integer) map.get("heldItemSlot") : null;
+        snapshot.freezeTicks = map.containsKey("freezeTicks") ? (Integer) map.get("freezeTicks") : null;
+        snapshot.glowing = map.containsKey("glowing") ? (Boolean) map.get("glowing") : null;
+        snapshot.collidable = map.containsKey("collidable") ? (Boolean) map.get("collidable") : null;
+        snapshot.canPickupItems = map.containsKey("canPickupItems") ? (Boolean) map.get("canPickupItems") : null;
+        return snapshot;
+    }
+
+    public void loadFrom(Player who, Collection<FieldType> fields) {
+        for (FieldType type : fields)
+            loadFrom(who, type);
+    }
+
+    public void loadFrom(Player who, FieldType type) {
+        switch (type) {
+            case ABSORBITION -> this.absorbition = who.getAbsorptionAmount();
+            case AIR -> this.remainingAir = who.getRemainingAir();
+            case ALLOWFLIGHT -> this.allowFlight = who.getAllowFlight();
+            case ARMOR -> {
+                this.armor = new ArrayList<>(Arrays.asList(who.getInventory().getArmorContents()));
+                for (int i = 0; i < this.armor.size(); i++) {
+                    ItemStack el = this.armor.get(i);
+                    if (el == null)
+                        continue;
+                    if (el.getType() == Material.AIR)
+                        this.armor.set(i, null);
+                }
+            }
+            case EXTRACONTENTS -> {
+                this.extraContents = new ArrayList<>(Arrays.asList(who.getInventory().getExtraContents()));
+                for (int i = 0; i < this.extraContents.size(); i++) {
+                    ItemStack el = this.extraContents.get(i);
+                    if (el == null)
+                        continue;
+                    if (el.getType() == Material.AIR)
+                        this.extraContents.set(i, null);
+                }
+            }
+            case EFFECTS -> this.effects = new ArrayList<>(who.getActivePotionEffects());
+            case ENDERCHEST -> {
+                this.enderChest = new ArrayList<>(Arrays.asList(who.getEnderChest().getStorageContents()));
+                for (int i = 0; i < this.enderChest.size(); i++) {
+                    ItemStack el = this.enderChest.get(i);
+                    if (el == null)
+                        continue;
+                    if (el.getType() == Material.AIR)
+                        this.enderChest.set(i, null);
+                }
+            }
+            case EXHAUSTION -> this.exhaustion = who.getExhaustion();
+            case EXPERIENCE -> this.experience = who.getExp();
+            case FIRETICKS -> this.fireTicks = who.getFireTicks();
+            case FLYING -> this.flying = who.isFlying();
+            case FLYSPEED -> this.flySpeed = who.getFlySpeed();
+            case FOODLEVEL -> this.foodLevel = who.getFoodLevel();
+            case GAMEMODE -> this.gameMode = who.getGameMode();
+            case GOD -> this.god = who.isInvulnerable();
+            case HEALTH -> this.health = who.getHealth();
+            case INVENTORY -> {
+                this.inventory = new ArrayList<>(Arrays.asList(who.getInventory().getStorageContents()));
+                for (int i = 0; i < this.inventory.size(); i++) {
+                    ItemStack el = this.inventory.get(i);
+                    if (el == null)
+                        continue;
+                    if (el.getType() == Material.AIR)
+                        this.inventory.set(i, null);
+                }
+            }
+            case LEVEL -> this.level = who.getLevel();
+            case LOCATION -> {
+                Location loc = who.getLocation();
+                this.locationWorldName = loc.getWorld().getName();
+                this.locationX = loc.getX();
+                this.locationY = loc.getY();
+                this.locationZ = loc.getZ();
+                this.locationYaw = loc.getYaw();
+                this.locationPitch = loc.getPitch();
+            }
+            case SATURATION -> this.saturation = who.getSaturation();
+            case WALKSPEED -> this.walkSpeed = who.getWalkSpeed();
+            //case INVISIBLE -> this.invisible = who.isInvisible();
+            case HELDITEMSLOT -> this.heldItemSlot = who.getInventory().getHeldItemSlot();
+            case FREEZETICKS -> this.freezeTicks = who.getFreezeTicks();
+            case GLOWING -> this.glowing = who.isGlowing();
+            case COLLIDABLE -> this.collidable = who.isCollidable();
+            case CANPICKUPITEMS -> this.canPickupItems = who.getCanPickupItems();
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        }
+    }
+
+    public void loadFrom(Player who, FieldType... fields) {
+        EnumSet<FieldType> savedTypes = EnumSet.noneOf(FieldType.class);
+        for (FieldType type : fields)
+            if (type != null)
+                savedTypes.add(type);
+        loadFrom(who, savedTypes);
     }
 
     public PlayerSnapshot clone() {
@@ -133,71 +276,8 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         return map;
     }
 
-    @SuppressWarnings("unchecked")
-    public static PlayerSnapshot deserialize(Map<String, Object> map) {
-        PlayerSnapshot snapshot = new PlayerSnapshot();
-        snapshot.locationWorldName = (String) map.get("locationWorldName");
-        snapshot.locationX = map.containsKey("locationX") ? ((Number) map.get("locationX")).doubleValue() : null;
-        snapshot.locationY = map.containsKey("locationY") ? ((Number) map.get("locationY")).doubleValue() : null;
-        snapshot.locationZ = map.containsKey("locationZ") ? ((Number) map.get("locationZ")).doubleValue() : null;
-        snapshot.locationYaw = map.containsKey("locationYaw") ? ((Number) map.get("locationYaw")).floatValue() : null;
-        snapshot.locationPitch = map.containsKey("locationPitch") ? ((Number) map.get("locationPitch")).floatValue()
-                : null;
-        snapshot.armor = (List<ItemStack>) map.get("armor");
-        snapshot.extraContents = (List<ItemStack>) map.get("extraContents");
-        snapshot.inventory = (List<ItemStack>) map.get("inventory");
-        snapshot.enderChest = (List<ItemStack>) map.get("enderChest");
-        snapshot.level = (Integer) map.get("level");
-        snapshot.experience = map.containsKey("experience") ? ((Number) map.get("experience")).floatValue() : null;
-        snapshot.effects = (Collection<PotionEffect>) map.get("effects");
-        snapshot.foodLevel = (Integer) map.get("foodLevel");
-        snapshot.exhaustion = map.containsKey("exhaustion") ? ((Number) map.get("exhaustion")).floatValue() : null;
-        snapshot.saturation = map.containsKey("saturation") ? ((Number) map.get("saturation")).floatValue() : null;
-        snapshot.health = (Double) map.get("health");
-        snapshot.absorbition = (Double) map.get("absorbition");
-        snapshot.allowFlight = (Boolean) map.get("allowFlight");
-        snapshot.god = (Boolean) map.get("god");
-        try {
-            String tmp = (String) map.get("gameMode");
-            snapshot.gameMode = tmp == null ? null : GameMode.valueOf(tmp);
-        } catch (Exception e) {
-            snapshot.gameMode = null;
-        }
-        snapshot.flySpeed = map.containsKey("flySpeed") ? ((Number) map.get("flySpeed")).floatValue() : null;
-        snapshot.fireTicks = (Integer) map.get("fireTicks");
-        snapshot.remainingAir = map.containsKey("remainingAir") ? (Integer) map.get("remainingAir") : null;
-        snapshot.walkSpeed = map.containsKey("walkSpeed") ? ((Number) map.get("walkSpeed")).floatValue() : null;
-        snapshot.flying = map.containsKey("flying") ? (Boolean) map.get("flying") : null;
-        //snapshot.invisible = map.containsKey("invisible") ? (Boolean) map.get("invisible") : null;
-        snapshot.heldItemSlot = map.containsKey("heldItemSlot") ? (Integer) map.get("heldItemSlot") : null;
-        snapshot.freezeTicks = map.containsKey("freezeTicks") ? (Integer) map.get("freezeTicks") : null;
-        snapshot.glowing = map.containsKey("glowing") ? (Boolean) map.get("glowing") : null;
-        snapshot.collidable = map.containsKey("collidable") ? (Boolean) map.get("collidable") : null;
-        snapshot.canPickupItems = map.containsKey("canPickupItems") ? (Boolean) map.get("canPickupItems") : null;
-        return snapshot;
-    }
-
-    /**
-     * LOCATION should be loaded before anything else for compatibility with plugins
-     * which do manage inventory, EFFECTS should be loaded before ABSORBITION and HEALTH
-     */
-    private final FieldType[] LOAD_ORDER = new FieldType[]{FieldType.LOCATION, FieldType.EFFECTS,
-            FieldType.ABSORBITION, FieldType.ARMOR, FieldType.EXTRACONTENTS, FieldType.INVENTORY, FieldType.ENDERCHEST, FieldType.LEVEL,
-            FieldType.EXPERIENCE, FieldType.FOODLEVEL, FieldType.EXHAUSTION, FieldType.HEALTH, FieldType.ALLOWFLIGHT,
-            FieldType.GOD, FieldType.GAMEMODE, FieldType.FLYSPEED, FieldType.FIRETICKS, FieldType.AIR,
-            FieldType.WALKSPEED, FieldType.SATURATION, /*FieldType.INVISIBLE,*/ FieldType.COLLIDABLE, FieldType.CANPICKUPITEMS,
-            FieldType.HELDITEMSLOT, FieldType.FREEZETICKS, FieldType.GLOWING};
-
     public void apply(Player who) {
         apply(who, EnumSet.allOf(FieldType.class));
-    }
-
-    public void apply(Player who, FieldType... fields) {
-        EnumSet<FieldType> loadedTypes = EnumSet.noneOf(FieldType.class);
-        for (FieldType type : fields)
-            if (type != null)
-                loadedTypes.add(type);
-        apply(who, loadedTypes);
     }
 
     public void apply(Player who, Collection<FieldType> fields) {
@@ -325,98 +405,16 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         }
     }
 
-    public void loadFrom(Player who) {
-        loadFrom(who, EnumSet.allOf(FieldType.class));
-    }
-
-    public void loadFrom(Player who, FieldType... fields) {
-        EnumSet<FieldType> savedTypes = EnumSet.noneOf(FieldType.class);
+    public void apply(Player who, FieldType... fields) {
+        EnumSet<FieldType> loadedTypes = EnumSet.noneOf(FieldType.class);
         for (FieldType type : fields)
             if (type != null)
-                savedTypes.add(type);
-        loadFrom(who, savedTypes);
+                loadedTypes.add(type);
+        apply(who, loadedTypes);
     }
 
-    public void loadFrom(Player who, Collection<FieldType> fields) {
-        for (FieldType type : fields)
-            loadFrom(who, type);
-    }
-
-    public void loadFrom(Player who, FieldType type) {
-        switch (type) {
-            case ABSORBITION -> this.absorbition = who.getAbsorptionAmount();
-            case AIR -> this.remainingAir = who.getRemainingAir();
-            case ALLOWFLIGHT -> this.allowFlight = who.getAllowFlight();
-            case ARMOR -> {
-                this.armor = new ArrayList<>(Arrays.asList(who.getInventory().getArmorContents()));
-                for (int i = 0; i < this.armor.size(); i++) {
-                    ItemStack el = this.armor.get(i);
-                    if (el == null)
-                        continue;
-                    if (el.getType() == Material.AIR)
-                        this.armor.set(i, null);
-                }
-            }
-            case EXTRACONTENTS -> {
-                this.extraContents = new ArrayList<>(Arrays.asList(who.getInventory().getExtraContents()));
-                for (int i = 0; i < this.extraContents.size(); i++) {
-                    ItemStack el = this.extraContents.get(i);
-                    if (el == null)
-                        continue;
-                    if (el.getType() == Material.AIR)
-                        this.extraContents.set(i, null);
-                }
-            }
-            case EFFECTS -> this.effects = new ArrayList<>(who.getActivePotionEffects());
-            case ENDERCHEST -> {
-                this.enderChest = new ArrayList<>(Arrays.asList(who.getEnderChest().getStorageContents()));
-                for (int i = 0; i < this.enderChest.size(); i++) {
-                    ItemStack el = this.enderChest.get(i);
-                    if (el == null)
-                        continue;
-                    if (el.getType() == Material.AIR)
-                        this.enderChest.set(i, null);
-                }
-            }
-            case EXHAUSTION -> this.exhaustion = who.getExhaustion();
-            case EXPERIENCE -> this.experience = who.getExp();
-            case FIRETICKS -> this.fireTicks = who.getFireTicks();
-            case FLYING -> this.flying = who.isFlying();
-            case FLYSPEED -> this.flySpeed = who.getFlySpeed();
-            case FOODLEVEL -> this.foodLevel = who.getFoodLevel();
-            case GAMEMODE -> this.gameMode = who.getGameMode();
-            case GOD -> this.god = who.isInvulnerable();
-            case HEALTH -> this.health = who.getHealth();
-            case INVENTORY -> {
-                this.inventory = new ArrayList<>(Arrays.asList(who.getInventory().getStorageContents()));
-                for (int i = 0; i < this.inventory.size(); i++) {
-                    ItemStack el = this.inventory.get(i);
-                    if (el == null)
-                        continue;
-                    if (el.getType() == Material.AIR)
-                        this.inventory.set(i, null);
-                }
-            }
-            case LEVEL -> this.level = who.getLevel();
-            case LOCATION -> {
-                Location loc = who.getLocation();
-                this.locationWorldName = loc.getWorld().getName();
-                this.locationX = loc.getX();
-                this.locationY = loc.getY();
-                this.locationZ = loc.getZ();
-                this.locationYaw = loc.getYaw();
-                this.locationPitch = loc.getPitch();
-            }
-            case SATURATION -> this.saturation = who.getSaturation();
-            case WALKSPEED -> this.walkSpeed = who.getWalkSpeed();
-            //case INVISIBLE -> this.invisible = who.isInvisible();
-            case HELDITEMSLOT -> this.heldItemSlot = who.getInventory().getHeldItemSlot();
-            case FREEZETICKS -> this.freezeTicks = who.getFreezeTicks();
-            case GLOWING -> this.glowing = who.isGlowing();
-            case COLLIDABLE -> this.collidable = who.isCollidable();
-            case CANPICKUPITEMS -> this.canPickupItems = who.getCanPickupItems();
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        }
+    public void loadFrom(Player who) {
+        loadFrom(who, EnumSet.allOf(FieldType.class));
     }
 
     public Object get(FieldType type) {
@@ -453,25 +451,246 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     }
 
-
-    public Boolean getCollidable() {
-        return this.collidable;
+    public Double getAbsorbition() {
+        return this.absorbition;
     }
 
-    public Boolean getCanPickupItems() {
-        return this.canPickupItems;
+    public void setAbsorbition(Double value) {
+        this.absorbition = value;
     }
 
-    public Boolean getGlowing() {
-        return this.glowing;
+    public Integer getRemainingAir() {
+        return this.remainingAir;
+    }
+
+    public void setRemainingAir(Integer value) {
+        this.remainingAir = value;
+    }
+
+    public Boolean getAllowFlight() {
+        return this.allowFlight;
+    }
+
+    public void setAllowFlight(Boolean value) {
+        this.allowFlight = value;
+    }
+
+    public List<ItemStack> getArmor() {
+        if (this.armor == null)
+            return null;
+        return Collections.unmodifiableList(this.armor);
+    }
+
+    public void setArmor(List<ItemStack> value) {
+        if (value != null && value.size() != 4)
+            throw new IllegalArgumentException();
+        this.armor = value == null ? null : new ArrayList<>(value);
+    }
+
+    public List<ItemStack> getExtraContents() {
+        if (this.extraContents == null)
+            return null;
+        return Collections.unmodifiableList(this.extraContents);
+    }
+
+    public void setExtraContents(List<ItemStack> value) {
+        if (value != null && value.size() != 1)
+            throw new IllegalArgumentException();
+        this.extraContents = value == null ? null : new ArrayList<>(value);
+    }
+
+    public Collection<PotionEffect> getEffects() {
+        if (this.effects == null)
+            return null;
+        return Collections.unmodifiableCollection(this.effects);
+    }
+
+    public void setEffects(Collection<PotionEffect> value) {
+        this.effects = value == null ? null : new ArrayList<>(value);
+    }
+
+    public List<ItemStack> getEnderChest() {
+        if (this.enderChest == null)
+            return null;
+        return Collections.unmodifiableList(this.enderChest);
+    }
+
+    public void setEnderChest(List<ItemStack> value) {
+        if (value != null && value.size() != 3 * 9)
+            throw new IllegalArgumentException();
+        this.enderChest = value == null ? null : new ArrayList<>(value);
+    }
+
+    public Float getExhaustion() {
+        return this.exhaustion;
+    }
+
+    public void setExhaustion(Float value) {
+        this.exhaustion = value;
+    }
+
+    public Float getExperience() {
+        return this.experience;
+    }
+
+    public void setExperience(Float value) {
+        this.experience = value;
+    }
+
+    public Integer getFireTicks() {
+        return this.fireTicks;
+    }
+
+    public void setFireTicks(Integer value) {
+        this.fireTicks = value;
+    }
+
+    public Boolean getFlying() {
+        return this.flying;
+    }
+
+    public void setFlying(Boolean value) {
+        this.flying = value;
+    }
+
+    public Float getFlySpeed() {
+        return this.flySpeed;
+    }
+
+    public void setFlySpeed(Float value) {
+        this.flySpeed = value;
+    }
+
+    public Integer getFoodLevel() {
+        return this.foodLevel;
+    }
+
+    public void setFoodLevel(Integer value) {
+        this.foodLevel = value;
+    }
+
+    public GameMode getGameMode() {
+        return this.gameMode;
+    }
+
+    public void setGameMode(GameMode value) {
+        this.gameMode = value;
+    }
+
+    public Boolean getGod() {
+        return this.god;
+    }
+
+    public void setGod(Boolean value) {
+        this.god = value;
+    }
+
+    public Double getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(Double value) {
+        this.health = value;
+    }
+
+    public List<ItemStack> getInventory() {
+        if (this.inventory == null)
+            return null;
+        return Collections.unmodifiableList(this.inventory);
+    }
+
+    public void setInventory(List<ItemStack> value) {
+        if (value != null && value.size() != 4 * 9)
+            throw new IllegalArgumentException();
+        this.inventory = value == null ? null : new ArrayList<>(value);
+    }
+
+    public Integer getLevel() {
+        return this.level;
+    }
+
+    public void setLevel(Integer value) {
+        this.level = value;
+    }
+
+    public Location getLocation() {
+        if (this.locationWorldName == null)
+            return null;
+        World w = Bukkit.getWorld(this.locationWorldName);
+        if (w == null)
+            return null;
+        return new Location(w, locationX,
+                this.locationY,
+                this.locationZ,
+                this.locationYaw,
+                this.locationPitch);
+    }
+
+    public void setLocation(Location value) {
+        World w = value == null ? null : value.getWorld();
+        boolean isNull = value == null || w == null;
+        this.locationWorldName = isNull ? null : w.getName();
+        this.locationX = isNull ? null : value.getX();
+        this.locationY = isNull ? null : value.getY();
+        this.locationZ = isNull ? null : value.getZ();
+        this.locationYaw = isNull ? null : value.getYaw();
+        this.locationPitch = isNull ? null : value.getPitch();
+    }
+
+    public Float getSaturation() {
+        return this.saturation;
+    }
+
+    public void setSaturation(Float value) {
+        this.saturation = value;
+    }
+
+    public Float getWalkSpeed() {
+        return this.walkSpeed;
+    }
+
+    public void setWalkSpeed(Float value) {
+        this.walkSpeed = value;
+    }
+
+    public Integer getHeldItemSlot() {
+        return heldItemSlot;
+    }
+
+    public void setHeldItemSlot(Integer value) { //check on number validity
+        this.heldItemSlot = value;
     }
 
     public Integer getFreezeTicks() {
         return this.freezeTicks;
     }
 
-    public Integer getHeldItemSlot() {
-        return heldItemSlot;
+    public void setFreezeTicks(Integer value) {
+        this.freezeTicks = value;
+    }
+
+    public Boolean getGlowing() {
+        return this.glowing;
+    }
+
+    public void setGlowing(Boolean value) {
+        this.glowing = value;
+    }
+
+    public Boolean getCollidable() {
+        return this.collidable;
+    }
+
+    public void setCollidable(Boolean value) {
+        this.collidable = value;
+    }
+
+    public Boolean getCanPickupItems() {
+        return this.canPickupItems;
+    }
+
+    public void setCanPickupItems(Boolean value) {
+        this.canPickupItems = value;
     }
 
     @SuppressWarnings("unchecked")
@@ -506,235 +725,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case CANPICKUPITEMS -> setCanPickupItems((Boolean) value);
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
-    }
-
-    public void setCollidable(Boolean value) {
-        this.collidable = value;
-    }
-
-    public void setCanPickupItems(Boolean value) {
-        this.canPickupItems = value;
-    }
-
-    public void setFreezeTicks(Integer value) {
-        this.freezeTicks = value;
-    }
-
-    public void setHeldItemSlot(Integer value) { //check on number validity
-        this.heldItemSlot = value;
-    }
-
-    public void setGlowing(Boolean value) {
-        this.glowing = value;
-    }
-
-    public void setAbsorbition(Double value) {
-        this.absorbition = value;
-    }
-
-    public void setRemainingAir(Integer value) {
-        this.remainingAir = value;
-    }
-
-    public void setAllowFlight(Boolean value) {
-        this.allowFlight = value;
-    }
-
-    public void setArmor(List<ItemStack> value) {
-        if (value != null && value.size() != 4)
-            throw new IllegalArgumentException();
-        this.armor = value == null ? null : new ArrayList<>(value);
-    }
-
-    public void setExtraContents(List<ItemStack> value) {
-        if (value != null && value.size() != 1)
-            throw new IllegalArgumentException();
-        this.extraContents = value == null ? null : new ArrayList<>(value);
-    }
-
-    public void setEffects(Collection<PotionEffect> value) {
-        this.effects = value == null ? null : new ArrayList<>(value);
-    }
-
-    public void setEnderChest(List<ItemStack> value) {
-        if (value != null && value.size() != 3 * 9)
-            throw new IllegalArgumentException();
-        this.enderChest = value == null ? null : new ArrayList<>(value);
-    }
-
-    public void setExhaustion(Float value) {
-        this.exhaustion = value;
-    }
-
-    public void setExperience(Float value) {
-        this.experience = value;
-    }
-
-    public void setFireTicks(Integer value) {
-        this.fireTicks = value;
-    }
-
-    public void setFlying(Boolean value) {
-        this.flying = value;
-    }
-
-    public void setFlySpeed(Float value) {
-        this.flySpeed = value;
-    }
-
-    public void setFoodLevel(Integer value) {
-        this.foodLevel = value;
-    }
-
-    public void setGameMode(GameMode value) {
-        this.gameMode = value;
-    }
-
-    public void setGod(Boolean value) {
-        this.god = value;
-    }
-
-    public void setHealth(Double value) {
-        this.health = value;
-    }
-
-    public void setInventory(List<ItemStack> value) {
-        if (value != null && value.size() != 4 * 9)
-            throw new IllegalArgumentException();
-        this.inventory = value == null ? null : new ArrayList<>(value);
-    }
-
-    public void setLevel(Integer value) {
-        this.level = value;
-    }
-
-    public void setLocation(Location value) {
-        World w = value == null ? null : value.getWorld();
-        boolean isNull = value == null || w == null;
-        this.locationWorldName = isNull ? null : w.getName();
-        this.locationX = isNull ? null : value.getX();
-        this.locationY = isNull ? null : value.getY();
-        this.locationZ = isNull ? null : value.getZ();
-        this.locationYaw = isNull ? null : value.getYaw();
-        this.locationPitch = isNull ? null : value.getPitch();
-    }
-
-    public void setSaturation(Float value) {
-        this.saturation = value;
-    }
-
-    public void setWalkSpeed(Float value) {
-        this.walkSpeed = value;
-    }
-
-
-    public Double getAbsorbition() {
-        return this.absorbition;
-    }
-
-    public Integer getRemainingAir() {
-        return this.remainingAir;
-    }
-
-    public Boolean getAllowFlight() {
-        return this.allowFlight;
-    }
-
-    public List<ItemStack> getArmor() {
-        if (this.armor == null)
-            return null;
-        return Collections.unmodifiableList(this.armor);
-    }
-
-    public List<ItemStack> getExtraContents() {
-        if (this.extraContents == null)
-            return null;
-        return Collections.unmodifiableList(this.extraContents);
-    }
-
-    public Collection<PotionEffect> getEffects() {
-        if (this.effects == null)
-            return null;
-        return Collections.unmodifiableCollection(this.effects);
-    }
-
-    public List<ItemStack> getEnderChest() {
-        if (this.enderChest == null)
-            return null;
-        return Collections.unmodifiableList(this.enderChest);
-    }
-
-    public Float getExhaustion() {
-        return this.exhaustion;
-    }
-
-    public Float getExperience() {
-        return this.experience;
-    }
-
-    public Integer getFireTicks() {
-        return this.fireTicks;
-    }
-
-    public Boolean getFlying() {
-        return this.flying;
-    }
-
-    public Float getFlySpeed() {
-        return this.flySpeed;
-    }
-
-    public Integer getFoodLevel() {
-        return this.foodLevel;
-    }
-
-    public GameMode getGameMode() {
-        return this.gameMode;
-    }
-
-    public Boolean getGod() {
-        return this.god;
-    }
-
-    public Double getHealth() {
-        return this.health;
-    }
-
-    public List<ItemStack> getInventory() {
-        if (this.inventory == null)
-            return null;
-        return Collections.unmodifiableList(this.inventory);
-    }
-
-    public Integer getLevel() {
-        return this.level;
-    }
-
-    public Location getLocation() {
-        if (this.locationWorldName == null)
-            return null;
-        World w = Bukkit.getWorld(this.locationWorldName);
-        if (w == null)
-            return null;
-        return new Location(w, locationX,
-                this.locationY,
-                this.locationZ,
-                this.locationYaw,
-                this.locationPitch);
-    }
-
-    public Float getSaturation() {
-        return this.saturation;
-    }
-
-    public Float getWalkSpeed() {
-        return this.walkSpeed;
-    }
-
-    public enum FieldType {
-        LOCATION, ARMOR, INVENTORY, ENDERCHEST, LEVEL, EXPERIENCE, EFFECTS, FOODLEVEL, EXHAUSTION, HEALTH, ABSORBITION,
-        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, /*INVISIBLE,*/ HELDITEMSLOT,
-        FREEZETICKS, COLLIDABLE, CANPICKUPITEMS, GLOWING
     }
 
     public void fillEmpty() {
@@ -845,6 +835,12 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
             case LOCATION -> null;// TODO fallback?
             default -> throw new IllegalStateException("Unexpected value: " + type);
         };
+    }
+
+    public enum FieldType {
+        LOCATION, ARMOR, INVENTORY, ENDERCHEST, LEVEL, EXPERIENCE, EFFECTS, FOODLEVEL, EXHAUSTION, HEALTH, ABSORBITION,
+        ALLOWFLIGHT, GOD, GAMEMODE, FLYSPEED, FIRETICKS, AIR, WALKSPEED, SATURATION, FLYING, EXTRACONTENTS, /*INVISIBLE,*/ HELDITEMSLOT,
+        FREEZETICKS, COLLIDABLE, CANPICKUPITEMS, GLOWING
     }
 
 }

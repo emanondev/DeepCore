@@ -42,6 +42,22 @@ public abstract class AGuiButton implements GuiButton {
      *                 <b>'gui_button.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+     */
+    @Deprecated
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, String def,
+                                       boolean color, String... holders) {
+        sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver Message receiver
+     * @param path     final configuration path is
+     *                 <b>'gui_button.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      */
@@ -78,6 +94,22 @@ public abstract class AGuiButton implements GuiButton {
      *                 <b>'gui_button.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+     */
+    @Deprecated
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def,
+                                       boolean color, String... holders) {
+        sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver Message receiver
+     * @param path     final configuration path is
+     *                 <b>'gui_button.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      */
@@ -104,38 +136,6 @@ public abstract class AGuiButton implements GuiButton {
                                  boolean color, CommandSender target, String... holders) {
         return getPlugin().getLanguageConfig(receiver).loadMessage("gui_button." + path, def, color,
                 target, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver Message receiver
-     * @param path     final configuration path is
-     *                 <b>'gui_button.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
-     */
-    @Deprecated
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, String def,
-                                       boolean color, String... holders) {
-        sendMessageFeedback(receiver, path, def, color, receiver, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver Message receiver
-     * @param path     final configuration path is
-     *                 <b>'gui_button.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
-     */
-    @Deprecated
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def,
-                                       boolean color, String... holders) {
-        sendMessageFeedback(receiver, path, def, color, receiver, holders);
     }
 
     /**
@@ -311,16 +311,14 @@ public abstract class AGuiButton implements GuiButton {
      * @param defClick   Default click suggestion
      * @param action     Default click action type
      * @param color      Whether translate color codes or not
-     * @param target     Player target for PlaceHolderAPI holders
      * @param holders    Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      * @return message list and set default if absent
      */
     @Deprecated
     protected ComponentBuilder loadComponentMessage(@NotNull CommandSender receiver, @NotNull String path,
                                                     String defMessage, String defHover, String defClick, ClickEvent.Action action,
-                                                    boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadComponentMessage("gui_button." + path,
-                defMessage, defHover, defClick, action, color, target, holders);
+                                                    boolean color, String... holders) {
+        return loadComponentMessage(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     /**
@@ -334,14 +332,16 @@ public abstract class AGuiButton implements GuiButton {
      * @param defClick   Default click suggestion
      * @param action     Default click action type
      * @param color      Whether translate color codes or not
+     * @param target     Player target for PlaceHolderAPI holders
      * @param holders    Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      * @return message list and set default if absent
      */
     @Deprecated
     protected ComponentBuilder loadComponentMessage(@NotNull CommandSender receiver, @NotNull String path,
                                                     String defMessage, String defHover, String defClick, ClickEvent.Action action,
-                                                    boolean color, String... holders) {
-        return loadComponentMessage(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
+                                                    boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadComponentMessage("gui_button." + path,
+                defMessage, defHover, defClick, action, color, target, holders);
     }
 
     /**
@@ -467,6 +467,25 @@ public abstract class AGuiButton implements GuiButton {
      * @param path     final configuration path is
      *                 <b>'gui_button.'+path</b>
      * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+     * @return message list and set default if absent
+     */
+    @Deprecated
+    protected List<String> loadMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
+                                            List<String> def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui_button." + path, def,
+                color, receiver, holders);
+    }
+
+    /**
+     * Get message list and set default if absent
+     *
+     * @param receiver Message receiver
+     * @param path     final configuration path is
+     *                 <b>'gui_button.'+path</b>
+     * @param def      Default message
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
      * @return message list and set default if absent
@@ -493,25 +512,10 @@ public abstract class AGuiButton implements GuiButton {
         return loadMultiMessage(receiver, path, def, true, receiver, holders);
     }
 
-    /**
-     * Get message list and set default if absent
-     *
-     * @param receiver Message receiver
-     * @param path     final configuration path is
-     *                 <b>'gui_button.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
-     * @return message list and set default if absent
-     */
     @Deprecated
-    protected List<String> loadMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
-                                            List<String> def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui_button." + path, def,
-                color, receiver, holders);
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
+        giveMessageFeedback(receiver, path, def, color, receiver, holders);
     }
-
 
     @Deprecated
     protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, CommandSender target, String... holders) {
@@ -525,26 +529,14 @@ public abstract class AGuiButton implements GuiButton {
     }
 
     @Deprecated
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, String... holders) {
+        giveMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    @Deprecated
     protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
         UtilsMessages.sendMessage(receiver, getPlugin().getLanguageConfig(receiver).loadMessage("gui_button." + path,
                 def, color, target, holders));
-    }
-
-    @Deprecated
-    protected String getMessage(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("gui_button." + path,
-                def, color, target, holders);
-    }
-
-
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
-        giveMessageFeedback(receiver, path, def, color, receiver, holders);
-    }
-
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, String... holders) {
-        giveMessageFeedback(receiver, path, def, color, receiver, holders);
     }
 
     @Deprecated
@@ -578,6 +570,12 @@ public abstract class AGuiButton implements GuiButton {
     }
 
     @Deprecated
+    protected String getMessage(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("gui_button." + path,
+                def, color, target, holders);
+    }
+
+    @Deprecated
     protected String getMessage(CommandSender receiver, @NotNull String path, String def, String... holders) {
         return getMessage(receiver, path, def, true, receiver, holders);
     }
@@ -598,13 +596,13 @@ public abstract class AGuiButton implements GuiButton {
     }
 
     @Deprecated
-    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadComponentMessage("gui_button." + path, defMessage, defHover, defClick, action, color, target, holders);
+    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, String... holders) {
+        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     @Deprecated
-    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, String... holders) {
-        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
+    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadComponentMessage("gui_button." + path, defMessage, defHover, defClick, action, color, target, holders);
     }
 
     @Deprecated
@@ -638,6 +636,11 @@ public abstract class AGuiButton implements GuiButton {
     }
 
     @Deprecated
+    protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui_button." + path, def, color, receiver, holders);
+    }
+
+    @Deprecated
     protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, CommandSender target, String... holders) {
         return getMultiMessage(receiver, path, def, true, target, holders);
     }
@@ -645,11 +648,6 @@ public abstract class AGuiButton implements GuiButton {
     @Deprecated
     protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, String... holders) {
         return getMultiMessage(receiver, path, def, true, receiver, holders);
-    }
-
-    @Deprecated
-    protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui_button." + path, def, color, receiver, holders);
     }
 
 }

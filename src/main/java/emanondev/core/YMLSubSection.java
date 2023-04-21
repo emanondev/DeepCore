@@ -21,8 +21,18 @@ public class YMLSubSection extends MemorySection implements YMLSection {
         super(parent, path);
     }
 
+    @Override
+    public String getFileName() {
+        return getRoot().getFileName();
+    }
+
     public YMLConfig getRoot() {
         return (YMLConfig) super.getRoot();
+    }
+
+    @Override
+    public boolean reload() {
+        return getRoot().reload();
     }
 
     @Override
@@ -37,8 +47,19 @@ public class YMLSubSection extends MemorySection implements YMLSection {
     }
 
     @Override
-    public void setNoDirty(@NotNull String path, Object value) {
-        super.set(path, value);
+    public @NotNull Set<String> getKeys(@NotNull String path) {
+        if (path.isEmpty())
+            return getKeys(false);
+        ConfigurationSection section = this.getConfigurationSection(path);
+        if (section == null)
+            return new LinkedHashSet<>();
+        else
+            return section.getKeys(false);
+    }
+
+    @Override
+    public boolean isDirty() {
+        return getRoot().isDirty();
     }
 
     @SuppressWarnings("deprecation")
@@ -74,24 +95,14 @@ public class YMLSubSection extends MemorySection implements YMLSection {
         return section.createSection(key);
     }
 
+    @Override
+    public void saveAsync() {
+        getRoot().saveAsync();
+    }
+
     @NotNull
     public YMLSection createSection(@NotNull String path, @NotNull Map<?, ?> map) {
         return (YMLSection) super.createSection(path, map);
-    }
-
-    @Override
-    public String getFileName() {
-        return getRoot().getFileName();
-    }
-
-    @Override
-    public JavaPlugin getPlugin() {
-        return getRoot().getPlugin();
-    }
-
-    @Override
-    public boolean reload() {
-        return getRoot().reload();
     }
 
     @Override
@@ -100,30 +111,20 @@ public class YMLSubSection extends MemorySection implements YMLSection {
     }
 
     @Override
-    public void saveAsync() {
-        getRoot().saveAsync();
-    }
-
-    @Override
     public @NotNull File getFile() {
         return getRoot().getFile();
     }
 
     @Override
-    public @NotNull Set<String> getKeys(@NotNull String path) {
-        if (path.isEmpty())
-            return getKeys(false);
-        ConfigurationSection section = this.getConfigurationSection(path);
-        if (section == null)
-            return new LinkedHashSet<>();
-        else
-            return section.getKeys(false);
+    public void setNoDirty(@NotNull String path, Object value) {
+        super.set(path, value);
     }
 
     @Override
-    public boolean isDirty() {
-        return getRoot().isDirty();
+    public JavaPlugin getPlugin() {
+        return getRoot().getPlugin();
     }
+
 
     @Override
     public YMLSection getConfigurationSection(@NotNull String path) {

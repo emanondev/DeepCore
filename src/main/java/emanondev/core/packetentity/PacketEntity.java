@@ -13,15 +13,13 @@ public abstract class PacketEntity {
 
     private final int id;
     private final UUID uuid;
-    private Location location;
-    protected boolean lock;
-    private boolean isSilent;
     private final PacketManager manager;
+    protected boolean lock;
     protected WrappedDataWatcher dataWatcher;
-
-    public WrappedDataWatcher getDataWatcher() {
-        return dataWatcher;
-    }
+    protected Collection<Player> active = new HashSet<>();
+    protected Integer cache = null;
+    private Location location;
+    private boolean isSilent;
 
     public PacketEntity(Location location, PacketManager manager) {
         if (location == null || manager == null)
@@ -35,15 +33,8 @@ public abstract class PacketEntity {
         this.manager.trackPacketEntity(this);
     }
 
-    public int cacheCode() {
-        int prime = 17;
-        int result = 1;
-        result = prime * result + id;
-        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-        result = prime * result + ((location == null) ? 0 : location.hashCode());
-        result = prime * result + ((lock) ? 1531 : 4021);
-        result = prime * result + ((isSilent) ? 3301 : 4507);
-        return result;
+    public WrappedDataWatcher getDataWatcher() {
+        return dataWatcher;
     }
 
     public PacketEntity setRotation(float yaw, float pitch) {
@@ -51,6 +42,11 @@ public abstract class PacketEntity {
             return this;
         }
         teleport(location.getWorld(), location.getX(), location.getY(), location.getZ(), yaw, pitch);
+        return this;
+    }
+
+    public PacketEntity teleport(World world, double x, double y, double z, float yaw, float pitch) {
+        this.location = new Location(world, x, y, z, yaw, pitch);
         return this;
     }
 
@@ -68,9 +64,8 @@ public abstract class PacketEntity {
         return this;
     }
 
-    public PacketEntity teleport(World world, double x, double y, double z, float yaw, float pitch) {
-        this.location = new Location(world, x, y, z, yaw, pitch);
-        return this;
+    public Location getLocation() {
+        return location.clone();
     }
 
     public PacketEntity setLocation(Location location) {
@@ -78,17 +73,13 @@ public abstract class PacketEntity {
         return this;
     }
 
-    public Location getLocation() {
-        return location.clone();
+    public boolean isSilent() {
+        return isSilent;
     }
 
     public PacketEntity setSilent(boolean bool) {
         this.isSilent = bool;
         return this;
-    }
-
-    public boolean isSilent() {
-        return isSilent;
     }
 
     public UUID getUniqueId() {
@@ -99,23 +90,18 @@ public abstract class PacketEntity {
         return id;
     }
 
+    public boolean isLocked() {
+        return lock;
+    }
+
     public PacketEntity setLocked(boolean bool) {
         this.lock = bool;
         return this;
     }
 
-    public boolean isLocked() {
-        return lock;
-    }
-
     public PacketManager getManager() {
         return manager;
     }
-
-    protected Collection<Player> active = new HashSet<>();
-    protected Integer cache = null;
-
-    protected abstract void handleRemovePackets(Collection<? extends Player> players);
 
     public PacketEntity remove() {
         return remove(active);
@@ -129,7 +115,7 @@ public abstract class PacketEntity {
         return this;
     }
 
-    protected abstract void handleSpawnPackets(Collection<? extends Player> players);
+    protected abstract void handleRemovePackets(Collection<? extends Player> players);
 
     public PacketEntity spawn(Collection<? extends Player> players) {
         active.addAll(players);
@@ -137,7 +123,7 @@ public abstract class PacketEntity {
         return this;
     }
 
-    protected abstract void handleUpdatePackets(Collection<? extends Player> players);
+    protected abstract void handleSpawnPackets(Collection<? extends Player> players);
 
     public PacketEntity update() {
         return update(active);
@@ -159,5 +145,18 @@ public abstract class PacketEntity {
         cache = this.cacheCode();
         return this;
     }
+
+    public int cacheCode() {
+        int prime = 17;
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+        result = prime * result + ((location == null) ? 0 : location.hashCode());
+        result = prime * result + ((lock) ? 1531 : 4021);
+        result = prime * result + ((isSilent) ? 3301 : 4507);
+        return result;
+    }
+
+    protected abstract void handleUpdatePackets(Collection<? extends Player> players);
 
 }

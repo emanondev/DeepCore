@@ -114,19 +114,6 @@ public interface GuiButton extends FileLogger {
 
     @Nullable ItemStack getItem();
 
-    @NotNull
-    default CorePlugin getPlugin() {
-        return getGui().getPlugin();
-    }
-
-    @NotNull Gui getGui();
-
-    @Nullable
-    default Player getTargetPlayer() {
-        return getGui().getTargetPlayer();
-    }
-
-
     /**
      * Returns language section for the command sender<br>
      * (load language config and go to sub pattern 'command.[command id]')
@@ -140,8 +127,20 @@ public interface GuiButton extends FileLogger {
     }
 
     @NotNull
+    default CorePlugin getPlugin() {
+        return getGui().getPlugin();
+    }
+
+    @NotNull Gui getGui();
+
+    @NotNull
     default YMLSection getLanguageSection() {
         return getPlugin().getLanguageConfig(getTargetPlayer()).loadSection("buttons");
+    }
+
+    @Nullable
+    default Player getTargetPlayer() {
+        return getGui().getTargetPlayer();
     }
 
 }

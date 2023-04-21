@@ -18,8 +18,8 @@ public class TypeGui implements Gui {
     private final Inventory inv;
     private final InventoryType type;
     private final CorePlugin plugin;
-    private boolean updateOnOpen = true;
     private final GuiButton[] buttons;
+    private boolean updateOnOpen = true;
 
     /**
      * Create a chest-type gui
@@ -69,11 +69,6 @@ public class TypeGui implements Gui {
     }
 
     @Override
-    public final Player getTargetPlayer() {
-        return player;
-    }
-
-    @Override
     public Gui getPreviousGui() {
         return previousHolder;
     }
@@ -82,13 +77,11 @@ public class TypeGui implements Gui {
     public void onClose(@NotNull InventoryCloseEvent event) {
     }
 
-    /**
-     * Sets whenever the inventory should be updated when a player open it
-     *
-     * @param value
-     */
-    public void setUpdateOnOpen(boolean value) {
-        this.updateOnOpen = value;
+    @Override
+    public void onClick(@NotNull InventoryClickEvent event) {
+        if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
+            if (buttons[event.getRawSlot()] != null && buttons[event.getRawSlot()].onClick(event))
+                updateInventory();
     }
 
     /**
@@ -98,11 +91,13 @@ public class TypeGui implements Gui {
         return this.updateOnOpen;
     }
 
-    @Override
-    public void onClick(@NotNull InventoryClickEvent event) {
-        if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
-            if (buttons[event.getRawSlot()] != null && buttons[event.getRawSlot()].onClick(event))
-                updateInventory();
+    /**
+     * Sets whenever the inventory should be updated when a player open it
+     *
+     * @param value
+     */
+    public void setUpdateOnOpen(boolean value) {
+        this.updateOnOpen = value;
     }
 
     @Override
@@ -118,6 +113,11 @@ public class TypeGui implements Gui {
     @Override
     public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final Player getTargetPlayer() {
+        return player;
     }
 
     @Override

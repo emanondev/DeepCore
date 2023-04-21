@@ -19,10 +19,10 @@ import java.util.List;
 @Deprecated
 public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
 
-    private T changeAmount;
     private final T maxChangeAmount;
     private final T minChangeAmount;
     private final ItemStack base;
+    private T changeAmount;
 
     /**
      * @param gui              parent gui
@@ -30,15 +30,6 @@ public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
      */
     public NumberEditorButton(Gui gui, T changeAmountBase) {
         this(gui, (ItemStack) null, changeAmountBase);
-    }
-
-    /**
-     * @param gui              parent gui
-     * @param base             Which material should be used for the button
-     * @param changeAmountBase Which should be the starting change value by click
-     */
-    public NumberEditorButton(Gui gui, Material base, T changeAmountBase) {
-        this(gui, base == null ? null : new ItemBuilder(base).setGuiProperty().build(), changeAmountBase);
     }
 
     /**
@@ -105,78 +96,13 @@ public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
         checkBounds();
     }
 
-    @Override
-    public boolean onClick(@NotNull InventoryClickEvent event) {
-        switch (event.getClick()) {
-            case LEFT: {
-                T old = getValue();
-                setValue(addNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case RIGHT: {
-                T old = getValue();
-                setValue(subtractNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case SHIFT_LEFT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(10D));
-                return !old.equals(getChangeAmount());
-            }
-            case SHIFT_RIGHT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(0.1D));
-                return !old.equals(getChangeAmount());
-            }
-            case MIDDLE:
-            default:
-                return false;
-        }
-    }
-
-    public List<String> getDescription() {
-        List<String> desc = new ArrayList<>();
-        List<String> tmp = getBaseDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        tmp = getInstructionsDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        return desc;
-    }
-
-    public List<String> getBaseDescription() {
-        return this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditor.Base",
-                Arrays.asList("&6&lAmount: &e%value%", ""));
-    }
-
-    public List<String> getInstructionsDescription() {
-        return this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditor.Instructions",
-                Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
-                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &e%amount% &9-> &e%amountx10%&b/&e%amount/10%"));
-    }
-
-    public abstract T getValue();
-
-    public abstract void setValue(T value);
-
-    @Override
-    public ItemStack getItem() {
-        return new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
-                UtilsString.formatOptional10Digit(getValue()), "%amount%",
-                UtilsString.formatOptional10Digit(changeAmount), "%amountx10%",
-                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount/10%",
-                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
-    }
-
-    public T getChangeAmount() {
-        return changeAmount;
-    }
-
-    public void setChangeAmount(T changeAmount) {
-        if (changeAmount.doubleValue() < 0)
-            throw new IllegalArgumentException();
-        this.changeAmount = changeAmount;
+    /**
+     * @param gui              parent gui
+     * @param base             Which material should be used for the button
+     * @param changeAmountBase Which should be the starting change value by click
+     */
+    public NumberEditorButton(Gui gui, Material base, T changeAmountBase) {
+        this(gui, base == null ? null : new ItemBuilder(base).setGuiProperty().build(), changeAmountBase);
     }
 
     @SuppressWarnings("unchecked")
@@ -210,23 +136,6 @@ public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
             return (T) (Integer) (a.intValue() - b.intValue());
         if (a instanceof Short && b instanceof Short)
             return (T) (Short) (short) (a.shortValue() - b.shortValue());
-        throw new UnsupportedOperationException();
-    }
-
-    @SuppressWarnings("unchecked")
-    private T multiplyEditor(double b) {
-        if (this.changeAmount instanceof BigDecimal)
-            return bound((T) ((BigDecimal) this.changeAmount).multiply(new BigDecimal(b)));
-        if (this.changeAmount instanceof Double)
-            return bound((T) (Double) (this.changeAmount.doubleValue() * b));
-        if (this.changeAmount instanceof Float)
-            return bound((T) (Float) (this.changeAmount.floatValue() * (float) b));
-        if (this.changeAmount instanceof Long)
-            return bound((T) (Long) Math.max(1L, (long) (this.changeAmount.doubleValue() * b)));
-        if (this.changeAmount instanceof Integer)
-            return bound((T) (Integer) Math.max(1, (int) (this.changeAmount.doubleValue() * b)));
-        if (this.changeAmount instanceof Short)
-            return bound((T) (Short) (short) Math.max(1, this.changeAmount.doubleValue() * b));
         throw new UnsupportedOperationException();
     }
 
@@ -302,6 +211,66 @@ public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean onClick(@NotNull InventoryClickEvent event) {
+        switch (event.getClick()) {
+            case LEFT: {
+                T old = getValue();
+                setValue(addNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case RIGHT: {
+                T old = getValue();
+                setValue(subtractNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case SHIFT_LEFT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(10D));
+                return !old.equals(getChangeAmount());
+            }
+            case SHIFT_RIGHT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(0.1D));
+                return !old.equals(getChangeAmount());
+            }
+            case MIDDLE:
+            default:
+                return false;
+        }
+    }
+
+    public abstract T getValue();
+
+    public abstract void setValue(T value);
+
+    public T getChangeAmount() {
+        return changeAmount;
+    }
+
+    public void setChangeAmount(T changeAmount) {
+        if (changeAmount.doubleValue() < 0)
+            throw new IllegalArgumentException();
+        this.changeAmount = changeAmount;
+    }
+
+    @SuppressWarnings("unchecked")
+    private T multiplyEditor(double b) {
+        if (this.changeAmount instanceof BigDecimal)
+            return bound((T) ((BigDecimal) this.changeAmount).multiply(new BigDecimal(b)));
+        if (this.changeAmount instanceof Double)
+            return bound((T) (Double) (this.changeAmount.doubleValue() * b));
+        if (this.changeAmount instanceof Float)
+            return bound((T) (Float) (this.changeAmount.floatValue() * (float) b));
+        if (this.changeAmount instanceof Long)
+            return bound((T) (Long) Math.max(1L, (long) (this.changeAmount.doubleValue() * b)));
+        if (this.changeAmount instanceof Integer)
+            return bound((T) (Integer) Math.max(1, (int) (this.changeAmount.doubleValue() * b)));
+        if (this.changeAmount instanceof Short)
+            return bound((T) (Short) (short) Math.max(1, this.changeAmount.doubleValue() * b));
+        throw new UnsupportedOperationException();
+    }
+
     private T bound(T num) {
         if (num instanceof BigDecimal) {
             if (((BigDecimal) num).compareTo(((BigDecimal) maxChangeAmount)) > 0)
@@ -351,6 +320,37 @@ public abstract class NumberEditorButton<T extends Number> extends AGuiButton {
             return num;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ItemStack getItem() {
+        return new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
+                UtilsString.formatOptional10Digit(getValue()), "%amount%",
+                UtilsString.formatOptional10Digit(changeAmount), "%amountx10%",
+                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount/10%",
+                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
+    }
+
+    public List<String> getDescription() {
+        List<String> desc = new ArrayList<>();
+        List<String> tmp = getBaseDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        tmp = getInstructionsDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        return desc;
+    }
+
+    public List<String> getBaseDescription() {
+        return this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditor.Base",
+                Arrays.asList("&6&lAmount: &e%value%", ""));
+    }
+
+    public List<String> getInstructionsDescription() {
+        return this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditor.Instructions",
+                Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
+                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &e%amount% &9-> &e%amountx10%&b/&e%amount/10%"));
     }
 
 }

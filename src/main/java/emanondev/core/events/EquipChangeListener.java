@@ -29,20 +29,84 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class EquipChangeListener implements Listener {
-    private final HashMap<Player, EnumMap<EquipmentSlot, ItemStack>> equips = new HashMap<>();
     private static final long timerCheckFrequencyTicks = 40; // at least 20;
     private static final int maxCheckedPlayerPerTick = 6;//not too low to avoid Thread switch overprice
-    private TimerCheckTask timerTask = null;
+    private final HashMap<Player, EnumMap<EquipmentSlot, ItemStack>> equips = new HashMap<>();
     private final HashSet<Player> clickDrop = new HashSet<>();
     private final CoreMain plugin;
+    private TimerCheckTask timerTask = null;
 
     public EquipChangeListener() {
         this.plugin = CoreMain.get();
         this.load();
     }
 
-    private boolean isValidUser(Player e) {
-        return !e.hasMetadata("BOT") && !e.hasMetadata("NPC");
+    private static EquipmentSlot getEquipmentSlotAtPosition(int pos, Player p, InventoryView view) {
+        if (view.getTopInventory().getType() == InventoryType.CRAFTING)
+            return switch (pos) {
+                case 5 -> EquipmentSlot.HEAD;
+                case 6 -> EquipmentSlot.CHEST;
+                case 7 -> EquipmentSlot.LEGS;
+                case 8 -> EquipmentSlot.FEET;
+                case 45 -> EquipmentSlot.OFF_HAND;
+                default -> p.getInventory().getHeldItemSlot() + 36 == pos ? EquipmentSlot.HAND : null;
+            };
+        return pos == p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27 ? EquipmentSlot.HAND
+                : null;
+    }
+
+    private static EquipmentSlot guessDispenserSlotType(ItemStack item) {
+        EquipmentSlot slot = guessRightClickSlotType(item);
+        if (slot == null && item != null) {
+            if (item.getType().name().endsWith("PUMPKIN"))
+                return EquipmentSlot.HEAD;
+            else if (item.getType() == Material.SHIELD)
+                return EquipmentSlot.OFF_HAND;
+        }
+        return slot;
+    }
+
+    private static EquipmentSlot guessRightClickSlotType(ItemStack item) {
+        if (UtilsInventory.isAirOrNull(item))
+            return null;
+        String type = item.getType().name();
+        if (type.endsWith("_HELMET") || type.endsWith("_SKULL") || type.endsWith("_HEAD"))
+            return EquipmentSlot.HEAD;
+        else if (type.endsWith("_CHESTPLATE") || type.equals("ELYTRA"))
+            return EquipmentSlot.CHEST;
+        else if (type.endsWith("_LEGGINGS"))
+            return EquipmentSlot.LEGS;
+        else if (type.endsWith("_BOOTS"))
+            return EquipmentSlot.FEET;
+        else
+            return null;
+    }
+
+    private static int getSlotPosition(EquipmentSlot slot, Player p, InventoryView view) {
+        if (view.getTopInventory().getType() == InventoryType.CRAFTING)
+            return switch (slot) {
+                case HAND -> p.getInventory().getHeldItemSlot() + 36;
+                case HEAD -> 5;
+                case CHEST -> 6;
+                case LEGS -> 7;
+                case FEET -> 8;
+                case OFF_HAND -> 45;
+            };
+        if (slot == EquipmentSlot.HAND)
+            return p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27;
+
+        return -1;
+    }
+
+    private void load() {
+        if (timerTask != null)
+            timerTask.cancel();
+        equips.clear();
+        for (Player p : Bukkit.getOnlinePlayers())
+            loadUser(p);
+        timerTask = new TimerCheckTask();
+        timerTask.runTaskTimer(plugin, timerCheckFrequencyTicks, timerCheckFrequencyTicks);
+
     }
 
     private void loadUser(Player p) {
@@ -57,15 +121,8 @@ public class EquipChangeListener implements Listener {
         equips.put(p, map);
     }
 
-    private void load() {
-        if (timerTask != null)
-            timerTask.cancel();
-        equips.clear();
-        for (Player p : Bukkit.getOnlinePlayers())
-            loadUser(p);
-        timerTask = new TimerCheckTask();
-        timerTask.runTaskTimer(plugin, timerCheckFrequencyTicks, timerCheckFrequencyTicks);
-
+    private boolean isValidUser(Player e) {
+        return !e.hasMetadata("BOT") && !e.hasMetadata("NPC");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -191,6 +248,11 @@ public class EquipChangeListener implements Listener {
             case UNKNOWN:
                 return; // ???
         }
+    }
+
+    private void onEquipChange(Player p, EquipMethod reason, EquipmentSlot type, ItemStack oldItem, ItemStack newItem) {
+        equips.get(p).put(type, UtilsInventory.isAirOrNull(newItem) ? null : new ItemStack(newItem));
+        Bukkit.getPluginManager().callEvent(new EquipmentChangeEvent(p, reason, type, oldItem, newItem));
     }
 
     @EventHandler(priority = EventPriority.MONITOR) // compatibility -> !=priority
@@ -412,69 +474,6 @@ public class EquipChangeListener implements Listener {
             return;
         new SlotCheck(event.getPlayer(), EquipMethod.PLUGIN_WORLD_CHANGE, EquipmentSlot.values()).runTaskLater(plugin,
                 1L);
-    }
-
-
-    private void onEquipChange(Player p, EquipMethod reason, EquipmentSlot type, ItemStack oldItem, ItemStack newItem) {
-        equips.get(p).put(type, UtilsInventory.isAirOrNull(newItem) ? null : new ItemStack(newItem));
-        Bukkit.getPluginManager().callEvent(new EquipmentChangeEvent(p, reason, type, oldItem, newItem));
-    }
-
-    private static EquipmentSlot guessRightClickSlotType(ItemStack item) {
-        if (UtilsInventory.isAirOrNull(item))
-            return null;
-        String type = item.getType().name();
-        if (type.endsWith("_HELMET") || type.endsWith("_SKULL") || type.endsWith("_HEAD"))
-            return EquipmentSlot.HEAD;
-        else if (type.endsWith("_CHESTPLATE") || type.equals("ELYTRA"))
-            return EquipmentSlot.CHEST;
-        else if (type.endsWith("_LEGGINGS"))
-            return EquipmentSlot.LEGS;
-        else if (type.endsWith("_BOOTS"))
-            return EquipmentSlot.FEET;
-        else
-            return null;
-    }
-
-    private static EquipmentSlot guessDispenserSlotType(ItemStack item) {
-        EquipmentSlot slot = guessRightClickSlotType(item);
-        if (slot == null && item != null) {
-            if (item.getType().name().endsWith("PUMPKIN"))
-                return EquipmentSlot.HEAD;
-            else if (item.getType() == Material.SHIELD)
-                return EquipmentSlot.OFF_HAND;
-        }
-        return slot;
-    }
-
-    private static int getSlotPosition(EquipmentSlot slot, Player p, InventoryView view) {
-        if (view.getTopInventory().getType() == InventoryType.CRAFTING)
-            return switch (slot) {
-                case HAND -> p.getInventory().getHeldItemSlot() + 36;
-                case HEAD -> 5;
-                case CHEST -> 6;
-                case LEGS -> 7;
-                case FEET -> 8;
-                case OFF_HAND -> 45;
-            };
-        if (slot == EquipmentSlot.HAND)
-            return p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27;
-
-        return -1;
-    }
-
-    private static EquipmentSlot getEquipmentSlotAtPosition(int pos, Player p, InventoryView view) {
-        if (view.getTopInventory().getType() == InventoryType.CRAFTING)
-            return switch (pos) {
-                case 5 -> EquipmentSlot.HEAD;
-                case 6 -> EquipmentSlot.CHEST;
-                case 7 -> EquipmentSlot.LEGS;
-                case 8 -> EquipmentSlot.FEET;
-                case 45 -> EquipmentSlot.OFF_HAND;
-                default -> p.getInventory().getHeldItemSlot() + 36 == pos ? EquipmentSlot.HAND : null;
-            };
-        return pos == p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27 ? EquipmentSlot.HAND
-                : null;
     }
 
     private class TimerCheckTask extends BukkitRunnable {

@@ -1,13 +1,13 @@
 package emanondev.core.gui;
 
 public interface PagedGui extends Gui {
-    int getPage();
-
-    boolean setPage(int i);
-
     default boolean incPage() {
         return setPage(getPage() + 1);
     }
+
+    boolean setPage(int i);
+
+    int getPage();
 
     default boolean decPage() {
         return setPage(getPage() - 1);

@@ -17,7 +17,6 @@ import java.util.function.Supplier;
 
 public class NumberEditorFButton<T extends Number> extends AGuiButton {
 
-    private T changeAmount;
     private final T maxChangeAmount;
     private final T minChangeAmount;
     private final Supplier<T> getValue;
@@ -25,6 +24,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     private final Supplier<ItemStack> baseItem;
     private final Supplier<List<String>> baseDescription;
     private final Supplier<List<String>> instructionsDescription;
+    private T changeAmount;
 
 
     /**
@@ -120,107 +120,6 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         this.instructionsDescription = instructionsDescription;
     }
 
-    @Override
-    public boolean onClick(@NotNull InventoryClickEvent event) {
-        switch (event.getClick()) {
-            case LEFT: {
-                T old = getValue();
-                setValue(subtractNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case RIGHT: {
-                T old = getValue();
-                setValue(addNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case SHIFT_RIGHT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(10D));
-                return !old.equals(getChangeAmount());
-            }
-            case SHIFT_LEFT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(0.1D));
-                return !old.equals(getChangeAmount());
-            }
-            case MIDDLE:
-            default:
-                return false;
-        }
-    }
-
-    public List<String> getDescription() {
-        List<String> desc = new ArrayList<>();
-        List<String> tmp = getBaseDescription();
-        if (tmp != null)
-            desc.addAll(getBaseDescription());
-        tmp = getInstructionsDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        return desc;
-    }
-
-    public List<String> getBaseDescription() {
-        return baseDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.base") : baseDescription.get();
-    }
-
-    public List<String> getInstructionsDescription() {
-        return instructionsDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.instructions") : instructionsDescription.get();
-    }
-
-    public T getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(T value) {
-        setValue.accept(value);
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
-                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
-    }
-
-    @Override
-    public ItemStack getItem() {
-        ItemStack base = getBaseItem();
-        return base == null ? null
-                : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
-                UtilsString.formatOptional10Digit(getValue()), "%amount%",
-                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
-                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
-                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
-    }
-
-    public T getChangeAmount() {
-        return changeAmount;
-    }
-
-    public void setChangeAmount(T changeAmount) {
-        if (changeAmount.doubleValue() < 0)
-            throw new IllegalArgumentException();
-        this.changeAmount = changeAmount;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Number> T addNumbers(T a, T b) {
-        if (a instanceof BigDecimal && b instanceof BigDecimal)
-            return (T) ((BigDecimal) a).add((BigDecimal) b);
-        if (a instanceof Double && b instanceof Double)
-            return (T) (Double) (a.doubleValue() + b.doubleValue());
-        if (a instanceof Float && b instanceof Float)
-            return (T) (Float) (a.floatValue() + b.floatValue());
-        if (a instanceof Long && b instanceof Long)
-            return (T) (Long) (a.longValue() + b.longValue());
-        if (a instanceof Integer && b instanceof Integer)
-            return (T) (Integer) (a.intValue() + b.intValue());
-        if (a instanceof Short && b instanceof Short)
-            return (T) (Short) (short) (a.shortValue() + b.shortValue());
-        throw new UnsupportedOperationException();
-    }
-
     @SuppressWarnings("unchecked")
     private static <T extends Number> T subtractNumbers(T a, T b) {
         if (a instanceof BigDecimal && b instanceof BigDecimal)
@@ -239,19 +138,19 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     }
 
     @SuppressWarnings("unchecked")
-    private T multiplyEditor(double b) {
-        if (this.changeAmount instanceof BigDecimal)
-            return bound((T) ((BigDecimal) this.changeAmount).multiply(new BigDecimal(b)));
-        if (this.changeAmount instanceof Double)
-            return bound((T) (Double) (this.changeAmount.doubleValue() * b));
-        if (this.changeAmount instanceof Float)
-            return bound((T) (Float) (this.changeAmount.floatValue() * (float) b));
-        if (this.changeAmount instanceof Long)
-            return bound((T) (Long) Math.max(1L, (long) (this.changeAmount.doubleValue() * b)));
-        if (this.changeAmount instanceof Integer)
-            return bound((T) (Integer) Math.max(1, (int) (this.changeAmount.doubleValue() * b)));
-        if (this.changeAmount instanceof Short)
-            return bound((T) (Short) (short) Math.max(1, this.changeAmount.doubleValue() * b));
+    private static <T extends Number> T addNumbers(T a, T b) {
+        if (a instanceof BigDecimal && b instanceof BigDecimal)
+            return (T) ((BigDecimal) a).add((BigDecimal) b);
+        if (a instanceof Double && b instanceof Double)
+            return (T) (Double) (a.doubleValue() + b.doubleValue());
+        if (a instanceof Float && b instanceof Float)
+            return (T) (Float) (a.floatValue() + b.floatValue());
+        if (a instanceof Long && b instanceof Long)
+            return (T) (Long) (a.longValue() + b.longValue());
+        if (a instanceof Integer && b instanceof Integer)
+            return (T) (Integer) (a.intValue() + b.intValue());
+        if (a instanceof Short && b instanceof Short)
+            return (T) (Short) (short) (a.shortValue() + b.shortValue());
         throw new UnsupportedOperationException();
     }
 
@@ -326,6 +225,70 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         }
     }
 
+    @Override
+    public boolean onClick(@NotNull InventoryClickEvent event) {
+        switch (event.getClick()) {
+            case LEFT: {
+                T old = getValue();
+                setValue(subtractNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case RIGHT: {
+                T old = getValue();
+                setValue(addNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case SHIFT_RIGHT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(10D));
+                return !old.equals(getChangeAmount());
+            }
+            case SHIFT_LEFT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(0.1D));
+                return !old.equals(getChangeAmount());
+            }
+            case MIDDLE:
+            default:
+                return false;
+        }
+    }
+
+    public T getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(T value) {
+        setValue.accept(value);
+    }
+
+    public T getChangeAmount() {
+        return changeAmount;
+    }
+
+    public void setChangeAmount(T changeAmount) {
+        if (changeAmount.doubleValue() < 0)
+            throw new IllegalArgumentException();
+        this.changeAmount = changeAmount;
+    }
+
+    @SuppressWarnings("unchecked")
+    private T multiplyEditor(double b) {
+        if (this.changeAmount instanceof BigDecimal)
+            return bound((T) ((BigDecimal) this.changeAmount).multiply(new BigDecimal(b)));
+        if (this.changeAmount instanceof Double)
+            return bound((T) (Double) (this.changeAmount.doubleValue() * b));
+        if (this.changeAmount instanceof Float)
+            return bound((T) (Float) (this.changeAmount.floatValue() * (float) b));
+        if (this.changeAmount instanceof Long)
+            return bound((T) (Long) Math.max(1L, (long) (this.changeAmount.doubleValue() * b)));
+        if (this.changeAmount instanceof Integer)
+            return bound((T) (Integer) Math.max(1, (int) (this.changeAmount.doubleValue() * b)));
+        if (this.changeAmount instanceof Short)
+            return bound((T) (Short) (short) Math.max(1, this.changeAmount.doubleValue() * b));
+        throw new UnsupportedOperationException();
+    }
+
     private T bound(T num) {
         if (num instanceof BigDecimal) {
             if (((BigDecimal) num).compareTo(((BigDecimal) maxChangeAmount)) > 0)
@@ -375,6 +338,43 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
             return num;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ItemStack getItem() {
+        ItemStack base = getBaseItem();
+        return base == null ? null
+                : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
+                UtilsString.formatOptional10Digit(getValue()), "%amount%",
+                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
+                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
+    }
+
+    public ItemStack getBaseItem() {
+        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
+    }
+
+    public List<String> getDescription() {
+        List<String> desc = new ArrayList<>();
+        List<String> tmp = getBaseDescription();
+        if (tmp != null)
+            desc.addAll(getBaseDescription());
+        tmp = getInstructionsDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        return desc;
+    }
+
+    public List<String> getBaseDescription() {
+        return baseDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.base") : baseDescription.get();
+    }
+
+    public List<String> getInstructionsDescription() {
+        return instructionsDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.instructions") : instructionsDescription.get();
     }
 
 }

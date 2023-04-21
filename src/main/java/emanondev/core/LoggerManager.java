@@ -18,19 +18,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LoggerManager {
 
     private final CorePlugin plugin;
+    private final YMLConfig data;
+    private final LinkedBlockingQueue<Request> requests = new LinkedBlockingQueue<>();
+    private final WeakHashMap<String, Logger> loggers = new WeakHashMap<>();
+    private BukkitTask task = null;
 
     public LoggerManager(CorePlugin plugin) {
         this.plugin = plugin;
         this.data = plugin.getConfig("loggerConfig.yml");
         reload();
-    }
-
-    private final YMLConfig data;
-
-    private final LinkedBlockingQueue<Request> requests = new LinkedBlockingQueue<>();
-
-    public String getDefaultDateFormat() {
-        return data.loadString("default.DateFormat", "[dd.MM.yyyy HH:mm:ss] ");
     }
 
     /**
@@ -63,24 +59,26 @@ public class LoggerManager {
         }
     }
 
-    protected void disable() {
-        if (task != null && !task.isCancelled())
-            task.cancel();
-        synchronized (requests) {
-            requests.notifyAll();
-        }
-    }
-
-    private BukkitTask task = null;
-
     private void reloadLoggers() {
         loggers.values().forEach(Logger::reload);
     }
 
-    private final WeakHashMap<String, Logger> loggers = new WeakHashMap<>();
+    @SuppressWarnings("unchecked")
+    private void log(Request req) {
+        if (req == null)
+            return;
+        try {
+            Logger logger = getLogger(req.fileName);
 
-    private void registerLogger(Logger logger, String fileName) {
-        loggers.put(new String(fileName), logger);
+            switch (req.type) {
+                case LOG_ARRAY_OF_TEXT -> logger.log(req.timestamp, (String[]) req.log);
+                case LOG_LIST_OF_TEXT -> logger.log(req.timestamp, (List<String>) req.log);
+                case LOG_TEXT -> logger.log(req.timestamp, (String) req.log);
+                default -> new IllegalArgumentException().printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -103,21 +101,19 @@ public class LoggerManager {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    private void log(Request req) {
-        if (req == null)
-            return;
-        try {
-            Logger logger = getLogger(req.fileName);
+    private void registerLogger(Logger logger, String fileName) {
+        loggers.put(new String(fileName), logger);
+    }
 
-            switch (req.type) {
-                case LOG_ARRAY_OF_TEXT -> logger.log(req.timestamp, (String[]) req.log);
-                case LOG_LIST_OF_TEXT -> logger.log(req.timestamp, (List<String>) req.log);
-                case LOG_TEXT -> logger.log(req.timestamp, (String) req.log);
-                default -> new IllegalArgumentException().printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public String getDefaultDateFormat() {
+        return data.loadString("default.DateFormat", "[dd.MM.yyyy HH:mm:ss] ");
+    }
+
+    protected void disable() {
+        if (task != null && !task.isCancelled())
+            task.cancel();
+        synchronized (requests) {
+            requests.notifyAll();
         }
     }
 
@@ -142,6 +138,10 @@ public class LoggerManager {
         }
     }
 
+    private enum RequestType {
+        LOG_TEXT, LOG_ARRAY_OF_TEXT, LOG_LIST_OF_TEXT
+    }
+
     private static class Request {
         private final String fileName;
         private final Object log;
@@ -156,10 +156,6 @@ public class LoggerManager {
         }
     }
 
-    private enum RequestType {
-        LOG_TEXT, LOG_ARRAY_OF_TEXT, LOG_LIST_OF_TEXT
-    }
-
     /**
      * Utility class to log on files Async <br>
      *
@@ -167,8 +163,8 @@ public class LoggerManager {
      */
     private class Logger {
         private final File file;
-        private DateFormat dateFormat;
         private final String path;
+        private DateFormat dateFormat;
 
         /**
          * @param fileName the name of the file/path associated to the logger <br>
@@ -209,6 +205,18 @@ public class LoggerManager {
         }
 
         /**
+         * @param messages <br>
+         *                 <p>
+         *                 adds this messages to the file
+         */
+        private void log(long timestamp, List<String> messages) {
+            if (messages == null)
+                return;
+            String date = dateFormat.format(new Date(timestamp));
+            log(timestamp, String.join("\n" + date, messages));
+        }
+
+        /**
          * @param message <br>
          *                <p>
          *                adds this message to a new line of the file
@@ -222,18 +230,6 @@ public class LoggerManager {
                 e.printStackTrace();
             }
 
-        }
-
-        /**
-         * @param messages <br>
-         *                 <p>
-         *                 adds this messages to the file
-         */
-        private void log(long timestamp, List<String> messages) {
-            if (messages == null)
-                return;
-            String date = dateFormat.format(new Date(timestamp));
-            log(timestamp, String.join("\n" + date, messages));
         }
 
         /**

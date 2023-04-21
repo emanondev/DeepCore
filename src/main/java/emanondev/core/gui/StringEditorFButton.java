@@ -19,6 +19,7 @@ public class StringEditorFButton extends AGuiButton {
     private final Consumer<String> setValue;
     private final Supplier<ItemStack> baseItem;
     private final boolean addInstructions;
+    private String title = "&9Text editor";
 
     /**
      * @param parent
@@ -62,15 +63,6 @@ public class StringEditorFButton extends AGuiButton {
         return builder.build();
     }
 
-
-    public String getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(String value) {
-        setValue.accept(value);
-    }
-
     public ItemStack getBaseItem() {
         return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
     }
@@ -80,13 +72,19 @@ public class StringEditorFButton extends AGuiButton {
         //, List.of("&7[&fClick&7] &9Any &7> &9Change Text"))
     }
 
-    public void setTitle(String value) {
-        title = value;
-    }
-
     public String getTitle() {
         return title;
     }
 
-    private String title = "&9Text editor";
+    public void setTitle(String value) {
+        title = value;
+    }
+
+    public String getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(String value) {
+        setValue.accept(value);
+    }
 }

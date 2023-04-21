@@ -23,17 +23,13 @@ public class MerchantCraftEvent extends CraftEvent {
         super(clickEvent);
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return HANDLERS_LIST;
-    }
-
     public static @NotNull HandlerList getHandlerList() {
         return HANDLERS_LIST;
     }
 
-    public MerchantInventory getMerchantInventory() {
-        return (MerchantInventory) this.getClickEvent().getView().getTopInventory();
+    @Override
+    public @NotNull HandlerList getHandlers() {
+        return HANDLERS_LIST;
     }
 
     /*
@@ -66,6 +62,10 @@ public class MerchantCraftEvent extends CraftEvent {
         }
         return maxTrades * getResult().getAmount();
 
+    }
+
+    public MerchantInventory getMerchantInventory() {
+        return (MerchantInventory) this.getClickEvent().getView().getTopInventory();
     }
 
 }

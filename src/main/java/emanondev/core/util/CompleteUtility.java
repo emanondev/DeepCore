@@ -235,7 +235,6 @@ public interface CompleteUtility {
         return results;
     }
 
-
     /**
      * @param sender sender
      * @param prefix prefix to match, case-insensitive

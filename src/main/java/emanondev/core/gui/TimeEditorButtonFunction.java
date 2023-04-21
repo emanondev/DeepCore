@@ -25,14 +25,13 @@ public class TimeEditorButtonFunction extends AGuiButton {
 
     private final Consumer<Long> changeRequest;
     private final Supplier<Long> grabValue;
-    private Long changeAmount;
     private final Long maxChangeAmount;
     private final Long minChangeAmount;
     private final ItemStack base;
     private final Function<Long, List<String>> baseDescription = null;
     private final BiFunction<Long, Long, List<String>> fullDescription = null;
-
     private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L, 4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
+    private Long changeAmount;
 
     /**
      * @param gui              parent gui
@@ -42,19 +41,6 @@ public class TimeEditorButtonFunction extends AGuiButton {
      */
     public TimeEditorButtonFunction(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, Long changeAmountBase) {
         this(gui, grabValue, changeRequest, (ItemStack) null, changeAmountBase);
-    }
-
-    /**
-     * @param gui              parent gui
-     * @param grabValue        Supply the current value
-     * @param changeRequest    Apply changes to current value
-     * @param base             Which material should be used for the button
-     * @param changeAmountBase Which should be the starting change value by click
-     */
-    public TimeEditorButtonFunction(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, Material base,
-                                    Long changeAmountBase) {
-        this(gui, grabValue, changeRequest, base == null ? null : new ItemStack(base),
-                changeAmountBase);
     }
 
     /**
@@ -104,6 +90,40 @@ public class TimeEditorButtonFunction extends AGuiButton {
         checkBounds();
     }
 
+    /**
+     * @param gui              parent gui
+     * @param grabValue        Supply the current value
+     * @param changeRequest    Apply changes to current value
+     * @param base             Which material should be used for the button
+     * @param changeAmountBase Which should be the starting change value by click
+     */
+    public TimeEditorButtonFunction(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, Material base,
+                                    Long changeAmountBase) {
+        this(gui, grabValue, changeRequest, base == null ? null : new ItemStack(base),
+                changeAmountBase);
+    }
+
+    private static Long addNumbers(Long a, Long b) {
+        return a + b;
+    }
+
+    private static Long subtractNumbers(Long a, Long b) {
+        return a - b;
+    }
+
+    private void checkBounds() {
+
+        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
+            throw new IllegalArgumentException();
+        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+
+    }
+
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
@@ -131,20 +151,6 @@ public class TimeEditorButtonFunction extends AGuiButton {
             default:
                 return false;
         }
-    }
-
-    /**
-     * holder %amount% for current value
-     *
-     * @param baseDescription
-     * @return
-     */
-    public TimeEditorButtonFunction setBaseDescription(Function<Long, List<String>> baseDescription) {
-        return this;
-    }
-
-    public TimeEditorButtonFunction setFullDescription(BiFunction<Long, Long, List<String>> fullDescription) {
-        return this;
     }
 
     @Override
@@ -177,6 +183,14 @@ public class TimeEditorButtonFunction extends AGuiButton {
                 "%amount/10%", UtilsString.getTimeStringSeconds(getTargetPlayer(), divide())).build();
     }
 
+    public Long getValue() {
+        return grabValue.get();
+    }
+
+    public void changeRequest(Long value) {
+        changeRequest.accept(value);
+    }
+
     public Long getChangeAmount() {
         return changeAmount;
     }
@@ -186,25 +200,6 @@ public class TimeEditorButtonFunction extends AGuiButton {
             throw new IllegalArgumentException();
         this.changeAmount = changeAmount;
     }
-
-    public void changeRequest(Long value) {
-        changeRequest.accept(value);
-    }
-
-    public Long getValue() {
-        return grabValue.get();
-    }
-
-
-    private static Long addNumbers(Long a, Long b) {
-        return a + b;
-    }
-
-
-    private static Long subtractNumbers(Long a, Long b) {
-        return a - b;
-    }
-
 
     private Long multiply() {
         for (int i = 0; i < ranges.length; i++)
@@ -220,19 +215,6 @@ public class TimeEditorButtonFunction extends AGuiButton {
         return bound(ranges[ranges.length - 1]);
     }
 
-    private void checkBounds() {
-
-        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
-            throw new IllegalArgumentException();
-        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-
-    }
-
     private Long bound(Long num) {
 
         if (num > maxChangeAmount)
@@ -241,6 +223,20 @@ public class TimeEditorButtonFunction extends AGuiButton {
             num = minChangeAmount;
         return num;
 
+    }
+
+    /**
+     * holder %amount% for current value
+     *
+     * @param baseDescription
+     * @return
+     */
+    public TimeEditorButtonFunction setBaseDescription(Function<Long, List<String>> baseDescription) {
+        return this;
+    }
+
+    public TimeEditorButtonFunction setFullDescription(BiFunction<Long, Long, List<String>> fullDescription) {
+        return this;
     }
 
 }

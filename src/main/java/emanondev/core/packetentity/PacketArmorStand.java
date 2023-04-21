@@ -15,26 +15,16 @@ import java.util.Collection;
 import java.util.EnumMap;
 
 public class PacketArmorStand extends PacketEntity {
-    private boolean hasArms;
-
-    private boolean hasBasePlate;
-
-    private boolean isMarker;
-
-    private boolean hasGravity;
-
-    private boolean isSmall;
-
-    private boolean isInvulnerable;
-
-    private boolean isVisible;
-
-    private EulerAngle rightArmPose;
-
-    private EulerAngle headPose;
-
     private final EnumMap<EquipmentSlot, ItemStack> equip = new EnumMap<>(EquipmentSlot.class);
-
+    private boolean hasArms;
+    private boolean hasBasePlate;
+    private boolean isMarker;
+    private boolean hasGravity;
+    private boolean isSmall;
+    private boolean isInvulnerable;
+    private boolean isVisible;
+    private EulerAngle rightArmPose;
+    private EulerAngle headPose;
     private BaseComponent customName;
 
     private boolean customNameVisible;
@@ -57,6 +47,30 @@ public class PacketArmorStand extends PacketEntity {
         this.velocity = new Vector(0.0D, 0.0D, 0.0D);
     }
 
+    public PacketArmorStand setAsHologram(String displayName) {
+        return this.setCustomName(displayName).setInvulnerable(true).setSmall(true).setMarker(true).setSilent(true)
+                .setGravity(false).setVisible(false).setCustomNameVisible(true);
+    }
+
+    public PacketArmorStand setGravity(boolean bool) {
+        this.hasGravity = bool;
+        return this;
+    }
+
+    public PacketArmorStand setSilent(boolean value) {
+        return (PacketArmorStand) super.setSilent(value);
+    }
+
+    @Override
+    protected void handleRemovePackets(Collection<? extends Player> players) {
+        getManager().removeArmorStand(players, this);
+    }
+
+    @Override
+    protected void handleSpawnPackets(Collection<? extends Player> players) {
+        getManager().spawnArmorStand(players, this);
+    }
+
     public int cacheCode() {
         int prime = 17;
         int result = super.cacheCode();
@@ -77,13 +91,13 @@ public class PacketArmorStand extends PacketEntity {
         return result;
     }
 
-    public PacketArmorStand setAsHologram(String displayName) {
-        return this.setCustomName(displayName).setInvulnerable(true).setSmall(true).setMarker(true).setSilent(true)
-                .setGravity(false).setVisible(false).setCustomNameVisible(true);
+    @Override
+    protected void handleUpdatePackets(Collection<? extends Player> players) {
+        getManager().updateArmorStand(players, this);
     }
 
-    public PacketArmorStand setSilent(boolean value) {
-        return (PacketArmorStand) super.setSilent(value);
+    public BaseComponent getCustomName() {
+        return this.customName;
     }
 
     public PacketArmorStand setCustomName(String customName) {
@@ -96,17 +110,13 @@ public class PacketArmorStand extends PacketEntity {
         return this;
     }
 
-    public BaseComponent getCustomName() {
-        return this.customName;
+    public boolean isCustomNameVisible() {
+        return this.customNameVisible;
     }
 
     public PacketArmorStand setCustomNameVisible(boolean bool) {
         this.customNameVisible = bool;
         return this;
-    }
-
-    public boolean isCustomNameVisible() {
-        return this.customNameVisible;
     }
 
     public PacketArmorStand setArms(boolean bool) {
@@ -127,17 +137,12 @@ public class PacketArmorStand extends PacketEntity {
         return this.hasBasePlate;
     }
 
-    public PacketArmorStand setMarker(boolean bool) {
-        this.isMarker = bool;
-        return this;
-    }
-
     public boolean isMarker() {
         return this.isMarker;
     }
 
-    public PacketArmorStand setGravity(boolean bool) {
-        this.hasGravity = bool;
+    public PacketArmorStand setMarker(boolean bool) {
+        this.isMarker = bool;
         return this;
     }
 
@@ -145,17 +150,12 @@ public class PacketArmorStand extends PacketEntity {
         return this.hasGravity;
     }
 
-    public PacketArmorStand setSmall(boolean bool) {
-        this.isSmall = bool;
-        return this;
-    }
-
     public boolean isSmall() {
         return this.isSmall;
     }
 
-    public PacketArmorStand setInvulnerable(boolean bool) {
-        this.isInvulnerable = bool;
+    public PacketArmorStand setSmall(boolean bool) {
+        this.isSmall = bool;
         return this;
     }
 
@@ -163,13 +163,22 @@ public class PacketArmorStand extends PacketEntity {
         return this.isInvulnerable;
     }
 
-    public PacketArmorStand setVisible(boolean bool) {
-        this.isVisible = bool;
+    public PacketArmorStand setInvulnerable(boolean bool) {
+        this.isInvulnerable = bool;
         return this;
     }
 
     public boolean isVisible() {
         return this.isVisible;
+    }
+
+    public PacketArmorStand setVisible(boolean bool) {
+        this.isVisible = bool;
+        return this;
+    }
+
+    public EulerAngle getRightArmPose() {
+        return this.rightArmPose;
     }
 
     public PacketArmorStand setRightArmPose(EulerAngle angle) {
@@ -179,8 +188,8 @@ public class PacketArmorStand extends PacketEntity {
         return this;
     }
 
-    public EulerAngle getRightArmPose() {
-        return this.rightArmPose;
+    public EulerAngle getHeadPose() {
+        return this.headPose;
     }
 
     public PacketArmorStand setHeadPose(EulerAngle angle) {
@@ -188,10 +197,6 @@ public class PacketArmorStand extends PacketEntity {
             return this;
         this.headPose = angle;
         return this;
-    }
-
-    public EulerAngle getHeadPose() {
-        return this.headPose;
     }
 
     public PacketArmorStand setItem(EquipmentSlot slot, ItemStack item) {
@@ -206,13 +211,13 @@ public class PacketArmorStand extends PacketEntity {
         return equip.get(slot);
     }
 
+    public Vector getVelocity() {
+        return this.velocity;
+    }
+
     public PacketArmorStand setVelocity(Vector vector) {
         this.velocity = vector.clone();
         return this;
-    }
-
-    public Vector getVelocity() {
-        return this.velocity;
     }
 
     public WrappedDataWatcher getWrappedDataWatcher() {
@@ -225,21 +230,6 @@ public class PacketArmorStand extends PacketEntity {
 
     public double getHeight() {
         return this.isSmall ? 0.5D : 1.975D;
-    }
-
-    @Override
-    protected void handleRemovePackets(Collection<? extends Player> players) {
-        getManager().removeArmorStand(players, this);
-    }
-
-    @Override
-    protected void handleSpawnPackets(Collection<? extends Player> players) {
-        getManager().spawnArmorStand(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(Collection<? extends Player> players) {
-        getManager().updateArmorStand(players, this);
     }
 
     public PacketArmorStand updateOnlyMeta() {

@@ -15,14 +15,6 @@ import java.util.Map;
 @SerializableAs(value = "SoundInfo")
 public class SoundInfo implements ConfigurationSerializable {
 
-    public static SoundInfo getSelfVillagerNo() {
-        return new SoundInfo(Sound.ENTITY_VILLAGER_NO, 1, 1, true);
-    }
-
-    public static SoundInfo getSelfExperiencePickup() {
-        return new SoundInfo(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1, true);
-    }
-
     private Sound sound;
     private float volume;
     private float pitch;
@@ -38,6 +30,13 @@ public class SoundInfo implements ConfigurationSerializable {
                 (double) map.getOrDefault("pitch", 1D), (boolean) map.getOrDefault("selfSound", false));
     }
 
+    public SoundInfo(@Nullable Sound sound, double volume, double pitch, boolean selfSound) {
+        this.sound = sound;
+        this.volume = (float) Math.max(0.001, volume);
+        this.pitch = (float) Math.max(0.001, pitch);
+        this.selfSound = selfSound;
+    }
+
     private static Sound getStringSound(String obj) {
         try {
             if (obj == null || obj.isEmpty())
@@ -48,11 +47,12 @@ public class SoundInfo implements ConfigurationSerializable {
         return null;
     }
 
-    public SoundInfo(@Nullable Sound sound, double volume, double pitch, boolean selfSound) {
-        this.sound = sound;
-        this.volume = (float) Math.max(0.001, volume);
-        this.pitch = (float) Math.max(0.001, pitch);
-        this.selfSound = selfSound;
+    public static SoundInfo getSelfVillagerNo() {
+        return new SoundInfo(Sound.ENTITY_VILLAGER_NO, 1, 1, true);
+    }
+
+    public static SoundInfo getSelfExperiencePickup() {
+        return new SoundInfo(Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1, true);
     }
 
     public void play(@NotNull Player p) {
@@ -78,28 +78,28 @@ public class SoundInfo implements ConfigurationSerializable {
         return sound;
     }
 
-    public double getVolume() {
-        return volume;
-    }
-
-    public double getPitch() {
-        return pitch;
-    }
-
-    public boolean getSelfSound() {
-        return selfSound;
-    }
-
     public void setSound(@Nullable Sound sound) {
         this.sound = sound;
+    }
+
+    public double getVolume() {
+        return volume;
     }
 
     public void setVolume(double volume) {
         this.volume = (float) Math.max(0.001, volume);
     }
 
+    public double getPitch() {
+        return pitch;
+    }
+
     public void setPitch(double pitch) {
         this.pitch = (float) Math.max(0.001, pitch);
+    }
+
+    public boolean getSelfSound() {
+        return selfSound;
     }
 
     public void setSelfSound(boolean selfSound) {

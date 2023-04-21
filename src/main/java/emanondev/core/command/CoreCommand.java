@@ -32,43 +32,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     private final Permission permission;
 
     /**
-     * Returns the ID of the Command.
-     *
-     * @return Command ID.
-     */
-    public final @NotNull String getID() {
-        return id;
-    }
-
-    /**
-     * Returns config file of this Command.
-     *
-     * @return Config file of this Command.
-     */
-    public @NotNull YMLConfig getConfig() {
-        return config;
-    }
-
-    /**
-     * Returns the owner of this PluginIdentifiableCommand.
-     *
-     * @return Plugin that owns this Command.
-     */
-    @Override
-    public @NotNull CorePlugin getPlugin() {
-        return plugin;
-    }
-
-    /**
-     * Returns the permission associated to the command.
-     *
-     * @return the permission associated to the command
-     */
-    public @Nullable Permission getCommandPermission() {
-        return permission;
-    }
-
-    /**
      * Construct a new Command. Note: id is used for both config file of the command
      * and default command name.
      *
@@ -78,21 +41,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      */
     public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission) {
         this(id, plugin, permission, null, null);
-    }
-
-    /**
-     * Construct a new Command. Note: id is used for both config file of the command
-     * and default command name.
-     *
-     * @param id                 Command ID.
-     * @param plugin             Plugin that own this Command.
-     * @param permission         Permission required to use this Command if exists.
-     * @param defaultDescription Default description of the Command, might be updated on Command
-     *                           file.
-     */
-    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
-                       @Nullable String defaultDescription) {
-        this(id, plugin, permission, defaultDescription, null);
     }
 
     /**
@@ -146,6 +94,21 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     }
 
     /**
+     * Construct a new Command. Note: id is used for both config file of the command
+     * and default command name.
+     *
+     * @param id                 Command ID.
+     * @param plugin             Plugin that own this Command.
+     * @param permission         Permission required to use this Command if exists.
+     * @param defaultDescription Default description of the Command, might be updated on Command
+     *                           file.
+     */
+    public CoreCommand(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
+                       @Nullable String defaultDescription) {
+        this(id, plugin, permission, defaultDescription, null);
+    }
+
+    /**
      * Override this only if you wish to change message shown on command fail used
      * as default<br>
      * Note: default is used only if the config file of the command has no value
@@ -156,6 +119,15 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     protected String getDefaultPermissionMessage() {
         return permission == null ? (ChatColor.RED + "You lack of permissions")
                 : (ChatColor.RED + "You lack of permission " + permission.getName());
+    }
+
+    /**
+     * Returns config file of this Command.
+     *
+     * @return Config file of this Command.
+     */
+    public @NotNull YMLConfig getConfig() {
+        return config;
     }
 
     /**
@@ -177,6 +149,28 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     }
 
     /**
+     * Returns the permission associated to the command.
+     *
+     * @return the permission associated to the command
+     */
+    public @Nullable Permission getCommandPermission() {
+        return permission;
+    }
+
+    /**
+     * Notify sender the lack of permission as specified at
+     * 'generic.lack_permission' path of language file
+     *
+     * @param sender target to notify
+     * @param perm   lacking permission
+     */
+    protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
+        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
+                "command.lack_permission", "",
+                "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
+    }
+
+    /**
      * Execute the command.
      *
      * @param sender Source object which is executing this command
@@ -184,6 +178,33 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param args   All arguments passed to the command, split via ' '
      */
     public abstract void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args);
+
+    /**
+     * Returns the owner of this PluginIdentifiableCommand.
+     *
+     * @return Plugin that owns this Command.
+     */
+    @Override
+    public @NotNull CorePlugin getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * Executed on tab completion for this command, returning a list of options the
+     * player can tab through.
+     *
+     * @param sender Source object which is executing this command
+     * @param alias  the alias being used
+     * @param args   All arguments passed to the command, split via ' '
+     * @return a list of tab-completions for the specified arguments. This will
+     * never be null. List may be immutable.
+     * @throws IllegalArgumentException if sender, alias, or args is null
+     */
+    @Override
+    public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
+                                                   @NotNull String[] args) {
+        return tabComplete(sender, alias, args, null);
+    }
 
     /**
      * Executed on tab completion for this command, returning a list of options the
@@ -213,15 +234,12 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender Source object which is executing this command
      * @param alias  the alias being used
      * @param args   All arguments passed to the command, split via ' '
-     * @return a list of tab-completions for the specified arguments. This will
-     * never be null. List may be immutable.
+     * @param loc    sender location
+     * @return a list of tab-completions for the specified arguments. May be null.
      * @throws IllegalArgumentException if sender, alias, or args is null
      */
-    @Override
-    public final @NotNull List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias,
-                                                   @NotNull String[] args) {
-        return tabComplete(sender, alias, args, null);
-    }
+    public abstract @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
+                                                      @NotNull String[] args, @Nullable Location loc);
 
     /**
      * Executed on tab completion for this command, returning a list of options the
@@ -237,20 +255,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                                              @NotNull String[] args) {
         return onComplete(sender, alias, args, null);
     }
-
-    /**
-     * Executed on tab completion for this command, returning a list of options the
-     * player can tab through.
-     *
-     * @param sender Source object which is executing this command
-     * @param alias  the alias being used
-     * @param args   All arguments passed to the command, split via ' '
-     * @param loc    sender location
-     * @return a list of tab-completions for the specified arguments. May be null.
-     * @throws IllegalArgumentException if sender, alias, or args is null
-     */
-    public abstract @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias,
-                                                      @NotNull String[] args, @Nullable Location loc);
 
     /**
      * @param sender     the sender
@@ -283,16 +287,12 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     }
 
     /**
-     * Notify sender the lack of permission as specified at
-     * 'generic.lack_permission' path of language file
+     * Returns the ID of the Command.
      *
-     * @param sender target to notify
-     * @param perm   lacking permission
+     * @return Command ID.
      */
-    protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
-        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
-                "command.lack_permission", "",
-                "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
+    public final @NotNull String getID() {
+        return id;
     }
 
     /**
@@ -306,35 +306,8 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                 "%plugin%", getPlugin().getName()).send();
     }
 
-    /**
-     * Returns language section for the command sender<br>
-     * (load language config and go to sub pattern 'command.[command id]')
-     *
-     * @param who target user
-     * @return language section for the command sender
-     */
-    public @NotNull YMLSection getLanguageSection(@Nullable CommandSender who) {
-        return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
-    }
-
     public @NotNull String getLanguagePath(@NotNull String subPath) {
         return "command." + this.getID() + "." + subPath;
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
     }
 
     /**
@@ -360,11 +333,56 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver,
+                getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
+                        target, holders));
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      */
     protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
                                        boolean color, String... holders) {
         sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
+    }
+
+    /**
+     * Returns language section for the command sender<br>
+     * (load language config and go to sub pattern 'command.[command id]')
+     *
+     * @param who target user
+     * @return language section for the command sender
+     */
+    public @NotNull YMLSection getLanguageSection(@Nullable CommandSender who) {
+        return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
     }
 
     /**
@@ -425,24 +443,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         sendMessageFeedback(receiver, path, def, true, target, holders);
     }
 
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver,
-                getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
-                        target, holders));
-    }
-
     public void reload() {
     }
 
@@ -472,17 +472,17 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         return getCommandLang(sender).loadSection(getPathSubCommandLang(subId));
     }
 
-    @Deprecated
-    protected @NotNull String getPathLang() {
-        return "command." + getID();
-    }
-
     protected @NotNull String getPathErrorLang() {
         return getPathLang("error");
     }
 
     protected @NotNull String getPathLang(@NotNull String subPath) {
         return getPathLang() + "." + subPath;
+    }
+
+    @Deprecated
+    protected @NotNull String getPathLang() {
+        return "command." + getID();
     }
 
     protected @NotNull String getPathSubCommandLang(@NotNull String subId) {

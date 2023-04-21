@@ -19,37 +19,36 @@ public class SimpleMessage {
         this.plugin = plugin;
     }
 
-    public void send(CommandSender target, String... placeholders) {
-        new DMessage(plugin, target).appendLang(pathMessage, placeholders).send();
-    }
-
-    public void send(Collection<? extends CommandSender> targets, String... placeholders) {
-        targets.forEach((target) -> send(target, placeholders));
-    }
-
-    public void sendActionBar(CommandSender target, String... placeholders) {
-        new DMessage(plugin, target).appendLang(pathMessage, placeholders).sendActionBar(target);
-    }
-
-    public void sendActionBar(Collection<? extends CommandSender> targets, String... placeholders) {
-        targets.forEach((target) -> sendActionBar(target, placeholders));
-    }
-
-    public void sendAsSubTitle(Player target, int fadeIn, int stayTime, int fadeOut, String... placeholders) {
-        target.sendTitle(" ", new DMessage(plugin, target).appendLang(pathMessage, placeholders).toLegacy(), fadeIn, stayTime, fadeOut);
-    }
-
-
-    public void sendAsSubTitle(Collection<? extends Player> targets, int fadeIn, int stayTime, int fadeOut, String... placeholders) {
-        targets.forEach((target) -> sendAsSubTitle(target, fadeIn, stayTime, fadeOut, placeholders));
-    }
-
     public static void clearTitle(@NotNull Player player) {
         player.sendTitle(" ", "", 0, 1, 0);
     }
 
     public static void sendEmptyActionBarMessage(@NotNull Player player) {
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+    }
+
+    public void send(Collection<? extends CommandSender> targets, String... placeholders) {
+        targets.forEach((target) -> send(target, placeholders));
+    }
+
+    public void send(CommandSender target, String... placeholders) {
+        new DMessage(plugin, target).appendLang(pathMessage, placeholders).send();
+    }
+
+    public void sendActionBar(Collection<? extends CommandSender> targets, String... placeholders) {
+        targets.forEach((target) -> sendActionBar(target, placeholders));
+    }
+
+    public void sendActionBar(CommandSender target, String... placeholders) {
+        new DMessage(plugin, target).appendLang(pathMessage, placeholders).sendActionBar(target);
+    }
+
+    public void sendAsSubTitle(Collection<? extends Player> targets, int fadeIn, int stayTime, int fadeOut, String... placeholders) {
+        targets.forEach((target) -> sendAsSubTitle(target, fadeIn, stayTime, fadeOut, placeholders));
+    }
+
+    public void sendAsSubTitle(Player target, int fadeIn, int stayTime, int fadeOut, String... placeholders) {
+        target.sendTitle(" ", new DMessage(plugin, target).appendLang(pathMessage, placeholders).toLegacy(), fadeIn, stayTime, fadeOut);
     }
 
 }

@@ -16,18 +16,18 @@ public class PreviousPageButton extends AGuiButton implements PagedButton {
     }
 
     @Override
+    public boolean onClick(@NotNull InventoryClickEvent event) {
+        getGui().decPage();
+        return false; //decPage should already call inventoryUpdate()
+    }
+
+    @Override
     public ItemStack getItem() {
         if (getPage() <= 1)
             return null;
         return item.setAmount(Math.min(getPage() - 1, 101)).setDescription(CoreMain.get().getLanguageConfig(getTargetPlayer())
                         .getStringList("gui_button.previous_page")
                 , true, getTargetPlayer(), "%target_page%", String.valueOf(getPage() - 1)).build();
-    }
-
-    @Override
-    public boolean onClick(@NotNull InventoryClickEvent event) {
-        getGui().decPage();
-        return false; //decPage should already call inventoryUpdate()
     }
 
     @Override

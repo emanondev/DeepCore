@@ -7,13 +7,6 @@ public interface ConsoleLogger {
 
 
     /**
-     * logs on console Message to print with plugin prefix
-     *
-     * @param log Message to print
-     */
-    void log(String log);
-
-    /**
      * logs on console message with plugin name and a green ✓ prefix
      *
      * @param log Message to print
@@ -31,6 +24,13 @@ public interface ConsoleLogger {
     default void logDone(ChatColor color, String log) {
         log(color + "✓ " + ChatColor.WHITE + log);
     }
+
+    /**
+     * logs on console Message to print with plugin prefix
+     *
+     * @param log Message to print
+     */
+    void log(String log);
 
     /**
      * logs on console message with plugin name and a colored ✓ prefix

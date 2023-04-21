@@ -11,6 +11,7 @@ import java.util.UUID;
 public class CooldownAPI {
 
     private final YMLConfig conf;
+    private final HashMap<UUID, HashMap<String, Long>> cooldowns = new HashMap<>();
 
     CooldownAPI(@NotNull CorePlugin plugin) {
         this(plugin, true);
@@ -54,7 +55,12 @@ public class CooldownAPI {
         }
     }
 
-    private final HashMap<UUID, HashMap<String, Long>> cooldowns = new HashMap<>();
+    /**
+     * as milliseconds
+     */
+    public void setCooldown(OfflinePlayer player, String cooldownId, long duration) {
+        setCooldown(player.getUniqueId(), cooldownId, duration);
+    }
 
     /**
      * as milliseconds
@@ -71,10 +77,29 @@ public class CooldownAPI {
     /**
      * as milliseconds
      */
+    public void addCooldown(OfflinePlayer player, String cooldownId, long duration) {
+        addCooldown(player.getUniqueId(), cooldownId, duration);
+    }
+
+    /**
+     * as milliseconds
+     */
     public void addCooldown(UUID uuid, String cooldownId, long duration) {
         if (duration < 0)
             throw new IllegalArgumentException();
         setCooldown(uuid, cooldownId, getCooldownMillis(uuid, cooldownId) + duration);
+    }
+
+    public long getCooldownMillis(UUID uuid, String cooldownId) {
+        return cooldowns.containsKey(uuid) ? (cooldowns.get(uuid).containsKey(cooldownId) ?
+                Math.max(0L, cooldowns.get(uuid).get(cooldownId) - System.currentTimeMillis()) : 0L) : 0L;
+    }
+
+    /**
+     * as milliseconds
+     */
+    public void reduceCooldown(OfflinePlayer player, String cooldownId, long duration) {
+        reduceCooldown(player.getUniqueId(), cooldownId, duration);
     }
 
     /**
@@ -86,16 +111,32 @@ public class CooldownAPI {
         setCooldown(uuid, cooldownId, getCooldownMillis(uuid, cooldownId) - duration);
     }
 
+    public void setCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
+        setCooldownSeconds(player.getUniqueId(), cooldownId, duration);
+    }
+
     public void setCooldownSeconds(UUID uuid, String cooldownId, long duration) {
         setCooldown(uuid, cooldownId, duration * 1000);
+    }
+
+    public void addCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
+        addCooldownSeconds(player.getUniqueId(), cooldownId, duration);
     }
 
     public void addCooldownSeconds(UUID uuid, String cooldownId, long duration) {
         addCooldown(uuid, cooldownId, duration * 1000);
     }
 
+    public void reduceCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
+        reduceCooldownSeconds(player.getUniqueId(), cooldownId, duration);
+    }
+
     public void reduceCooldownSeconds(UUID uuid, String cooldownId, long duration) {
         reduceCooldown(uuid, cooldownId, duration * 1000);
+    }
+
+    public void removeCooldown(OfflinePlayer player, String cooldownId) {
+        removeCooldown(player.getUniqueId(), cooldownId);
     }
 
     public void removeCooldown(UUID uuid, String cooldownId) {
@@ -103,67 +144,13 @@ public class CooldownAPI {
             cooldowns.get(uuid).remove(cooldownId);
     }
 
+    public boolean hasCooldown(OfflinePlayer player, String cooldownId) {
+        return hasCooldown(player.getUniqueId(), cooldownId);
+    }
+
     public boolean hasCooldown(UUID uuid, String cooldownId) {
         return getCooldownMillis(uuid, cooldownId) > 0;
 
-    }
-
-    public long getCooldownMillis(UUID uuid, String cooldownId) {
-        return cooldowns.containsKey(uuid) ? (cooldowns.get(uuid).containsKey(cooldownId) ?
-                Math.max(0L, cooldowns.get(uuid).get(cooldownId) - System.currentTimeMillis()) : 0L) : 0L;
-    }
-
-    public long getCooldownSeconds(UUID uuid, String cooldownId) {
-        return getCooldownMillis(uuid, cooldownId) / 1000;
-    }
-
-    public long getCooldownMinutes(UUID uuid, String cooldownId) {
-        return getCooldownMillis(uuid, cooldownId) / 60000;
-    }
-
-    public long getCooldownHours(UUID uuid, String cooldownId) {
-        return getCooldownMillis(uuid, cooldownId) / 3600000;
-    }
-
-    /**
-     * as milliseconds
-     */
-    public void setCooldown(OfflinePlayer player, String cooldownId, long duration) {
-        setCooldown(player.getUniqueId(), cooldownId, duration);
-    }
-
-    /**
-     * as milliseconds
-     */
-    public void addCooldown(OfflinePlayer player, String cooldownId, long duration) {
-        addCooldown(player.getUniqueId(), cooldownId, duration);
-    }
-
-    /**
-     * as milliseconds
-     */
-    public void reduceCooldown(OfflinePlayer player, String cooldownId, long duration) {
-        reduceCooldown(player.getUniqueId(), cooldownId, duration);
-    }
-
-    public void setCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
-        setCooldownSeconds(player.getUniqueId(), cooldownId, duration);
-    }
-
-    public void addCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
-        addCooldownSeconds(player.getUniqueId(), cooldownId, duration);
-    }
-
-    public void reduceCooldownSeconds(OfflinePlayer player, String cooldownId, long duration) {
-        reduceCooldownSeconds(player.getUniqueId(), cooldownId, duration);
-    }
-
-    public void removeCooldown(OfflinePlayer player, String cooldownId) {
-        removeCooldown(player.getUniqueId(), cooldownId);
-    }
-
-    public boolean hasCooldown(OfflinePlayer player, String cooldownId) {
-        return hasCooldown(player.getUniqueId(), cooldownId);
     }
 
     public long getCooldownMillis(OfflinePlayer player, String cooldownId) {
@@ -174,12 +161,24 @@ public class CooldownAPI {
         return getCooldownSeconds(player.getUniqueId(), cooldownId);
     }
 
+    public long getCooldownSeconds(UUID uuid, String cooldownId) {
+        return getCooldownMillis(uuid, cooldownId) / 1000;
+    }
+
     public long getCooldownMinutes(OfflinePlayer player, String cooldownId) {
         return getCooldownMinutes(player.getUniqueId(), cooldownId);
     }
 
+    public long getCooldownMinutes(UUID uuid, String cooldownId) {
+        return getCooldownMillis(uuid, cooldownId) / 60000;
+    }
+
     public long getCooldownHours(OfflinePlayer player, String cooldownId) {
         return getCooldownHours(player.getUniqueId(), cooldownId);
+    }
+
+    public long getCooldownHours(UUID uuid, String cooldownId) {
+        return getCooldownMillis(uuid, cooldownId) / 3600000;
     }
 
     /**

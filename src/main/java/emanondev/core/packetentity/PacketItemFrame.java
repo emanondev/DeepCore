@@ -25,15 +25,6 @@ public class PacketItemFrame extends PacketEntity {
         this.frameRotation = 0;
     }
 
-    public int cacheCode() {
-        int prime = 17;
-        int result = super.cacheCode();
-        result = prime * result + ((this.item == null) ? 0 : this.item.hashCode());
-        result = prime * result + ((this.facing == null) ? 0 : this.facing.hashCode());
-        result = prime * result + this.frameRotation;
-        return result;
-    }
-
     public EntityType getType() {
         return EntityType.ITEM_FRAME;
     }
@@ -82,13 +73,17 @@ public class PacketItemFrame extends PacketEntity {
         return 0.0F;
     }
 
+    public ItemStack getItem() {
+        return this.item;
+    }
+
     public PacketItemFrame setItem(ItemStack item) {
         this.item = item.clone();
         return this;
     }
 
-    public ItemStack getItem() {
-        return this.item;
+    public BlockFace getFacingDirection() {
+        return this.facing;
     }
 
     public PacketItemFrame setFacingDirection(BlockFace facing) {
@@ -96,8 +91,8 @@ public class PacketItemFrame extends PacketEntity {
         return this;
     }
 
-    public BlockFace getFacingDirection() {
-        return this.facing;
+    public int getFrameRotation() {
+        return this.frameRotation;
     }
 
     public PacketItemFrame setFrameRotation(int rotation) {
@@ -107,10 +102,6 @@ public class PacketItemFrame extends PacketEntity {
             Bukkit.getLogger().severe("Item Frame Rotation must be between 0 and 7");
         }
         return this;
-    }
-
-    public int getFrameRotation() {
-        return this.frameRotation;
     }
 
     public WrappedDataWatcher getWrappedDataWatcher() {
@@ -129,6 +120,15 @@ public class PacketItemFrame extends PacketEntity {
     @Override
     protected void handleSpawnPackets(Collection<? extends Player> players) {
         getManager().spawnItemFrame(players, this);
+    }
+
+    public int cacheCode() {
+        int prime = 17;
+        int result = super.cacheCode();
+        result = prime * result + ((this.item == null) ? 0 : this.item.hashCode());
+        result = prime * result + ((this.facing == null) ? 0 : this.facing.hashCode());
+        result = prime * result + this.frameRotation;
+        return result;
     }
 
     @Override

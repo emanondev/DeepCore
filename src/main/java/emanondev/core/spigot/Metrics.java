@@ -86,15 +86,6 @@ public class Metrics {
                         logResponseStatusText);
     }
 
-    /**
-     * Adds a custom chart.
-     *
-     * @param chart The chart to add.
-     */
-    public void addCustomChart(CustomChart chart) {
-        metricsBase.addCustomChart(chart);
-    }
-
     private void appendPlatformData(JsonObjectBuilder builder) {
         builder.appendField("playerAmount", getPlayerAmount());
         builder.appendField("onlineMode", Bukkit.getOnlineMode() ? 1 : 0);
@@ -124,6 +115,15 @@ public class Metrics {
             // Just use the new method if the reflection failed
             return Bukkit.getOnlinePlayers().size();
         }
+    }
+
+    /**
+     * Adds a custom chart.
+     *
+     * @param chart The chart to add.
+     */
+    public void addCustomChart(CustomChart chart) {
+        metricsBase.addCustomChart(chart);
     }
 
     public static class MetricsBase {
@@ -221,8 +221,43 @@ public class Metrics {
             }
         }
 
-        public void addCustomChart(CustomChart chart) {
-            this.customCharts.add(chart);
+        /**
+         * Gzips the given string.
+         *
+         * @param str The string to gzip.
+         * @return The gzipped string.
+         */
+        private static byte[] compress(final String str) throws IOException {
+            if (str == null) {
+                return null;
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+                gzip.write(str.getBytes(StandardCharsets.UTF_8));
+            }
+            return outputStream.toByteArray();
+        }
+
+        /**
+         * Checks that the class was properly relocated.
+         */
+        private void checkRelocation() {
+            // You can use the property to disable the check in your test environment
+            if (System.getProperty("bstats.relocatecheck") == null
+                    || !System.getProperty("bstats.relocatecheck").equals("false")) {
+                // Maven's Relocate is clever and changes strings, too. So we have to use this little
+                // "trick" ... :D
+                final String defaultPackage =
+                        new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
+                final String examplePackage =
+                        new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
+                // We want to make sure no one just copy & pastes the example and uses the wrong package
+                // names
+                if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
+                        || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
+                    throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
+                }
+            }
         }
 
         private void startSubmitting() {
@@ -315,43 +350,8 @@ public class Metrics {
             }
         }
 
-        /**
-         * Checks that the class was properly relocated.
-         */
-        private void checkRelocation() {
-            // You can use the property to disable the check in your test environment
-            if (System.getProperty("bstats.relocatecheck") == null
-                    || !System.getProperty("bstats.relocatecheck").equals("false")) {
-                // Maven's Relocate is clever and changes strings, too. So we have to use this little
-                // "trick" ... :D
-                final String defaultPackage =
-                        new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
-                final String examplePackage =
-                        new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
-                // We want to make sure no one just copy & pastes the example and uses the wrong package
-                // names
-                if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
-                        || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
-                    throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
-                }
-            }
-        }
-
-        /**
-         * Gzips the given string.
-         *
-         * @param str The string to gzip.
-         * @return The gzipped string.
-         */
-        private static byte[] compress(final String str) throws IOException {
-            if (str == null) {
-                return null;
-            }
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
-                gzip.write(str.getBytes(StandardCharsets.UTF_8));
-            }
-            return outputStream.toByteArray();
+        public void addCustomChart(CustomChart chart) {
+            this.customCharts.add(chart);
         }
     }
 
@@ -652,6 +652,34 @@ public class Metrics {
         }
 
         /**
+         * Escapes the given string like stated in https://www.ietf.org/rfc/rfc4627.txt.
+         *
+         * <p>This method escapes only the necessary characters '"', '\'. and '\u0000' - '\u001F'.
+         * Compact escapes are not used (e.g., '\n' is escaped as "\u000a" and not as "\n").
+         *
+         * @param value The value to escape.
+         * @return The escaped value.
+         */
+        private static String escape(String value) {
+            final StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '"') {
+                    builder.append("\\\"");
+                } else if (c == '\\') {
+                    builder.append("\\\\");
+                } else if (c <= '\u000F') {
+                    builder.append("\\u000").append(Integer.toHexString(c));
+                } else if (c <= '\u001F') {
+                    builder.append("\\u00").append(Integer.toHexString(c));
+                } else {
+                    builder.append(c);
+                }
+            }
+            return builder.toString();
+        }
+
+        /**
          * Appends a null field to the JSON.
          *
          * @param key The key of the field.
@@ -660,6 +688,26 @@ public class Metrics {
         public JsonObjectBuilder appendNull(String key) {
             appendFieldUnescaped(key, "null");
             return this;
+        }
+
+        /**
+         * Appends a field to the object.
+         *
+         * @param key          The key of the field.
+         * @param escapedValue The escaped value of the field.
+         */
+        private void appendFieldUnescaped(String key, String escapedValue) {
+            if (builder == null) {
+                throw new IllegalStateException("JSON has already been built");
+            }
+            if (key == null) {
+                throw new IllegalArgumentException("JSON key must not be null");
+            }
+            if (hasAtLeastOneField) {
+                builder.append(",");
+            }
+            builder.append("\"").append(escape(key)).append("\":").append(escapedValue);
+            hasAtLeastOneField = true;
         }
 
         /**
@@ -758,26 +806,6 @@ public class Metrics {
         }
 
         /**
-         * Appends a field to the object.
-         *
-         * @param key          The key of the field.
-         * @param escapedValue The escaped value of the field.
-         */
-        private void appendFieldUnescaped(String key, String escapedValue) {
-            if (builder == null) {
-                throw new IllegalStateException("JSON has already been built");
-            }
-            if (key == null) {
-                throw new IllegalArgumentException("JSON key must not be null");
-            }
-            if (hasAtLeastOneField) {
-                builder.append(",");
-            }
-            builder.append("\"").append(escape(key)).append("\":").append(escapedValue);
-            hasAtLeastOneField = true;
-        }
-
-        /**
          * Builds the JSON string and invalidates this builder.
          *
          * @return The built JSON string.
@@ -789,34 +817,6 @@ public class Metrics {
             JsonObject object = new JsonObject(builder.append("}").toString());
             builder = null;
             return object;
-        }
-
-        /**
-         * Escapes the given string like stated in https://www.ietf.org/rfc/rfc4627.txt.
-         *
-         * <p>This method escapes only the necessary characters '"', '\'. and '\u0000' - '\u001F'.
-         * Compact escapes are not used (e.g., '\n' is escaped as "\u000a" and not as "\n").
-         *
-         * @param value The value to escape.
-         * @return The escaped value.
-         */
-        private static String escape(String value) {
-            final StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < value.length(); i++) {
-                char c = value.charAt(i);
-                if (c == '"') {
-                    builder.append("\\\"");
-                } else if (c == '\\') {
-                    builder.append("\\\\");
-                } else if (c <= '\u000F') {
-                    builder.append("\\u000").append(Integer.toHexString(c));
-                } else if (c <= '\u001F') {
-                    builder.append("\\u00").append(Integer.toHexString(c));
-                } else {
-                    builder.append(c);
-                }
-            }
-            return builder.toString();
         }
 
         /**

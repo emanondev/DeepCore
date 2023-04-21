@@ -37,13 +37,6 @@ public interface YMLSection extends ConfigurationSection {
     String getFileName();
 
     /**
-     * Return the plugin associated with this Config.
-     *
-     * @return the plugin associated with this Config
-     */
-    JavaPlugin getPlugin();
-
-    /**
      * Reload config object in RAM to that of the file.<br>
      * Lose any unsaved changes.<br>
      *
@@ -52,33 +45,33 @@ public interface YMLSection extends ConfigurationSection {
     boolean reload();
 
     /**
-     * Save the config object in RAM to the file.<br>
-     * Overwrites any changes that the configurator has made to the file unless
-     * {@link #reload()} has been called since.
-     */
-    void save();
-
-    /**
-     * Save the config object in RAM to the file.<br>
-     * Overwrites any changes that the configurator has made to the file unless
-     * {@link #reload()} has been called since. Save asynchronously if possible.
-     */
-    void saveAsync();
-
-    /**
-     * Get the file of the config.
-     *
-     * @return the file associated to the config
-     */
-    @NotNull File getFile();
-
-    /**
      * Gets a set of sub keys at path.
      *
      * @param path Path of the Object
      * @return sub keys at selected path
      */
     @NotNull Set<String> getKeys(@NotNull String path);
+
+    /**
+     * Returns true if the config has been changed since the last change
+     *
+     * @return true if the config has been changed since the last change
+     */
+    boolean isDirty();
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or of another
+     * class, default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable SoundInfo loadSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
+        return load(path, def, SoundInfo.class);
+    }
 
     /**
      * Gets the object from the config or set the default.<br>
@@ -110,17 +103,14 @@ public interface YMLSection extends ConfigurationSection {
         return (T) value;
     }
 
-    /**
-     * Returns true if the config has been changed since the last change
-     *
-     * @return true if the config has been changed since the last change
-     */
-    boolean isDirty();
+    default @Nullable SoundInfo getSoundInfo(@NotNull String path) {
+        return getSoundInfo(path, null);
+    }
 
-    /**
-     * Sets specified Object on selected path
-     */
-    void set(@NotNull String path, @Nullable Object value);
+    @Contract("_, !null -> !null")
+    default @Nullable SoundInfo getSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
+        return get(path, def, SoundInfo.class);
+    }
 
     /**
      * Gets the object from the config or default.<br>
@@ -144,38 +134,6 @@ public interface YMLSection extends ConfigurationSection {
             return def;
         }
         return (T) value;
-    }
-
-    /**
-     * internal use only
-     *
-     * @param path Path of the Object
-     * @return Object at specified path
-     */
-    @Deprecated
-    Object get(@NotNull String path);
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or of another
-     * class, default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    @Contract("_, !null -> !null")
-    default @Nullable SoundInfo loadSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
-        return load(path, def, SoundInfo.class);
-    }
-
-    @Contract("_, !null -> !null")
-    default @Nullable SoundInfo getSoundInfo(@NotNull String path, @Nullable SoundInfo def) {
-        return get(path, def, SoundInfo.class);
-    }
-
-    default @Nullable SoundInfo getSoundInfo(@NotNull String path) {
-        return getSoundInfo(path, null);
     }
 
     /**
@@ -273,10 +231,53 @@ public interface YMLSection extends ConfigurationSection {
         return loadMessage(path, def, true, target, holders);
     }
 
+    @Contract("_, !null, _, _, _ -> !null")
+    default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
+                                         @Nullable CommandSender target, String... holders) {
+        holdersCheck(path, holders);
+
+        return UtilsString.fix(load(path, def, String.class), target instanceof Player ? ((Player) target) : null,
+                color, holders);
+    }
+
+    private void holdersCheck(String path, String... holders) {
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
+        }
+    }
+
+    /**
+     * Save the config object in RAM to the file.<br>
+     * Overwrites any changes that the configurator has made to the file unless
+     * {@link #reload()} has been called since. Save asynchronously if possible.
+     */
+    void saveAsync();
+
     @Contract("_, !null, _, _ -> !null")
     default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def,
                                          @Nullable CommandSender target, String... holders) {
         return loadMessage(path, def, true, target, holders);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Contract("_, !null, _, _, _ -> !null")
+    default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
+                                         @Nullable CommandSender target, String... holders) {
+        holdersCheck(path, holders);
+
+        try {
+            return UtilsString.fix(String.join("\n", load(path, def, List.class)),
+                    target instanceof Player ? ((Player) target) : null, color, holders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def == null ? null
+                    : UtilsString.fix(String.join("\n", def), target instanceof Player ? ((Player) target) : null,
+                    color, holders);
+        }
     }
 
     @Deprecated
@@ -352,48 +353,10 @@ public interface YMLSection extends ConfigurationSection {
         return loadComponentMessage(path, defMessage, defHover, defClick, action, color, null, holders);
     }
 
-    @Contract("_, !null, _, _, _ -> !null")
-    default @Nullable String loadMessage(@NotNull String path, @Nullable String def, boolean color,
-                                         @Nullable CommandSender target, String... holders) {
-        holdersCheck(path, holders);
-
-        return UtilsString.fix(load(path, def, String.class), target instanceof Player ? ((Player) target) : null,
-                color, holders);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Contract("_, !null, _, _, _ -> !null")
-    default @Nullable String loadMessage(@NotNull String path, @Nullable List<String> def, boolean color,
-                                         @Nullable CommandSender target, String... holders) {
-        holdersCheck(path, holders);
-
-        try {
-            return UtilsString.fix(String.join("\n", load(path, def, List.class)),
-                    target instanceof Player ? ((Player) target) : null, color, holders);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return def == null ? null
-                    : UtilsString.fix(String.join("\n", def), target instanceof Player ? ((Player) target) : null,
-                    color, holders);
-        }
-    }
-
     @Contract("_, !null, _, _ -> !null")
     default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
                                                     boolean color, String... holders) {
         return loadMultiMessage(path, def, color, null, holders);
-    }
-
-    @Contract("_, !null, _, _ -> !null")
-    default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
-                                                    @Nullable CommandSender target, String... holders) {
-        return loadMultiMessage(path, def, true, target, holders);
-    }
-
-    @Contract("_, !null, _ -> !null")
-    default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
-                                                    String... holders) {
-        return loadMultiMessage(path, def, true, null, holders);
     }
 
     @SuppressWarnings("unchecked")
@@ -410,6 +373,18 @@ public interface YMLSection extends ConfigurationSection {
             return def == null ? null
                     : UtilsString.fix(def, target instanceof Player ? ((Player) target) : null, color, holders);
         }
+    }
+
+    @Contract("_, !null, _, _ -> !null")
+    default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
+                                                    @Nullable CommandSender target, String... holders) {
+        return loadMultiMessage(path, def, true, target, holders);
+    }
+
+    @Contract("_, !null, _ -> !null")
+    default @Nullable List<String> loadMultiMessage(@NotNull String path, @Nullable List<String> def,
+                                                    String... holders) {
+        return loadMultiMessage(path, def, true, null, holders);
     }
 
     @Contract("_, _, _, _ -> !null")
@@ -535,7 +510,6 @@ public interface YMLSection extends ConfigurationSection {
         return comp;
     }
 
-
     @Contract("_, !null, _, _, _, _, _, _ -> !null")
     default @Nullable ComponentBuilder loadComponentMessage(@NotNull String path, @Nullable List<String> defMessage,
                                                             @Nullable List<String> defHover, @Nullable String defClick, @Nullable ClickEvent.Action action,
@@ -585,14 +559,9 @@ public interface YMLSection extends ConfigurationSection {
      * @param def  Default Object
      * @return object or default
      */
-    @Contract("_, !null -> !null")
-    default @Nullable String loadString(@NotNull String path, @Nullable String def) {
-        return load(path, def, String.class);
-    }
-
-    @Contract("_, !null -> !null")
-    default @Nullable String getString(@NotNull String path, @Nullable String def) {
-        return get(path, def, String.class);
+    default @NotNull Set<String> loadStringSet(@NotNull String path, @Nullable Collection<String> def) {
+        return new LinkedHashSet<>(loadStringList(path,
+                def == null ? new ArrayList<>() : (def instanceof List ? (List<String>) def : new ArrayList<>(def))));
     }
 
     /**
@@ -616,17 +585,8 @@ public interface YMLSection extends ConfigurationSection {
         }
     }
 
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or of another
-     * class, default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    default @NotNull Set<String> loadStringSet(@NotNull String path, @Nullable Collection<String> def) {
-        return new LinkedHashSet<>(loadStringList(path,
+    default @NotNull Set<String> getStringSet(@NotNull String path, @Nullable Collection<String> def) {
+        return new HashSet<>(getStringList(path,
                 def == null ? new ArrayList<>() : (def instanceof List ? (List<String>) def : new ArrayList<>(def))));
     }
 
@@ -642,9 +602,66 @@ public interface YMLSection extends ConfigurationSection {
         }
     }
 
-    default @NotNull Set<String> getStringSet(@NotNull String path, @Nullable Collection<String> def) {
-        return new HashSet<>(getStringList(path,
-                def == null ? new ArrayList<>() : (def instanceof List ? (List<String>) def : new ArrayList<>(def))));
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or of another
+     * class, default value is set and returned
+     *
+     * @param <T>  Map values type
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @SuppressWarnings("unchecked")
+    @Contract("_, !null -> !null")
+    default @Nullable <T> Map<String, T> loadMap(@NotNull String path, @Nullable Map<String, T> def) {
+        try {
+            if (!this.contains(path)) {
+                set(path, def);
+                save();
+                return def;
+            }
+
+            Map<String, Object> subMap = ((ConfigurationSection) this.get(path)).getValues(true);
+            try {
+                return (Map<String, T>) subMap;
+            } catch (Exception ignored) {
+            }
+
+            Map<String, T> result = new LinkedHashMap<>();
+            for (String key : subMap.keySet()) {
+                try {
+                    result.put(key, (T) subMap.get(key));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def;
+        }
+    }
+
+    /**
+     * Save the config object in RAM to the file.<br>
+     * Overwrites any changes that the configurator has made to the file unless
+     * {@link #reload()} has been called since.
+     */
+    void save();
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String,
+     * default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable Sound loadSound(@NotNull String path, @Nullable Sound def) {
+        return loadEnum(path, def, Sound.class);
     }
 
     /**
@@ -678,6 +695,32 @@ public interface YMLSection extends ConfigurationSection {
         return def;
     }
 
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or of another
+     * class, default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable String loadString(@NotNull String path, @Nullable String def) {
+        return load(path, def, String.class);
+    }
+
+    /**
+     * Get the file of the config.
+     *
+     * @return the file associated to the config
+     */
+    @NotNull File getFile();
+
+    @Contract("_, !null -> !null")
+    default @Nullable Sound getSound(@NotNull String path, @Nullable Sound def) {
+        return getEnum(path, def, Sound.class);
+    }
+
     @Contract("_, !null, _ -> !null")
     default @Nullable <T extends Enum<T>> T getEnum(@NotNull String path, @Nullable T def,
                                                     @NotNull Class<T> clazz) {
@@ -697,6 +740,47 @@ public interface YMLSection extends ConfigurationSection {
             }
         }
         return def;
+    }
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String,
+     * default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable Material loadMaterial(@NotNull String path, @Nullable Material def) {
+        return loadEnum(path, def, Material.class);
+    }
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String,
+     * default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    @Contract("_, !null -> !null")
+    default @Nullable Material getMaterial(@NotNull String path, @Nullable Material def) {
+        return getEnum(path, def, Material.class);
+    }
+
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String
+     * List, default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    default @NotNull List<Material> loadMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
+        return loadEnumList(path, def, Material.class);
     }
 
     /**
@@ -747,6 +831,9 @@ public interface YMLSection extends ConfigurationSection {
         return destination;
     }
 
+    default @NotNull List<Material> getMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
+        return getEnumList(path, def, Material.class);
+    }
 
     /**
      * assumes that enum constants are all uppercase null enum values contained in
@@ -796,6 +883,20 @@ public interface YMLSection extends ConfigurationSection {
         return destination;
     }
 
+    /**
+     * Gets the object from the config or set default.<br>
+     * Get the object from path, if object at selected path is null or not a String
+     * List, default value is set and returned
+     *
+     * @param path Path of the Object
+     * @param def  Default Object
+     * @return object or default
+     */
+    default @NotNull EnumSet<Material> loadMaterialSet(@NotNull String path,
+                                                       @Nullable Collection<Material> def) {
+        return loadEnumSet(path, def, Material.class);
+    }
+
     default @NotNull <T extends Enum<T>> EnumSet<T> loadEnumSet(@NotNull String path,
                                                                 @Nullable Collection<T> def, @NotNull Class<T> clazz) {
         EnumSet<T> destination = EnumSet.noneOf(clazz);
@@ -832,127 +933,6 @@ public interface YMLSection extends ConfigurationSection {
                 destination.add(val);
         }
         return destination;
-    }
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or of another
-     * class, default value is set and returned
-     *
-     * @param <T>  Map values type
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    @SuppressWarnings("unchecked")
-    @Contract("_, !null -> !null")
-    default @Nullable <T> Map<String, T> loadMap(@NotNull String path, @Nullable Map<String, T> def) {
-        try {
-            if (!this.contains(path)) {
-                set(path, def);
-                save();
-                return def;
-            }
-
-            Map<String, Object> subMap = ((ConfigurationSection) this.get(path)).getValues(true);
-            try {
-                return (Map<String, T>) subMap;
-            } catch (Exception ignored) {
-            }
-
-            Map<String, T> result = new LinkedHashMap<>();
-            for (String key : subMap.keySet()) {
-                try {
-                    result.put(key, (T) subMap.get(key));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return def;
-        }
-    }
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or not a String,
-     * default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    @Contract("_, !null -> !null")
-    default @Nullable Sound loadSound(@NotNull String path, @Nullable Sound def) {
-        return loadEnum(path, def, Sound.class);
-    }
-
-    @Contract("_, !null -> !null")
-    default @Nullable Sound getSound(@NotNull String path, @Nullable Sound def) {
-        return getEnum(path, def, Sound.class);
-    }
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or not a String,
-     * default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    @Contract("_, !null -> !null")
-    default @Nullable Material loadMaterial(@NotNull String path, @Nullable Material def) {
-        return loadEnum(path, def, Material.class);
-    }
-
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or not a String,
-     * default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    @Contract("_, !null -> !null")
-    default @Nullable Material getMaterial(@NotNull String path, @Nullable Material def) {
-        return getEnum(path, def, Material.class);
-    }
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or not a String
-     * List, default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    default @NotNull List<Material> loadMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
-        return loadEnumList(path, def, Material.class);
-    }
-
-
-    default @NotNull List<Material> getMaterialList(@NotNull String path, @Nullable Collection<Material> def) {
-        return getEnumList(path, def, Material.class);
-    }
-
-    /**
-     * Gets the object from the config or set default.<br>
-     * Get the object from path, if object at selected path is null or not a String
-     * List, default value is set and returned
-     *
-     * @param path Path of the Object
-     * @param def  Default Object
-     * @return object or default
-     */
-    default @NotNull EnumSet<Material> loadMaterialSet(@NotNull String path,
-                                                       @Nullable Collection<Material> def) {
-        return loadEnumSet(path, def, Material.class);
     }
 
     /**
@@ -1048,6 +1028,33 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
+     * Gets the parent YMLSection that directly contains this
+     * YMLSection.
+     * <p>
+     * For any Configuration themselves, this will return null.
+     * <p>
+     * If the section is no longer contained within its parent for any reason, such
+     * as being replaced with a different value, this may return null.
+     *
+     * @return Parent section containing this section.
+     */
+    @Nullable YMLSection getParent();
+
+    /**
+     * internal use only
+     *
+     * @param path Path of the Object
+     * @return Object at specified path
+     */
+    @Deprecated
+    Object get(@NotNull String path);
+
+    /**
+     * Sets specified Object on selected path
+     */
+    void set(@NotNull String path, @Nullable Object value);
+
+    /**
      * Creates a ConfigurationSection at the specified path, with specified values.
      * <p>
      * Any value that was previously set at this path will be overwritten. If the
@@ -1076,6 +1083,11 @@ public interface YMLSection extends ConfigurationSection {
     @NotNull
     YMLSection createSection(@NotNull String path, @NotNull Map<?, ?> map);
 
+    @Contract("_, !null -> !null")
+    default @Nullable String getString(@NotNull String path, @Nullable String def) {
+        return get(path, def, String.class);
+    }
+
     /**
      * Gets the requested ConfigurationSection by path.
      * <p>
@@ -1089,19 +1101,6 @@ public interface YMLSection extends ConfigurationSection {
      */
     @Deprecated
     YMLSection getConfigurationSection(@NotNull String path);
-
-    /**
-     * Gets the parent YMLSection that directly contains this
-     * YMLSection.
-     * <p>
-     * For any Configuration themselves, this will return null.
-     * <p>
-     * If the section is no longer contained within its parent for any reason, such
-     * as being replaced with a different value, this may return null.
-     *
-     * @return Parent section containing this section.
-     */
-    @Nullable YMLSection getParent();
 
     /**
      * Gets the equivalent YMLSection from the default Configuration
@@ -1291,6 +1290,20 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
+     * This method works like {@link #getInt(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default int getTrackInt(@NotNull String path) {
+        return getTrack(path, 0, Integer.class);
+    }
+
+    /**
+     * Returns target object or default.<br>
      * This method works like {@link #get(String, Object, Class)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
@@ -1315,18 +1328,11 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
-     * Returns target object or default.<br>
-     * This method works like {@link #getInt(String)} but also keep tracks of null objects:
-     * notify console and leave track on a file if object is null.
-     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
-     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     * Return the plugin associated with this Config.
      *
-     * @param path path to object
-     * @return target object or default, also if object is null tracks it on file and console
+     * @return the plugin associated with this Config
      */
-    default int getTrackInt(@NotNull String path) {
-        return getTrack(path, 0, Integer.class);
-    }
+    JavaPlugin getPlugin();
 
     /**
      * Returns target object or default.<br>
@@ -1358,20 +1364,6 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getString(String)} but also keep tracks of null objects:
-     * notify console and leave track on a file if object is null.
-     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
-     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
-     *
-     * @param path path to object
-     * @return target object or default, also if object is null tracks it on file and console
-     */
-    default @NotNull String getTrackString(@NotNull String path) {
-        return getTrack(path, "", String.class);
-    }
-
-    /**
-     * Returns target object or default.<br>
      * This method works like {@link #getSoundInfo(String)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
@@ -1387,6 +1379,20 @@ public interface YMLSection extends ConfigurationSection {
     default @NotNull String getTrackMessage(@NotNull String path, @Nullable CommandSender sender, String... holders) {
         holdersCheck(path, holders);
         return UtilsString.fix(getTrackString(path), sender instanceof Player ? (Player) sender : null, true, holders);
+    }
+
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getString(String)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull String getTrackString(@NotNull String path) {
+        return getTrack(path, "", String.class);
     }
 
     default @NotNull List<String> getTrackMultiMessage(@NotNull String path, @Nullable CommandSender sender, String... holders) {
@@ -1424,20 +1430,6 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getEntityType(String, EntityType)} but also keep tracks of null objects:
-     * notify console and leave track on a file if object is null.
-     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
-     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
-     *
-     * @param path path to object
-     * @return target object or default, also if object is null tracks it on file and console
-     */
-    default @NotNull EntityType getTrackEntityType(@NotNull String path) {
-        return getTrackEnum(path, EntityType.SHEEP, EntityType.class);
-    }
-
-    /**
-     * Returns target object or default.<br>
      * This method works like {@link #getEnum(String, T, Class<T>)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
@@ -1464,18 +1456,22 @@ public interface YMLSection extends ConfigurationSection {
         return def;
     }
 
+    /**
+     * Returns target object or default.<br>
+     * This method works like {@link #getEntityType(String, EntityType)} but also keep tracks of null objects:
+     * notify console and leave track on a file if object is null.
+     * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
+     * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
+     *
+     * @param path path to object
+     * @return target object or default, also if object is null tracks it on file and console
+     */
+    default @NotNull EntityType getTrackEntityType(@NotNull String path) {
+        return getTrackEnum(path, EntityType.SHEEP, EntityType.class);
+    }
+
     default String getMessage(@NotNull String path, @Nullable CommandSender target, String... holders) {
         return getMessage(path, null, true, target, holders);
-    }
-
-    default String getMessage(
-            @NotNull String path, @Nullable String def,
-            @Nullable CommandSender target, String... holders) {
-        return getMessage(path, def, true, target, holders);
-    }
-
-    default String getMessage(@NotNull String path, boolean color, @Nullable CommandSender target, String... holders) {
-        return getMessage(path, null, color, target, holders);
     }
 
     default String getMessage(
@@ -1493,14 +1489,13 @@ public interface YMLSection extends ConfigurationSection {
         }
     }
 
+    default String getMessage(
+            @NotNull String path, @Nullable String def,
+            @Nullable CommandSender target, String... holders) {
+        return getMessage(path, def, true, target, holders);
+    }
 
-    private void holdersCheck(String path, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
+    default String getMessage(@NotNull String path, boolean color, @Nullable CommandSender target, String... holders) {
+        return getMessage(path, null, color, target, holders);
     }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 
 public abstract class TextEditorGui extends AnvilGui {
 
+    private final BackButton back = new BackButton(this);
     private String original;
     private String storedText = "";
     private String lastText;
@@ -34,6 +35,55 @@ public abstract class TextEditorGui extends AnvilGui {
         super(title, p, previousHolder, plugin, isTimerUpdated);
         original = baseLine;
 
+    }
+
+    public ItemStack getItemZero() {
+        String line = getLine();
+        List<String> desc = new ArrayList<>();
+        desc.add(lastText);
+        desc.addAll(format("Original", original));
+        desc.addAll(format("Changes", line));
+
+        desc.addAll(UtilsString.fix(Arrays.asList("", "&7[&fClick&7] &9Left &7> &eUpdate",
+                "&7[&fClick&7] &9Middle &7> &aUpdate and Confirm changes", "&7[&fClick&7] &9Right &7> &cEmpty line",
+                "&7[&fClick&7] &9Shift Left/Right &7> &cRevert to original"), null, true));
+        return new ItemBuilder(Material.PAPER).setDescription(desc, false).build();
+    }
+
+    public String getLine() {
+        String line = storedText + lastText;
+        if (line.startsWith(">"))
+            line = line.substring(1);
+        return line;
+    }
+
+    public void setLine(String line) {
+        if (line.length() > 29) {
+            storedText = ">" + line.substring(0, line.length() - 29);
+            lastText = line.substring(line.length() - 29);
+        } else {
+            lastText = ">" + line;
+        }
+        updateInventory();
+    }
+
+    private List<String> format(String info, String text) {
+        List<String> list = new ArrayList<>();
+        list.add(UtilsString.fix("&b[&9" + info + "&b]", null, true));
+        if (text.isEmpty()) {
+            list.add("");
+            return list;
+        }
+        list.addAll(UtilsString.textLineSplitter(text));
+        String line = text;
+
+        text = UtilsString.fix(line, null, true);
+        if (line.equals(text))
+            return list;
+
+        list.add(UtilsString.fix("&b[&9" + info + " with Color&b]", null, true));
+        list.addAll(UtilsString.textLineSplitter(text));
+        return list;
     }
 
     @Override
@@ -103,9 +153,11 @@ public abstract class TextEditorGui extends AnvilGui {
         }
     }
 
-    public abstract void onTextConfirmed(String line);
-
-    private final BackButton back = new BackButton(this);
+    @Override
+    public void updateInventory() {
+        this.getInventory().setItem(0, getItemZero());
+        this.getInventory().setItem(1, back.getItem());
+    }
 
     @Override
     public @Nullable GuiButton getButton(int slot) {
@@ -122,28 +174,7 @@ public abstract class TextEditorGui extends AnvilGui {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void updateInventory() {
-        this.getInventory().setItem(0, getItemZero());
-        this.getInventory().setItem(1, back.getItem());
-    }
-
-    public String getLine() {
-        String line = storedText + lastText;
-        if (line.startsWith(">"))
-            line = line.substring(1);
-        return line;
-    }
-
-    public void setLine(String line) {
-        if (line.length() > 29) {
-            storedText = ">" + line.substring(0, line.length() - 29);
-            lastText = line.substring(line.length() - 29);
-        } else {
-            lastText = ">" + line;
-        }
-        updateInventory();
-    }
+    public abstract void onTextConfirmed(String line);
 
     public String getOriginal() {
         return original;
@@ -154,38 +185,6 @@ public abstract class TextEditorGui extends AnvilGui {
             original = "";
         else
             original = value.replace("§", "&");
-    }
-
-    private List<String> format(String info, String text) {
-        List<String> list = new ArrayList<>();
-        list.add(UtilsString.fix("&b[&9" + info + "&b]", null, true));
-        if (text.isEmpty()) {
-            list.add("");
-            return list;
-        }
-        list.addAll(UtilsString.textLineSplitter(text));
-        String line = text;
-
-        text = UtilsString.fix(line, null, true);
-        if (line.equals(text))
-            return list;
-
-        list.add(UtilsString.fix("&b[&9" + info + " with Color&b]", null, true));
-        list.addAll(UtilsString.textLineSplitter(text));
-        return list;
-    }
-
-    public ItemStack getItemZero() {
-        String line = getLine();
-        List<String> desc = new ArrayList<>();
-        desc.add(lastText);
-        desc.addAll(format("Original", original));
-        desc.addAll(format("Changes", line));
-
-        desc.addAll(UtilsString.fix(Arrays.asList("", "&7[&fClick&7] &9Left &7> &eUpdate",
-                "&7[&fClick&7] &9Middle &7> &aUpdate and Confirm changes", "&7[&fClick&7] &9Right &7> &cEmpty line",
-                "&7[&fClick&7] &9Shift Left/Right &7> &cRevert to original"), null, true));
-        return new ItemBuilder(Material.PAPER).setDescription(desc, false).build();
     }
 
 }

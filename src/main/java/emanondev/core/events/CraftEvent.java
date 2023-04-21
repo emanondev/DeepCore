@@ -29,6 +29,13 @@ abstract class CraftEvent extends InventoryEvent implements Cancellable {
         return clickEvent;
     }
 
+    public int getExpectedRecipeUses() {
+        if (clickEvent.getCurrentItem() == null || clickEvent.getCurrentItem().getType().isAir()
+                || clickEvent.getCurrentItem().getAmount() == 0)
+            return 0;
+        return (int) Math.ceil(((double) getExpectedCraftedAmount()) / clickEvent.getCurrentItem().getAmount());
+    }
+
     public int getExpectedCraftedAmount() {
 
         switch (clickEvent.getClick()) {
@@ -114,13 +121,6 @@ abstract class CraftEvent extends InventoryEvent implements Cancellable {
         maxCraftable = maxCraftable * clickEvent.getCurrentItem().getAmount();
         return maxCraftable;
 
-    }
-
-    public int getExpectedRecipeUses() {
-        if (clickEvent.getCurrentItem() == null || clickEvent.getCurrentItem().getType().isAir()
-                || clickEvent.getCurrentItem().getAmount() == 0)
-            return 0;
-        return (int) Math.ceil(((double) getExpectedCraftedAmount()) / clickEvent.getCurrentItem().getAmount());
     }
 
     public ItemStack getResult() {

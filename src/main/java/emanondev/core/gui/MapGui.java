@@ -14,6 +14,12 @@ import java.util.HashMap;
 public class MapGui extends ChestGui {
 
     /**
+     * will replace with array GuiButton[rows*9]
+     */
+    @Deprecated
+    protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
+
+    /**
      * @param title
      * @param rows
      * @param p
@@ -47,26 +53,18 @@ public class MapGui extends ChestGui {
         super(title, rows, p, previousHolder, plugin, timerUpdate);
     }
 
-    /**
-     * will replace with array GuiButton[rows*9]
-     */
-    @Deprecated
-    protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
-
-    /**
-     * @see #setButton(int, GuiButton)
-     */
-    @Deprecated
-    public void putGuiButton(int pos, GuiButton button) {
-        setButton(pos, button);
-    }
-
     @Override
     public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
             if (buttonsMap.get(event.getRawSlot()) != null)
                 if (buttonsMap.get(event.getRawSlot()).onClick(event))
                     updateInventory();
+    }
+
+    @Override
+    public void updateInventory() {
+        for (int i = 0; i < getInventory().getSize(); i++)
+            getInventory().setItem(i, buttonsMap.get(i) == null ? null : buttonsMap.get(i).getItem());
     }
 
     @Override
@@ -99,10 +97,12 @@ public class MapGui extends ChestGui {
         throw new IndexOutOfBoundsException("Gui is full");
     }
 
-    @Override
-    public void updateInventory() {
-        for (int i = 0; i < getInventory().getSize(); i++)
-            getInventory().setItem(i, buttonsMap.get(i) == null ? null : buttonsMap.get(i).getItem());
+    /**
+     * @see #setButton(int, GuiButton)
+     */
+    @Deprecated
+    public void putGuiButton(int pos, GuiButton button) {
+        setButton(pos, button);
     }
 
 }

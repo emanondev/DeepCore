@@ -27,12 +27,12 @@ public class Translations {
         return get(block.getType());
     }
 
-    public static @NotNull String get(@NotNull ItemStack stack) {
-        return get(stack.getType());
-    }
-
     public static @NotNull String get(@NotNull Material material) {
         return getTranslation((material.isBlock() ? "block." : "item.") + format(material));
+    }
+
+    public static @NotNull String getTranslation(@NotNull String path) {
+        return "<tr:" + path + ">";
     }
 
     /*
@@ -41,6 +41,14 @@ public class Translations {
      return getTranslation(tr.getTranslationKey());
      }
      */
+
+    private static @NotNull String format(@NotNull Keyed keyed) {
+        return keyed.getKey().getNamespace() + "." + keyed.getKey().getKey();
+    }
+
+    public static @NotNull String get(@NotNull ItemStack stack) {
+        return get(stack.getType());
+    }
 
     /**
      * Note: only vanilla effects are translated
@@ -114,13 +122,5 @@ public class Translations {
 
     public static @NotNull String getItemDurability(int value, int max) {
         return "<tr:item.durability:'" + value + "':'" + max + "'>";
-    }
-
-    public static @NotNull String getTranslation(@NotNull String path) {
-        return "<tr:" + path + ">";
-    }
-
-    private static @NotNull String format(@NotNull Keyed keyed) {
-        return keyed.getKey().getNamespace() + "." + keyed.getKey().getKey();
     }
 }

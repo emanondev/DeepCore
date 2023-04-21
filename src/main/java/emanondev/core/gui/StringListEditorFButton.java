@@ -18,15 +18,15 @@ import java.util.function.Supplier;
 
 public class StringListEditorFButton extends AGuiButton {
 
-    private Action action = Action.ADD_LINE;
-    private int line;
-    private String subTitle = "&9Line editor";
     private final Supplier<List<String>> getValue;
     private final Consumer<List<String>> setValue;
     private final Supplier<ItemStack> baseItem;
     private final Supplier<List<String>> baseDescription;
     private final Supplier<List<String>> valueDescription;
     private final Supplier<List<String>> instructionsDescription;
+    private Action action = Action.ADD_LINE;
+    private int line;
+    private String subTitle = "&9Line editor";
 
     /**
      * @param parent
@@ -52,14 +52,6 @@ public class StringListEditorFButton extends AGuiButton {
 
     public void setLineEditorTitle(String value) {
         subTitle = value;
-    }
-
-    public List<String> getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(List<String> list) {
-        setValue.accept(list);
     }
 
     @Override
@@ -91,10 +83,6 @@ public class StringListEditorFButton extends AGuiButton {
         return false;
     }
 
-    private void setLine(int value) {
-        line = value;
-    }
-
     private int getLine() {
         List<String> value = getValue();
         if (value == null) {
@@ -107,6 +95,10 @@ public class StringListEditorFButton extends AGuiButton {
         if (r == 0 && action == Action.MOVE_UP)
             action = Action.MOVE_DOWN;
         return r;
+    }
+
+    private void setLine(int value) {
+        line = value;
     }
 
     private void applyAction() {
@@ -179,8 +171,12 @@ public class StringListEditorFButton extends AGuiButton {
 
     }
 
-    public ItemStack getBaseItem() {
-        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
+    public List<String> getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(List<String> list) {
+        setValue.accept(list);
     }
 
     @Override
@@ -189,6 +185,10 @@ public class StringListEditorFButton extends AGuiButton {
         if (item == null)
             return null;
         return new ItemBuilder(item).setDescription(getDescription()).build();
+    }
+
+    public ItemStack getBaseItem() {
+        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
     }
 
     public List<String> getDescription() {

@@ -21,10 +21,6 @@ public final class UtilsTowny {
 
     }
 
-    public static @Nullable Resident getResident(@NotNull OfflinePlayer p) {
-        return TownyUniverse.getInstance().getResident(p.getUniqueId());
-    }
-
     public static @NotNull Collection<Town> getTowns() {
         return TownyUniverse.getInstance().getTowns();
     }
@@ -33,10 +29,12 @@ public final class UtilsTowny {
         return TownyUniverse.getInstance().getNations();
     }
 
-    public static @Nullable Town getTown(@NotNull OfflinePlayer p) {
+    public static @Nullable Nation getNation(@Nullable TownBlock tBlock) {
+        Town t = getTown(tBlock);
+        if (t == null)
+            return null;
         try {
-            Resident r = getResident(p);
-            return r != null && r.hasTown() ? r.getTown() : null;
+            return t.hasNation() ? t.getNation() : null;
         } catch (Exception e) {
             return null;
         }
@@ -52,35 +50,8 @@ public final class UtilsTowny {
         }
     }
 
-    public static @Nullable Nation getNation(@Nullable Town t) {
-        if (t == null)
-            return null;
-        try {
-            return t.hasNation() ? t.getNation() : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static @Nullable Nation getNation(@NotNull OfflinePlayer p) {
-        try {
-            Resident r = getResident(p);
-            return r.hasNation() ? r.getNation() : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-
-    public static @Nullable Nation getNation(@Nullable TownBlock tBlock) {
-        Town t = getTown(tBlock);
-        if (t == null)
-            return null;
-        try {
-            return t.hasNation() ? t.getNation() : null;
-        } catch (Exception e) {
-            return null;
-        }
+    public static @Nullable TownBlock getTownBlock(Block b) {
+        return getTownBlock(b.getLocation());
     }
 
     public static @Nullable TownBlock getTownBlock(Location l) {
@@ -91,12 +62,8 @@ public final class UtilsTowny {
         }
     }
 
-    /**
-     * @see #getTownBlock(Location)
-     */
-    @Deprecated
-    public static @Nullable TownBlock getLocationTownBlock(Location l) {
-        return getTownBlock(l);
+    public static @Nullable Town getTown(Block b) {
+        return getTown(b.getLocation());
     }
 
     public static @Nullable Town getTown(Location l) {
@@ -107,37 +74,22 @@ public final class UtilsTowny {
         }
     }
 
-
-    /**
-     * @see #getTown(Location)
-     */
-    @Deprecated
-    public static @Nullable Town getLocationTown(Location l) {
-        return getTown(l);
+    public static @Nullable Nation getNation(Block b) {
+        return getNation(b.getLocation());
     }
 
     public static @Nullable Nation getNation(Location l) {
         return getNation(getTown(l));
     }
 
-    /**
-     * @see #getNation(Location)
-     */
-    @Deprecated
-    public static @Nullable Nation getLocationNation(Location l) {
-        return getNation(l);
-    }
-
-    public static @Nullable TownBlock getTownBlock(Block b) {
-        return getTownBlock(b.getLocation());
-    }
-
-    public static @Nullable Town getTown(Block b) {
-        return getTown(b.getLocation());
-    }
-
-    public static @Nullable Nation getNation(Block b) {
-        return getNation(b.getLocation());
+    public static @Nullable Nation getNation(@Nullable Town t) {
+        if (t == null)
+            return null;
+        try {
+            return t.hasNation() ? t.getNation() : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -149,11 +101,27 @@ public final class UtilsTowny {
     }
 
     /**
+     * @see #getTownBlock(Location)
+     */
+    @Deprecated
+    public static @Nullable TownBlock getLocationTownBlock(Location l) {
+        return getTownBlock(l);
+    }
+
+    /**
      * @see #getTown(Block)
      */
     @Deprecated
     public static @Nullable Town getLocationTown(Block b) {
         return getLocationTown(b.getLocation());
+    }
+
+    /**
+     * @see #getTown(Location)
+     */
+    @Deprecated
+    public static @Nullable Town getLocationTown(Location l) {
+        return getTown(l);
     }
 
     /**
@@ -164,12 +132,42 @@ public final class UtilsTowny {
         return getLocationNation(b.getLocation());
     }
 
+    /**
+     * @see #getNation(Location)
+     */
+    @Deprecated
+    public static @Nullable Nation getLocationNation(Location l) {
+        return getNation(l);
+    }
+
     public static boolean hasTown(@NotNull OfflinePlayer p) {
         return getTown(p) != null;
     }
 
+    public static @Nullable Town getTown(@NotNull OfflinePlayer p) {
+        try {
+            Resident r = getResident(p);
+            return r != null && r.hasTown() ? r.getTown() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static @Nullable Resident getResident(@NotNull OfflinePlayer p) {
+        return TownyUniverse.getInstance().getResident(p.getUniqueId());
+    }
+
     public static boolean hasNation(Player p) {
         return getNation(p) != null;
+    }
+
+    public static @Nullable Nation getNation(@NotNull OfflinePlayer p) {
+        try {
+            Resident r = getResident(p);
+            return r.hasNation() ? r.getNation() : null;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static boolean areSameTown(Player p, Player p2) {

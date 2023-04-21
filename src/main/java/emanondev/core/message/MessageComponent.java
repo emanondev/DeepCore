@@ -49,10 +49,26 @@ public class MessageComponent {
         this(plugin, null, null);
     }
 
+    public static MessageComponent fromGson(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget, String gson) {
+        return new MessageComponent(plugin, target, papiTarget, Component.text().append(GsonComponentSerializer.gson().deserialize(gson)));
+    }
+
     @Contract("_ -> this")
     @NotNull
     public MessageComponent append(@NotNull MessageComponent component) {
         base.append(component.base);
+        return this;
+    }
+
+    public String toGson() {
+        return GsonComponentSerializer.gson().serialize(base.build());
+    }
+
+    @Contract("_, _ -> this")
+    @NotNull
+    public MessageComponent append(@Nullable List<String> text, String... holders) {
+        if (text != null)
+            append(String.join("\n", text), holders);
         return this;
     }
 
@@ -62,14 +78,6 @@ public class MessageComponent {
         if (text != null)
             base.append(format(text, holders));
         return this;
-    }
-
-    public String toGson() {
-        return GsonComponentSerializer.gson().serialize(base.build());
-    }
-
-    public static MessageComponent fromGson(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget, String gson) {
-        return new MessageComponent(plugin, target, papiTarget, Component.text().append(GsonComponentSerializer.gson().deserialize(gson)));
     }
 
     @NotNull
@@ -93,14 +101,6 @@ public class MessageComponent {
         return MiniMessage.miniMessage().deserialize(text);
     }
 
-    @Contract("_, _ -> this")
-    @NotNull
-    public MessageComponent append(@Nullable List<String> text, String... holders) {
-        if (text != null)
-            append(String.join("\n", text), holders);
-        return this;
-    }
-
     @Contract("_, _, _ -> this")
     @NotNull
     public MessageComponent appendConfigurable(@NotNull String path, @Nullable List<String> text, String... holders) {
@@ -121,17 +121,17 @@ public class MessageComponent {
 
     @Contract("_, _ -> this")
     @NotNull
-    public MessageComponent hoverText(@Nullable String text, String... holders) {
+    public MessageComponent hoverText(@Nullable List<String> text, String... holders) {
         if (text != null && !text.isEmpty())
-            base.hoverEvent(HoverEvent.showText(format(text, holders)));
+            hoverText(String.join("\n", text), holders);
         return this;
     }
 
     @Contract("_, _ -> this")
     @NotNull
-    public MessageComponent hoverText(@Nullable List<String> text, String... holders) {
+    public MessageComponent hoverText(@Nullable String text, String... holders) {
         if (text != null && !text.isEmpty())
-            hoverText(String.join("\n", text), holders);
+            base.hoverEvent(HoverEvent.showText(format(text, holders)));
         return this;
     }
 

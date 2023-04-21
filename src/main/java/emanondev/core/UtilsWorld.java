@@ -81,19 +81,6 @@ public final class UtilsWorld {
         Files.delete(path);
     }
 
-    private static Location getFallbackLocation(Location l, World w) {
-        if (l == null)
-            return Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
-                    : Bukkit.getWorlds().get(0).getSpawnLocation();
-
-        if (l.getWorld().equals(w) || !l.isWorldLoaded()) {
-            l = Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
-                    : Bukkit.getWorlds().get(0).getSpawnLocation();
-            new IllegalArgumentException("invalid input location correcting it with " + l).printStackTrace();
-        }
-        return l;
-    }
-
     /**
      * @param name      world name
      * @param saveWorld should save chunks?
@@ -122,5 +109,18 @@ public final class UtilsWorld {
         list.remove(world);
         return result;
 
+    }
+
+    private static Location getFallbackLocation(Location l, World w) {
+        if (l == null)
+            return Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
+                    : Bukkit.getWorlds().get(0).getSpawnLocation();
+
+        if (l.getWorld().equals(w) || !l.isWorldLoaded()) {
+            l = Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
+                    : Bukkit.getWorlds().get(0).getSpawnLocation();
+            new IllegalArgumentException("invalid input location correcting it with " + l).printStackTrace();
+        }
+        return l;
     }
 }

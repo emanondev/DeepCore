@@ -24,16 +24,16 @@ public class BackButton extends AGuiButton {
     }
 
     @Override
-    public ItemStack getItem() {
-        return item;
-    }
-
-    @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         if (getGui().getPreviousGui() != null)
             getGui().getPreviousGui().open(event.getWhoClicked());
         else
             event.getWhoClicked().closeInventory();
         return false;
+    }
+
+    @Override
+    public ItemStack getItem() {
+        return item;
     }
 }

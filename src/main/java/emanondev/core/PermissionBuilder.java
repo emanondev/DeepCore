@@ -15,10 +15,10 @@ import java.util.Map;
 
 public class PermissionBuilder {
 
+    private final Map<String, Boolean> children = new LinkedHashMap<>();
     private String name;
     private PermissionDefault def = PermissionDefault.OP;
     private String description;
-    private final Map<String, Boolean> children = new LinkedHashMap<>();
 
     /**
      * Build a permission with name {@code plugin.getName()+"."+subName} .
@@ -37,6 +37,16 @@ public class PermissionBuilder {
      */
     public PermissionBuilder(@NotNull String name) {
         setName(name);
+    }
+
+    /**
+     * @param perm base permission
+     */
+    public PermissionBuilder(@NotNull Permission perm) {
+        setName(perm.getName());
+        setDescription(perm.getDescription());
+        setAccess(perm.getDefault());
+        children.putAll(perm.getChildren());
     }
 
     /**
@@ -96,21 +106,21 @@ public class PermissionBuilder {
         return new PermissionBuilder(plugin.getName() + "." + subName);
     }
 
-
-    /**
-     * @param perm base permission
-     */
-    public PermissionBuilder(@NotNull Permission perm) {
-        setName(perm.getName());
-        setDescription(perm.getDescription());
-        setAccess(perm.getDefault());
-        children.putAll(perm.getChildren());
-    }
-
     private void setName(@NotNull String name) {
         if (name.isEmpty() || name.contains(" ") || name.startsWith(".") || name.endsWith("."))
             throw new IllegalArgumentException(name + " is invalid permission name");
         this.name = name.toLowerCase(Locale.ENGLISH);
+    }
+
+    /**
+     * @param description permission description
+     * @return this for chaining.
+     */
+    @Contract("_ -> this")
+    @NotNull
+    public PermissionBuilder setDescription(String description) {
+        this.description = description == null ? null : ChatColor.translateAlternateColorCodes('&', description);
+        return this;
     }
 
     /**
@@ -126,17 +136,6 @@ public class PermissionBuilder {
         if (def == null)
             def = PermissionDefault.OP;
         this.def = def;
-        return this;
-    }
-
-    /**
-     * @param description permission description
-     * @return this for chaining.
-     */
-    @Contract("_ -> this")
-    @NotNull
-    public PermissionBuilder setDescription(String description) {
-        this.description = description == null ? null : ChatColor.translateAlternateColorCodes('&', description);
         return this;
     }
 

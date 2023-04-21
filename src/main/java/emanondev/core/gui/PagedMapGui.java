@@ -13,14 +13,15 @@ import java.util.TreeMap;
 
 public class PagedMapGui extends ChestGui implements PagedGui {
 
+    private final SortedMap<Integer, GuiButton> buttons = new TreeMap<>();
+    private final GuiButton[] controlButtons = new GuiButton[9];
+    private final NextPageButton nextB = new NextPageButton(this);
+    private final PreviousPageButton prevB = new PreviousPageButton(this);
+    private final BackButton backB = new BackButton(this);
     private int nextPageSlot = 8;
     private int previousPageSlot = 0;
     private int backGuiSlot = 4;
-
     private int page;
-    private final SortedMap<Integer, GuiButton> buttons = new TreeMap<>();
-
-    private final GuiButton[] controlButtons = new GuiButton[9];
 
     /**
      * This implementation uses the last row for pages buttons, those buttons won't
@@ -79,6 +80,29 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * @param p
      * @param previousHolder
      * @param plugin
+     * @param timerUpdate
+     * @param page
+     */
+    public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate,
+                       int page) {
+        super(title, rows, p, previousHolder, plugin, timerUpdate);
+        if (rows == 1)
+            throw new IllegalArgumentException("at least 2 rows");
+        this.page = Math.max(1, page);
+        this.setControlGuiButton(previousPageSlot, prevB);
+        this.setControlGuiButton(backGuiSlot, backB);
+        this.setControlGuiButton(nextPageSlot, nextB);
+    }
+
+    /**
+     * This implementation uses the last row for pages buttons, those buttons won't
+     * change position changing gui page
+     *
+     * @param title
+     * @param rows
+     * @param p
+     * @param previousHolder
+     * @param plugin
      * @param page
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, int page) {
@@ -101,31 +125,18 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     }
 
     /**
-     * This implementation uses the last row for pages buttons, those buttons won't
-     * change position changing gui page
+     * control buttons are the last line buttons
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
-     * @param timerUpdate
-     * @param page
+     * @param slot   - from 0 to 8
+     * @param button - what button? might be null
      */
-    public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate,
-                       int page) {
-        super(title, rows, p, previousHolder, plugin, timerUpdate);
-        if (rows == 1)
-            throw new IllegalArgumentException("at least 2 rows");
-        this.page = Math.max(1, page);
-        this.setControlGuiButton(previousPageSlot, prevB);
-        this.setControlGuiButton(backGuiSlot, backB);
-        this.setControlGuiButton(nextPageSlot, nextB);
+    public void setControlGuiButton(int slot, GuiButton button) {
+        if (slot < 0 || slot >= 9)
+            return;
+        controlButtons[slot] = button;
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
     }
-
-    private final NextPageButton nextB = new NextPageButton(this);
-    private final PreviousPageButton prevB = new PreviousPageButton(this);
-    private final BackButton backB = new BackButton(this);
 
     /**
      * @param slot must be 0-8 value if button should be shown
@@ -166,16 +177,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
             controlButtons[backGuiSlot] = backB;
     }
 
-    public void onOpen(@NotNull InventoryOpenEvent event) {
-        if (isUpdateOnOpen())
-            this.reloadInventory();
-    }
-
-    @Override
-    public int getPage() {
-        return page;
-    }
-
     /**
      * returns true if the page changed
      */
@@ -188,26 +189,9 @@ public class PagedMapGui extends ChestGui implements PagedGui {
         return true;
     }
 
-    /**
-     * like updateInventory but also reload last line buttons
-     */
-    public void reloadInventory() {
-        updateInventory();
-        updateControlButtons();
-    }
-
-    /**
-     * control buttons are the last line buttons
-     *
-     * @param slot   - from 0 to 8
-     * @param button - what button? might be null
-     */
-    public void setControlGuiButton(int slot, GuiButton button) {
-        if (slot < 0 || slot >= 9)
-            return;
-        controlButtons[slot] = button;
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            getInventory().setItem(getInventory().getSize() - 9 + slot, button.getItem());
+    @Override
+    public int getPage() {
+        return page;
     }
 
     /**
@@ -234,15 +218,38 @@ public class PagedMapGui extends ChestGui implements PagedGui {
                 updateInventory();
     }
 
+    public void onOpen(@NotNull InventoryOpenEvent event) {
+        if (isUpdateOnOpen())
+            this.reloadInventory();
+    }
+
+    /**
+     * like updateInventory but also reload last line buttons
+     */
+    public void reloadInventory() {
+        updateInventory();
+        updateControlButtons();
+    }
+
+    public void updateControlButtons() {
+        for (int i = 0; i < 9; i++)
+            if (controlButtons[i] != null)
+                getInventory().setItem(getInventory().getSize() - 9 + i, controlButtons[i].getItem());
+            else
+                getInventory().setItem(getInventory().getSize() - 9 + i, null);
+    }
+
+    @Override
+    public void updateInventory() {
+        for (int i = 0; i < this.getInventory().getSize() - 9; i++) {
+            int slot = i + (page - 1) * (this.getInventory().getSize() - 9);
+            this.getInventory().setItem(i, getButton(slot) == null ? null : getButton(slot).getItem());
+        }
+    }
+
     @Override
     public GuiButton getButton(int slot) {
         return buttons.get(slot);
-    }
-
-    public GuiButton getControlButton(int slot) {
-        if (slot < 0 || slot > 8)
-            return null;
-        return controlButtons[slot];
     }
 
     @Override
@@ -266,20 +273,10 @@ public class PagedMapGui extends ChestGui implements PagedGui {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void updateInventory() {
-        for (int i = 0; i < this.getInventory().getSize() - 9; i++) {
-            int slot = i + (page - 1) * (this.getInventory().getSize() - 9);
-            this.getInventory().setItem(i, getButton(slot) == null ? null : getButton(slot).getItem());
-        }
-    }
-
-    public void updateControlButtons() {
-        for (int i = 0; i < 9; i++)
-            if (controlButtons[i] != null)
-                getInventory().setItem(getInventory().getSize() - 9 + i, controlButtons[i].getItem());
-            else
-                getInventory().setItem(getInventory().getSize() - 9 + i, null);
+    public GuiButton getControlButton(int slot) {
+        if (slot < 0 || slot > 8)
+            return null;
+        return controlButtons[slot];
     }
 
 }

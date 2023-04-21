@@ -4,14 +4,14 @@ import org.bukkit.Bukkit;
 
 public final class GameVersion {
 
-    private GameVersion() {
-        throw new AssertionError();
-    }
-
     public static final String NMS_VERSION = loadNmsver();
     public static final int GAME_MAIN_VERSION = Integer.parseInt(NMS_VERSION.split("_")[0].substring(1));
     public static final int GAME_VERSION = Integer.parseInt(NMS_VERSION.split("_")[1]);
     public static final int GAME_SUB_VERSION = Integer.parseInt(NMS_VERSION.split("_")[2].substring(1));
+
+    private GameVersion() {
+        throw new AssertionError();
+    }
 
     private static String loadNmsver() {
         String txt = Bukkit.getServer().getClass().getPackage().getName();

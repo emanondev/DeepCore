@@ -15,13 +15,13 @@ import java.util.function.Supplier;
 
 public class DoubleEditorFButton extends AGuiButton {
 
-    private double changeAmount;
     private final double maxChangeAmount;
     private final double minChangeAmount;
     private final Supplier<Double> getValue;
     private final Consumer<Double> setValue;
     private final Supplier<ItemStack> baseItem;
     private final boolean addInstructions;
+    private double changeAmount;
 
     /**
      * @param gui      parent gui
@@ -59,9 +59,17 @@ public class DoubleEditorFButton extends AGuiButton {
                                double changeAmountBase, double minChangeValue, double maxChangeValue,
                                @NotNull Supplier<Double> getValue,
                                @NotNull Consumer<Double> setValue,
-                               @Nullable Supplier<ItemStack> baseItem) {
-        this(gui, changeAmountBase, minChangeValue, maxChangeValue,
-                getValue, setValue, baseItem, true);
+                               @Nullable Supplier<ItemStack> baseItem,
+                               boolean addInstructions) {
+        super(gui);
+        this.changeAmount = changeAmountBase;
+        this.maxChangeAmount = maxChangeValue;
+        this.minChangeAmount = minChangeValue;
+        checkBounds();
+        this.getValue = getValue;
+        this.setValue = setValue;
+        this.baseItem = baseItem;
+        this.addInstructions = addInstructions;
     }
 
     /**
@@ -82,17 +90,19 @@ public class DoubleEditorFButton extends AGuiButton {
                                double changeAmountBase, double minChangeValue, double maxChangeValue,
                                @NotNull Supplier<Double> getValue,
                                @NotNull Consumer<Double> setValue,
-                               @Nullable Supplier<ItemStack> baseItem,
-                               boolean addInstructions) {
-        super(gui);
-        this.changeAmount = changeAmountBase;
-        this.maxChangeAmount = maxChangeValue;
-        this.minChangeAmount = minChangeValue;
-        checkBounds();
-        this.getValue = getValue;
-        this.setValue = setValue;
-        this.baseItem = baseItem;
-        this.addInstructions = addInstructions;
+                               @Nullable Supplier<ItemStack> baseItem) {
+        this(gui, changeAmountBase, minChangeValue, maxChangeValue,
+                getValue, setValue, baseItem, true);
+    }
+
+    private void checkBounds() {
+        if (minChangeAmount <= 0 || minChangeAmount > maxChangeAmount)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+
     }
 
     @Override
@@ -124,39 +134,12 @@ public class DoubleEditorFButton extends AGuiButton {
         }
     }
 
-    public DMessage getInstructionsDescription() {
-        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("gui_button.number_editor.instructions");
-    }
-
     public double getValue() {
         return getValue.get();
     }
 
     public void setValue(double value) {
         setValue.accept(value);
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
-                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
-    }
-
-    @Override
-    public ItemStack getItem() {
-        ItemStack base = getBaseItem();
-        if (base == null)
-            return null;
-        ItemBuilder builder = new ItemBuilder(base);
-        if (this.addInstructions)
-            return builder.addDescription(getInstructionsDescription().applyHolders(getPlaceholders())).build();
-        return builder.applyPlaceholders(getPlugin(), null, getPlaceholders()).build();
-    }
-
-    private String[] getPlaceholders() {
-        return new String[]{"%value%", UtilsString.formatOptional10Digit(getValue()),
-                "%amount%", UtilsString.formatOptional10Digit(changeAmount),
-                "%amount_inc%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
-                "%amount_dec%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))};
     }
 
     public double getChangeAmount() {
@@ -173,22 +156,39 @@ public class DoubleEditorFButton extends AGuiButton {
         return bound(Math.max(Double.MIN_NORMAL, this.changeAmount * b));
     }
 
-    private void checkBounds() {
-        if (minChangeAmount <= 0 || minChangeAmount > maxChangeAmount)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-
-    }
-
     private double bound(double num) {
         if (num > maxChangeAmount)
             num = maxChangeAmount;
         if (num < minChangeAmount)
             num = minChangeAmount;
         return num;
+    }
+
+    @Override
+    public ItemStack getItem() {
+        ItemStack base = getBaseItem();
+        if (base == null)
+            return null;
+        ItemBuilder builder = new ItemBuilder(base);
+        if (this.addInstructions)
+            return builder.addDescription(getInstructionsDescription().applyHolders(getPlaceholders())).build();
+        return builder.applyPlaceholders(getPlugin(), null, getPlaceholders()).build();
+    }
+
+    public ItemStack getBaseItem() {
+        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
+    }
+
+    public DMessage getInstructionsDescription() {
+        return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("gui_button.number_editor.instructions");
+    }
+
+    private String[] getPlaceholders() {
+        return new String[]{"%value%", UtilsString.formatOptional10Digit(getValue()),
+                "%amount%", UtilsString.formatOptional10Digit(changeAmount),
+                "%amount_inc%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
+                "%amount_dec%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))};
     }
 
 }

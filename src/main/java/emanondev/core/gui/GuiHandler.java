@@ -19,11 +19,24 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 
 public class GuiHandler implements Listener {
+    public static final BukkitTask timerSeconds = new BukkitRunnable() {
+        @Override
+        public void run() {
+            long time = System.currentTimeMillis();
+            int counter = 0;
+            for (Player p : Bukkit.getOnlinePlayers())
+                if (p.getOpenInventory().getTopInventory() instanceof Gui gui &&
+                        gui.isTimerUpdated()) {
+                    gui.onTimerUpdate();
+                    gui.updateInventory();
+                    counter++;
+                }
+            time = System.currentTimeMillis() - time;
+            if (time > 8)
+                CoreMain.get().logIssue("GuiHandler used &e" + time + " &fms to update &e" + counter + "&f gui with timer");
+        }
+    }.runTaskTimer(CoreMain.get(), 100L, 20L);
     private static final HashMap<Player, Gui> latestUsedGui = new HashMap<>();
-
-    public static Gui getLastUsedGui(Player p) {
-        return latestUsedGui.get(p);
-    }
 
     public GuiHandler() {
         if (Hooks.isEnabled("ProtocolLib")) {
@@ -33,6 +46,10 @@ public class GuiHandler implements Listener {
                 t.printStackTrace();
             }
         }
+    }
+
+    public static Gui getLastUsedGui(Player p) {
+        return latestUsedGui.get(p);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -67,7 +84,6 @@ public class GuiHandler implements Listener {
             gui.onClose(event);
     }
 
-
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     private static void onPluginDisable(PluginDisableEvent event) {
         if (event.getPlugin() instanceof CorePlugin)
@@ -75,23 +91,5 @@ public class GuiHandler implements Listener {
                 if (p.getOpenInventory().getTopInventory().getHolder() instanceof Gui gui && gui.getPlugin().equals(event.getPlugin()))
                     p.closeInventory();
     }
-
-    public static final BukkitTask timerSeconds = new BukkitRunnable() {
-        @Override
-        public void run() {
-            long time = System.currentTimeMillis();
-            int counter = 0;
-            for (Player p : Bukkit.getOnlinePlayers())
-                if (p.getOpenInventory().getTopInventory() instanceof Gui gui &&
-                        gui.isTimerUpdated()) {
-                    gui.onTimerUpdate();
-                    gui.updateInventory();
-                    counter++;
-                }
-            time = System.currentTimeMillis() - time;
-            if (time > 8)
-                CoreMain.get().logIssue("GuiHandler used &e" + time + " &fms to update &e" + counter + "&f gui with timer");
-        }
-    }.runTaskTimer(CoreMain.get(), 100L, 20L);
 
 }

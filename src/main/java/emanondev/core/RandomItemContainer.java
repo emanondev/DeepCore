@@ -31,23 +31,6 @@ public class RandomItemContainer<T> {
             addItem(item, weight);
     }
 
-    /**
-     * Adds selected item, weight is 100 by default
-     *
-     * @param item item to add
-     */
-    public void addItem(T item) {
-        addItem(item, 100);
-    }
-
-    public int getWeight(T item) {
-        int index = items.indexOf(item);
-        if (index == -1)
-            return 0;
-        return weights.get(index);
-    }
-
-
     public void addItem(T item, int weight) {
         int before = getWeight(item);
         int after = Math.max(before + weight, 0);
@@ -66,6 +49,13 @@ public class RandomItemContainer<T> {
         }
     }
 
+    public int getWeight(T item) {
+        int index = items.indexOf(item);
+        if (index == -1)
+            return 0;
+        return weights.get(index);
+    }
+
     public boolean deleteItem(T item) {
         int index = items.indexOf(item);
         if (index < 0)
@@ -73,6 +63,15 @@ public class RandomItemContainer<T> {
         items.remove(index);
         fullWeight -= weights.remove(index);
         return true;
+    }
+
+    /**
+     * Adds selected item, weight is 100 by default
+     *
+     * @param item item to add
+     */
+    public void addItem(T item) {
+        addItem(item, 100);
     }
 
     public boolean setWeight(T item, int weight) {

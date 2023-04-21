@@ -20,14 +20,22 @@ public final class CoreMain extends CorePlugin {
         return inst;
     }
 
-    public void load() {
-        if (inst != null)
-            throw new IllegalStateException("Plugin already loaded");
-        inst = this;
-        ConfigurationSerialization.registerClass(SoundInfo.class, "SoundInfo");
-        this.logDone("Registered &aSoundInfo &fas ConfigurationSerializable");
-        ConfigurationSerialization.registerClass(PlayerSnapshot.class, "PlayerSnapshot");
-        this.logDone("Registered &aPlayerSnapshot &fas ConfigurationSerializable");
+    protected boolean registerReloadCommand() {
+        return false;
+    }
+
+    @Override
+    public void disable() {
+        ConfigurationSerialization.unregisterClass(SoundInfo.class);
+        this.logDone("Unregistered &eSoundInfo&f from ConfigurationSerialization");
+        if (Hooks.isFAWEEnabled()) {
+            this.logDone("Cleaning WorldEditCache");
+            FAWECleaner.cleanAll();
+            this.logDone("Cleaned");
+        }
+    }
+
+    public void reload() {
     }
 
     public void enable() {
@@ -56,22 +64,13 @@ public final class CoreMain extends CorePlugin {
         }
     }
 
-
-    public void reload() {
-    }
-
-    protected boolean registerReloadCommand() {
-        return false;
-    }
-
-    @Override
-    public void disable() {
-        ConfigurationSerialization.unregisterClass(SoundInfo.class);
-        this.logDone("Unregistered &eSoundInfo&f from ConfigurationSerialization");
-        if (Hooks.isFAWEEnabled()) {
-            this.logDone("Cleaning WorldEditCache");
-            FAWECleaner.cleanAll();
-            this.logDone("Cleaned");
-        }
+    public void load() {
+        if (inst != null)
+            throw new IllegalStateException("Plugin already loaded");
+        inst = this;
+        ConfigurationSerialization.registerClass(SoundInfo.class, "SoundInfo");
+        this.logDone("Registered &aSoundInfo &fas ConfigurationSerializable");
+        ConfigurationSerialization.registerClass(PlayerSnapshot.class, "PlayerSnapshot");
+        this.logDone("Registered &aPlayerSnapshot &fas ConfigurationSerializable");
     }
 }

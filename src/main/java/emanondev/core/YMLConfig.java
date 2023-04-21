@@ -34,23 +34,54 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     private final JavaPlugin plugin;
     private final File file;
     private final String name;
+    private boolean saveIfDirtyOnReload = true;
+    private BukkitTask delayedSave = null;
+    private boolean dirty = false;
+    private boolean autosaveOnSet = true;
 
-    @Deprecated
-    public YMLSection getConfigurationSection(@NotNull String path) {
-        return (YMLSection) super.getConfigurationSection(path);
+    /**
+     * Constructs a new Configuration File.<br>
+     * Used file is located at plugin.{@link JavaPlugin#getDataFolder()
+     * getDataFolder()}/{@link #fixName(String) YMLConfig.fixName(name)}.<br>
+     * If the plugin jar has a file on name path, that file is used to generate the
+     * config file.
+     *
+     * @param plugin associated plugin to grab the folder
+     * @param name   raw name of the file subpath
+     * @throws NullPointerException     if name is null
+     * @throws IllegalArgumentException if name is empty
+     */
+    public YMLConfig(@NotNull JavaPlugin plugin, @NotNull String name) {
+        this(plugin, new File(plugin.getDataFolder(), fixName(name)), fixName(name));
     }
 
-    public YMLSection getParent() {
-        return (YMLSection) super.getParent();
+    private YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file, @NotNull String name) {
+        if (file.isDirectory())
+            throw new IllegalStateException("file is a directory");
+        this.plugin = plugin;
+        this.file = file;
+        this.name = name;
+        reload();
     }
 
-    @Override
-    public YMLSection getDefaultSection() {
-        return (YMLSection) super.getDefaultSection();
+    public YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file) {
+        this(plugin, file, file.getName());
     }
 
-    public YMLConfig getRoot() {
-        return (YMLConfig) super.getRoot();
+    /**
+     * Fix the given name for a yaml file name
+     *
+     * @param name the raw name of the file with or withouth .yml
+     * @return fixed name
+     * @throws NullPointerException     if name is null
+     * @throws IllegalArgumentException if name is empty
+     */
+    public static String fixName(@NotNull String name) {
+        if (name.isEmpty())
+            throw new IllegalArgumentException("YAML file must have a name!");
+        if (!name.endsWith(".yml"))
+            name += ".yml";
+        return name;
     }
 
     @Deprecated
@@ -93,6 +124,29 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return (YMLSection) super.createSection(path, map);
     }
 
+    public YMLConfig getRoot() {
+        return (YMLConfig) super.getRoot();
+    }
+
+    @Override
+    public YMLSection getDefaultSection() {
+        return (YMLSection) super.getDefaultSection();
+    }
+
+    @Override
+    public void set(@NotNull String path, Object value) {
+        set(path, value, true);
+    }
+
+    @Deprecated
+    public YMLSection getConfigurationSection(@NotNull String path) {
+        return (YMLSection) super.getConfigurationSection(path);
+    }
+
+    public YMLSection getParent() {
+        return (YMLSection) super.getParent();
+    }
+
     /**
      * Returns the file path of this config.
      *
@@ -102,67 +156,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      */
     public String getFileName() {
         return name;
-    }
-
-    /**
-     * Return the plugin associated with this Config.
-     *
-     * @return the plugin associated with this Config
-     */
-    public JavaPlugin getPlugin() {
-        return plugin;
-    }
-
-    /**
-     * Constructs a new Configuration File.<br>
-     * Used file is located at plugin.{@link JavaPlugin#getDataFolder()
-     * getDataFolder()}/{@link #fixName(String) YMLConfig.fixName(name)}.<br>
-     * If the plugin jar has a file on name path, that file is used to generate the
-     * config file.
-     *
-     * @param plugin associated plugin to grab the folder
-     * @param name   raw name of the file subpath
-     * @throws NullPointerException     if name is null
-     * @throws IllegalArgumentException if name is empty
-     */
-    public YMLConfig(@NotNull JavaPlugin plugin, @NotNull String name) {
-        this(plugin, new File(plugin.getDataFolder(), fixName(name)), fixName(name));
-    }
-
-    public YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file) {
-        this(plugin, file, file.getName());
-    }
-
-    private YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file, @NotNull String name) {
-        if (file.isDirectory())
-            throw new IllegalStateException("file is a directory");
-        this.plugin = plugin;
-        this.file = file;
-        this.name = name;
-        reload();
-    }
-
-    /**
-     * Fix the given name for a yaml file name
-     *
-     * @param name the raw name of the file with or withouth .yml
-     * @return fixed name
-     * @throws NullPointerException     if name is null
-     * @throws IllegalArgumentException if name is empty
-     */
-    public static String fixName(@NotNull String name) {
-        if (name.isEmpty())
-            throw new IllegalArgumentException("YAML file must have a name!");
-        if (!name.endsWith(".yml"))
-            name += ".yml";
-        return name;
-    }
-
-    private boolean saveIfDirtyOnReload = true;
-
-    public YMLConfig setSaveIfDirtyOnReload(boolean value) {
-        saveIfDirtyOnReload = value;
-        return this;
     }
 
     @Override
@@ -203,18 +196,19 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     @Override
-    public void save() {
-        boolean oldDirty = dirty;
-        dirty = false;
-        try {
-            this.save(file);
-        } catch (Exception e) {
-            dirty = oldDirty;
-            e.printStackTrace();
-        }
+    public @NotNull Set<String> getKeys(@NotNull String path) {
+        if (path.isEmpty())
+            return getKeys(false);
+        ConfigurationSection section = this.getConfigurationSection(path);
+        if (section == null)
+            return new LinkedHashSet<>();
+        else
+            return section.getKeys(false);
     }
 
-    private BukkitTask delayedSave = null;
+    public boolean isDirty() {
+        return dirty;
+    }
 
     public void saveAsync() {
         if (!dirty || delayedSave != null)
@@ -236,29 +230,45 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         }
     }
 
+    public @Nullable ItemStack loadItemStack(@NotNull String path, @Nullable ItemStack def) {
+        return load(path, def, ItemStack.class);
+    }
+
+    @Override
+    public void save() {
+        boolean oldDirty = dirty;
+        dirty = false;
+        try {
+            this.save(file);
+        } catch (Exception e) {
+            dirty = oldDirty;
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public @NotNull File getFile() {
         return file;
     }
 
     @Override
-    public @NotNull Set<String> getKeys(@NotNull String path) {
-        if (path.isEmpty())
-            return getKeys(false);
-        ConfigurationSection section = this.getConfigurationSection(path);
-        if (section == null)
-            return new LinkedHashSet<>();
-        else
-            return section.getKeys(false);
+    public void setNoDirty(@NotNull String path, Object value) {
+        super.set(path, value);
     }
 
-    private boolean dirty = false;
-
-    public boolean isDirty() {
-        return dirty;
+    /**
+     * Return the plugin associated with this Config.
+     *
+     * @return the plugin associated with this Config
+     */
+    public JavaPlugin getPlugin() {
+        return plugin;
     }
 
-    private boolean autosaveOnSet = true;
+    public YMLConfig setSaveIfDirtyOnReload(boolean value) {
+        saveIfDirtyOnReload = value;
+        return this;
+    }
 
     public boolean getAutosaveOnSet() {
         return autosaveOnSet;
@@ -273,39 +283,8 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         autosaveOnSet = value;
     }
 
-    @Override
-    public void set(@NotNull String path, Object value) {
-        set(path, value, true);
-    }
-
-    public void set(String path, Object value, boolean save) {
-        super.set(path, value);
-        dirty = true;
-        if (save && autosaveOnSet)
-            if (plugin.isEnabled())
-                saveAsync();
-            else
-                save();
-    }
-
-    @Override
-    public void setNoDirty(@NotNull String path, Object value) {
-        super.set(path, value);
-    }
-
     void setDirty() {
         dirty = true;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def) {
-        try {
-            return get(path, def, List.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return def == null ? Collections.emptyList() : def;
-        }
     }
 
     public @Nullable FireworkEffect loadFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
@@ -326,6 +305,50 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return def;
     }
 
+    public @Nullable Type loadFireworkEffectType(@NotNull String path, @Nullable Type def) {
+        return this.loadEnum(path, def, Type.class);
+    }
+
+    public @NotNull List<Color> loadColors(@NotNull String path, @Nullable Collection<Color> def) {
+        return stringListToColorList(loadStringList(path, colorCollectionToStringList(def)));
+    }
+
+    private String getError(String path) {
+        return "Value has wrong type or wrong value at '" + path + ":' on file " + name;
+    }
+
+    public void set(String path, Object value, boolean save) {
+        super.set(path, value);
+        dirty = true;
+        if (save && autosaveOnSet)
+            if (plugin.isEnabled())
+                saveAsync();
+            else
+                save();
+    }
+
+    private ArrayList<Color> stringListToColorList(@Nullable Collection<String> rgb) {
+        ArrayList<Color> colors = new ArrayList<>();
+        for (String color : rgb) {
+            try {
+                String[] args = color.split(" ");
+                colors.add(Color.fromRGB(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+            } catch (Exception e) {
+                e.printStackTrace();
+                new IllegalArgumentException("color rgb format example '0 20 255'").printStackTrace();
+            }
+        }
+        return colors;
+    }
+
+    private ArrayList<String> colorCollectionToStringList(@Nullable Collection<Color> colors) {
+        ArrayList<String> list = new ArrayList<>();
+        if (colors != null)
+            for (Color color : colors)
+                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
+        return list;
+    }
+
     public @Nullable FireworkEffect getFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
         try {
             Type type = getEnum(path + ".type", def == null ? null : def.getType(), FireworkEffect.Type.class);
@@ -344,34 +367,19 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return def;
     }
 
-    public @NotNull List<Color> loadColors(@NotNull String path, @Nullable Collection<Color> def) {
-        return stringListToColorList(loadStringList(path, colorCollectionToStringList(def)));
-    }
-
     public @NotNull List<Color> getColors(@NotNull String path, @Nullable Collection<Color> def) {
         return stringListToColorList(getStringList(path, colorCollectionToStringList(def)));
     }
 
-    private ArrayList<String> colorCollectionToStringList(@Nullable Collection<Color> colors) {
-        ArrayList<String> list = new ArrayList<>();
-        if (colors != null)
-            for (Color color : colors)
-                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
-        return list;
-    }
-
-    private ArrayList<Color> stringListToColorList(@Nullable Collection<String> rgb) {
-        ArrayList<Color> colors = new ArrayList<>();
-        for (String color : rgb) {
-            try {
-                String[] args = color.split(" ");
-                colors.add(Color.fromRGB(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-            } catch (Exception e) {
-                e.printStackTrace();
-                new IllegalArgumentException("color rgb format example '0 20 255'").printStackTrace();
-            }
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    public @NotNull List<String> getStringList(@NotNull String path, @Nullable List<String> def) {
+        try {
+            return get(path, def, List.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return def == null ? Collections.emptyList() : def;
         }
-        return colors;
     }
 
     private @NotNull List<String> colorsToStringList(Collection<Color> colors) {
@@ -380,14 +388,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             for (Color color : colors)
                 list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
         return list;
-    }
-
-    public @Nullable Type loadFireworkEffectType(@NotNull String path, @Nullable Type def) {
-        return this.loadEnum(path, def, Type.class);
-    }
-
-    private String getError(String path) {
-        return "Value has wrong type or wrong value at '" + path + ":' on file " + name;
     }
 
     /**
@@ -463,6 +463,26 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     /**
      * Get String value.<br>
      * adds path+_HOLDERS if any exists to notify usable holders<br>
+     * target = null
+     *
+     * @param path  Path of the Object
+     * @param def   Default object
+     * @param color Whether or not translate color codes
+     * @param args  holders and replacer
+     * @return the value found or default if none
+     * @see #getString(String, String, Player, boolean, String...) getString(path,
+     * def, null, color, args)
+     * @see #get(String, Object, Class)
+     * @deprecated use
+     * {@link YMLSection#loadMessage(String, String, boolean, CommandSender, String...)}
+     */
+    public @Nullable String getString(@NotNull String path, @Nullable String def, boolean color, String... args) {
+        return this.getString(path, def, null, color, args);
+    }
+
+    /**
+     * Get String value.<br>
+     * adds path+_HOLDERS if any exists to notify usable holders<br>
      *
      * @param path   Path of the Object
      * @param def    Default object
@@ -485,26 +505,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                 save();
             }
         return UtilsString.fix(get(path, def, String.class), target, color, args);
-    }
-
-    /**
-     * Get String value.<br>
-     * adds path+_HOLDERS if any exists to notify usable holders<br>
-     * target = null
-     *
-     * @param path  Path of the Object
-     * @param def   Default object
-     * @param color Whether or not translate color codes
-     * @param args  holders and replacer
-     * @return the value found or default if none
-     * @see #getString(String, String, Player, boolean, String...) getString(path,
-     * def, null, color, args)
-     * @see #get(String, Object, Class)
-     * @deprecated use
-     * {@link YMLSection#loadMessage(String, String, boolean, CommandSender, String...)}
-     */
-    public @Nullable String getString(@NotNull String path, @Nullable String def, boolean color, String... args) {
-        return this.getString(path, def, null, color, args);
     }
 
     /**
@@ -597,10 +597,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         }
     }
 
-    public @Nullable ItemStack loadItemStack(@NotNull String path, @Nullable ItemStack def) {
-        return load(path, def, ItemStack.class);
-    }
-
     /**
      * Return result component
      *
@@ -682,4 +678,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                 section.set(key, value);
         }
     }
+
+
 }

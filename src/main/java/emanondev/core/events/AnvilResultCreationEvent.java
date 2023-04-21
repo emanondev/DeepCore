@@ -26,6 +26,10 @@ public class AnvilResultCreationEvent extends PlayerEvent implements Cancellable
         this.clickEvent = event;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS_LIST;
+    }
+
     public AnvilInventory getAnvil() {
         return (AnvilInventory) clickEvent.getClickedInventory();
     }
@@ -46,10 +50,6 @@ public class AnvilResultCreationEvent extends PlayerEvent implements Cancellable
 
     @Override
     public @NotNull HandlerList getHandlers() {
-        return HANDLERS_LIST;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS_LIST;
     }
 

@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SQLDatabase {
-    private Connection con;
     // private final CorePlugin plugin;
     private final SQLType type;
     private final String host;
@@ -18,6 +17,7 @@ public class SQLDatabase {
     private final String password;
     private final String database;
     private final int port;
+    private Connection con;
 
     public SQLDatabase(@NotNull SQLType type, @NotNull String host, @NotNull String user, @NotNull String password, String database, int port) throws ClassNotFoundException, SQLException {
         this.type = type;
@@ -29,16 +29,20 @@ public class SQLDatabase {
         connect();
     }
 
-    public String getUrl() {
-        return type.getUrl(host, port, database);
+    public void connect() throws ClassNotFoundException, SQLException {
+        connect(true);
     }
 
-    public SQLType getType() {
-        return type;
-    }
+    private void connect(boolean message) throws ClassNotFoundException, SQLException {
 
-    public Connection getConnection() {
-        return con;
+        if (isConnected()) {
+            if (message) {
+                Bukkit.getConsoleSender().sendMessage(
+                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: Already connected");
+            }
+        } else {
+            setConnection();
+        }
     }
 
     public boolean isConnected() throws SQLException {
@@ -54,6 +58,50 @@ public class SQLDatabase {
             }
         }
         return false;
+    }
+
+    public void setConnection() throws ClassNotFoundException, SQLException {
+        disconnect(false);
+
+        try {
+            con = type.getConnection(host, user, password, database, port);
+        } catch (ClassNotFoundException | SQLException e) {
+            Bukkit.getConsoleSender().sendMessage(
+                    ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: " + e.getMessage());
+            throw e;
+        }
+
+    }
+
+    public void disconnect(boolean message) throws SQLException {
+        try {
+            if (isConnected()) {
+                con.close();
+
+                if (message) {
+                    Bukkit.getConsoleSender()
+                            .sendMessage(ChatColor.GREEN + "✓  " + ChatColor.WHITE + type.name() + " disconnected.");
+                }
+            } else if (message) {
+                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "✗  " + ChatColor.WHITE + type.name()
+                        + " Disconnect Error: No existing connection");
+            }
+        } catch (SQLException e) {
+            if (message) {
+                Bukkit.getConsoleSender().sendMessage(
+                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Disconnect Error: " + e.getMessage());
+            }
+            throw e;
+        }
+        con = null;
+    }
+
+    public String getUrl() {
+        return type.getUrl(host, port, database);
+    }
+
+    public SQLType getType() {
+        return type;
     }
 
     public boolean update(String command) throws ClassNotFoundException, SQLException {
@@ -97,60 +145,12 @@ public class SQLDatabase {
         return rs;
     }
 
-    public void connect() throws ClassNotFoundException, SQLException {
-        connect(true);
-    }
-
-    public void setConnection() throws ClassNotFoundException, SQLException {
-        disconnect(false);
-
-        try {
-            con = type.getConnection(host, user, password, database, port);
-        } catch (ClassNotFoundException | SQLException e) {
-            Bukkit.getConsoleSender().sendMessage(
-                    ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: " + e.getMessage());
-            throw e;
-        }
-
-    }
-
-    private void connect(boolean message) throws ClassNotFoundException, SQLException {
-
-        if (isConnected()) {
-            if (message) {
-                Bukkit.getConsoleSender().sendMessage(
-                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: Already connected");
-            }
-        } else {
-            setConnection();
-        }
+    public Connection getConnection() {
+        return con;
     }
 
     public void disconnect() throws SQLException {
         disconnect(true);
-    }
-
-    public void disconnect(boolean message) throws SQLException {
-        try {
-            if (isConnected()) {
-                con.close();
-
-                if (message) {
-                    Bukkit.getConsoleSender()
-                            .sendMessage(ChatColor.GREEN + "✓  " + ChatColor.WHITE + type.name() + " disconnected.");
-                }
-            } else if (message) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "✗  " + ChatColor.WHITE + type.name()
-                        + " Disconnect Error: No existing connection");
-            }
-        } catch (SQLException e) {
-            if (message) {
-                Bukkit.getConsoleSender().sendMessage(
-                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Disconnect Error: " + e.getMessage());
-            }
-            throw e;
-        }
-        con = null;
     }
 
     public void reconnect() throws ClassNotFoundException, SQLException {

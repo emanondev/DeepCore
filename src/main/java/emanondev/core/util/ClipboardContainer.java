@@ -81,9 +81,95 @@ public final class ClipboardContainer implements Clipboard {
         parent.setOrigin(origin);
     }
 
+    public boolean hasBiomes() {
+        return parent.hasBiomes();
+    }
+
     @Override
     public void removeEntity(Entity entity) {
         parent.removeEntity(entity);
+    }
+
+    public int getWidth() {
+        return parent.getWidth();
+    }
+
+    public int getHeight() {
+        return parent.getHeight();
+    }
+
+    public int getLength() {
+        return parent.getLength();
+    }
+
+    public int getArea() {
+        return parent.getArea();
+    }
+
+    public int getVolume() {
+        return parent.getVolume();
+    }
+
+    public Iterator<BlockVector3> iterator(Order order) {
+        return parent.iterator(order);
+    }
+
+    @Nonnull
+    public Iterator<BlockVector3> iterator() {
+        return parent.iterator();
+    }
+
+    public Iterator<BlockVector2> iterator2d() {
+        return parent.iterator2d();
+    }
+
+    public URI getURI() {
+        return parent.getURI();
+    }
+
+    public <T extends Filter> T apply(Region region, T filter, boolean full) {
+        return parent.apply(region, filter, full);
+    }
+
+    public void close() {
+        parent.close();
+    }
+
+    public void flush() {
+        parent.flush();
+    }
+
+    public EditSession paste(World world, BlockVector3 to) {
+        return parent.paste(world, to);
+    }
+
+    public void save(File file, ClipboardFormat format) throws IOException {
+        parent.save(file, format);
+    }
+
+    public void save(OutputStream stream, ClipboardFormat format) throws IOException {
+        parent.save(stream, format);
+    }
+
+    //TODO undo?
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
+        return parent.paste(world, to, allowUndo, pasteAir, transform);
+    }
+
+    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, boolean pasteEntities, @Nullable Transform transform) {
+        return parent.paste(world, to, allowUndo, pasteAir, pasteEntities, transform);
+    }
+
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, @Nullable Transform transform) {
+        parent.paste(extent, to, pasteAir, transform);
+    }
+
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
+        parent.paste(extent, to, pasteAir);
+    }
+
+    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
+        parent.paste(extent, to, pasteAir, pasteEntities, pasteBiomes);
     }
 
     @Override
@@ -94,90 +180,6 @@ public final class ClipboardContainer implements Clipboard {
     @Override
     public BlockVector3 getMaximumPoint() {
         return parent.getMaximumPoint();
-    }
-
-    @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
-    }
-
-    protected void finalize() {
-        try {
-            clean();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    private void clean() {
-        if (parent instanceof ClipboardContainer container)
-            container.clean();
-        else if (Hooks.isFAWEEnabled())
-            FAWECleaner.clean(parent);
-    }
-
-    public BlockState getBlock(BlockVector3 position) {
-        return parent.getBlock(position);
-    }
-
-    public BlockState getBlock(int x, int y, int z) {
-        return parent.getBlock(x, y, z);
-    }
-
-    public BaseBlock getFullBlock(BlockVector3 position) {
-        return parent.getFullBlock(position);
-    }
-
-    public BaseBlock getFullBlock(int x, int y, int z) {
-        return parent.getFullBlock(x, y, z);
-    }
-
-    public BiomeType getBiome(BlockVector2 position) {
-        return parent.getBiome(position);
-    }
-
-    public BiomeType getBiomeType(int x, int y, int z) {
-        return parent.getBiomeType(x, y, z);
-    }
-
-    public BiomeType getBiome(BlockVector3 position) {
-        return parent.getBiome(position);
-    }
-
-    public int getEmittedLight(BlockVector3 position) {
-        return parent.getEmittedLight(position);
-    }
-
-    public int getEmittedLight(int x, int y, int z) {
-        return parent.getEmittedLight(x, y, z);
-    }
-
-    public int getSkyLight(MutableBlockVector3 position) {
-        return parent.getSkyLight(position);
-    }
-
-    public int getSkyLight(int x, int y, int z) {
-        return parent.getSkyLight(x, y, z);
-    }
-
-    public int getBrightness(MutableBlockVector3 position) {
-        return parent.getBrightness(position);
-    }
-
-    public int getBrightness(int x, int y, int z) {
-        return parent.getBrightness(x, y, z);
-    }
-
-    public int getOpacity(MutableBlockVector3 position) {
-        return parent.getOpacity(position);
-    }
-
-    public int getOpacity(int x, int y, int z) {
-        return parent.getOpacity(x, y, z);
-    }
-
-    public int[] getHeightMap(HeightMapType type) {
-        return parent.getHeightMap(type);
     }
 
     public List<? extends Entity> getEntities(Region region) {
@@ -379,12 +381,87 @@ public final class ClipboardContainer implements Clipboard {
         return parent.disableHistory();
     }
 
-    public <T extends Filter> T apply(Region region, T filter, boolean full) {
-        return parent.apply(region, filter, full);
-    }
-
     public <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
         return parent.apply(positions, filter);
+    }
+
+    protected void finalize() {
+        try {
+            clean();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private void clean() {
+        if (parent instanceof ClipboardContainer container)
+            container.clean();
+        else if (Hooks.isFAWEEnabled())
+            FAWECleaner.clean(parent);
+    }
+
+    public BlockState getBlock(BlockVector3 position) {
+        return parent.getBlock(position);
+    }
+
+    public BlockState getBlock(int x, int y, int z) {
+        return parent.getBlock(x, y, z);
+    }
+
+    public BaseBlock getFullBlock(BlockVector3 position) {
+        return parent.getFullBlock(position);
+    }
+
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return parent.getFullBlock(x, y, z);
+    }
+
+    public BiomeType getBiome(BlockVector2 position) {
+        return parent.getBiome(position);
+    }
+
+    public BiomeType getBiomeType(int x, int y, int z) {
+        return parent.getBiomeType(x, y, z);
+    }
+
+    public BiomeType getBiome(BlockVector3 position) {
+        return parent.getBiome(position);
+    }
+
+    public int getEmittedLight(BlockVector3 position) {
+        return parent.getEmittedLight(position);
+    }
+
+    public int getEmittedLight(int x, int y, int z) {
+        return parent.getEmittedLight(x, y, z);
+    }
+
+    public int getSkyLight(MutableBlockVector3 position) {
+        return parent.getSkyLight(position);
+    }
+
+    public int getSkyLight(int x, int y, int z) {
+        return parent.getSkyLight(x, y, z);
+    }
+
+    public int getBrightness(MutableBlockVector3 position) {
+        return parent.getBrightness(position);
+    }
+
+    public int getBrightness(int x, int y, int z) {
+        return parent.getBrightness(x, y, z);
+    }
+
+    public int getOpacity(MutableBlockVector3 position) {
+        return parent.getOpacity(position);
+    }
+
+    public int getOpacity(int x, int y, int z) {
+        return parent.getOpacity(x, y, z);
+    }
+
+    public int[] getHeightMap(HeightMapType type) {
+        return parent.getHeightMap(type);
     }
 
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
@@ -393,6 +470,11 @@ public final class ClipboardContainer implements Clipboard {
 
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
         return parent.setBlock(x, y, z, block);
+    }
+
+    @Override
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return parent.setTile(x, y, z, tile);
     }
 
     public boolean fullySupports3DBiomes() {
@@ -437,88 +519,6 @@ public final class ClipboardContainer implements Clipboard {
 
     public Spliterator<BlockVector3> spliterator() {
         return parent.spliterator();
-    }
-
-    public boolean hasBiomes() {
-        return parent.hasBiomes();
-    }
-
-    public int getWidth() {
-        return parent.getWidth();
-    }
-
-    public int getHeight() {
-        return parent.getHeight();
-    }
-
-    public int getLength() {
-        return parent.getLength();
-    }
-
-    public int getArea() {
-        return parent.getArea();
-    }
-
-    public int getVolume() {
-        return parent.getVolume();
-    }
-
-    public Iterator<BlockVector3> iterator(Order order) {
-        return parent.iterator(order);
-    }
-
-    @Nonnull
-    public Iterator<BlockVector3> iterator() {
-        return parent.iterator();
-    }
-
-    public Iterator<BlockVector2> iterator2d() {
-        return parent.iterator2d();
-    }
-
-    public URI getURI() {
-        return parent.getURI();
-    }
-
-    public void close() {
-        parent.close();
-    }
-
-    public void flush() {
-        parent.flush();
-    }
-
-    public EditSession paste(World world, BlockVector3 to) {
-        return parent.paste(world, to);
-    }
-
-    public void save(File file, ClipboardFormat format) throws IOException {
-        parent.save(file, format);
-    }
-
-    public void save(OutputStream stream, ClipboardFormat format) throws IOException {
-        parent.save(stream, format);
-    }
-
-    //TODO undo?
-    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, @Nullable Transform transform) {
-        return parent.paste(world, to, allowUndo, pasteAir, transform);
-    }
-
-    public EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir, boolean pasteEntities, @Nullable Transform transform) {
-        return parent.paste(world, to, allowUndo, pasteAir, pasteEntities, transform);
-    }
-
-    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, @Nullable Transform transform) {
-        parent.paste(extent, to, pasteAir, transform);
-    }
-
-    public void paste(Extent extent, BlockVector3 to, boolean pasteAir) {
-        parent.paste(extent, to, pasteAir);
-    }
-
-    public void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
-        parent.paste(extent, to, pasteAir, pasteEntities, pasteBiomes);
     }
 
 }

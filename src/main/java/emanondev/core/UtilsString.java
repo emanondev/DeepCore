@@ -20,8 +20,35 @@ import java.util.regex.Pattern;
 
 public final class UtilsString {
 
+    private static final Pattern LOWCASED_KEY_ID = Pattern.compile("[0-9a-z_]+");
+    private static final Pattern KEY_ID = Pattern.compile("[0-9a-zA-Z_]+");
+    private static final Map<Character, Integer> roman = new HashMap<>() {
+        {
+            put('I', 1);
+            put('V', 5);
+            put('X', 10);
+            put('L', 50);
+            put('C', 100);
+            put('D', 500);
+            put('M', 1000);
+        }
+    };
+    private static final int[] romanValues = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] romanLiterals = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV",
+            "I"};
+    private static final DecimalFormat optional1Digit = new DecimalFormat("0.#");
+    private static final DecimalFormat optional2Digit = new DecimalFormat("0.##");
+    private static final DecimalFormat optional10Digit = new DecimalFormat("0.##########");
+    private static final DecimalFormat forced1Digit = new DecimalFormat("0.0");
+    private static final DecimalFormat forced2Digit = new DecimalFormat("0.00");
+    private static final DecimalFormat forcedIntDigit = new DecimalFormat("0");
+
     private UtilsString() {
 
+    }
+
+    public static void updateDescription(@Nullable ItemStack item, @Nullable List<String> desc, String... holders) {
+        updateDescription(item, desc, null, false, holders);
     }
 
     /**
@@ -82,8 +109,36 @@ public final class UtilsString {
 
     }
 
-    public static void updateDescription(@Nullable ItemStack item, @Nullable List<String> desc, String... holders) {
-        updateDescription(item, desc, null, false, holders);
+    @Contract("!null, _, _, _ -> !null; null, _, _, _ -> null")
+    public static String fix(@Nullable String text, @Nullable Player papiTarget, boolean color, String... holders) {
+        if (text == null)
+            return null;
+
+        // holders
+        if (holders != null && holders.length % 2 != 0)
+            throw new IllegalArgumentException("holder without replacer");
+        if (holders != null && holders.length > 0)
+            for (int i = 0; i < holders.length; i += 2)
+                text = text.replace(holders[i], holders[i + 1]);
+
+        // papi
+        if (papiTarget != null && Hooks.isPAPIEnabled())
+            text = PlaceholderAPI.setPlaceholders(papiTarget, text);
+
+        // color
+        if (color)
+            text = ChatColor.translateAlternateColorCodes('&', text);
+        /*try {
+            int from = 0;
+            while (text.indexOf("&#", from) >= 0) {
+                from = text.indexOf("&#", from) + 1;
+                text = text.replace(text.substring(from - 1, from + 7),
+                        net.md_5.bungee.api.ChatColor.of(text.substring(from, from + 7)).toString());
+            }
+        } catch (Throwable ignored) {
+        }*/// pretty useless
+        // MiniMessage
+        return text;
     }
 
     /**
@@ -127,38 +182,6 @@ public final class UtilsString {
         ItemStack itemCopy = new ItemStack(item);
         updateDescription(itemCopy, description, player, color, holders);
         return itemCopy;
-    }
-
-    @Contract("!null, _, _, _ -> !null; null, _, _, _ -> null")
-    public static String fix(@Nullable String text, @Nullable Player papiTarget, boolean color, String... holders) {
-        if (text == null)
-            return null;
-
-        // holders
-        if (holders != null && holders.length % 2 != 0)
-            throw new IllegalArgumentException("holder without replacer");
-        if (holders != null && holders.length > 0)
-            for (int i = 0; i < holders.length; i += 2)
-                text = text.replace(holders[i], holders[i + 1]);
-
-        // papi
-        if (papiTarget != null && Hooks.isPAPIEnabled())
-            text = PlaceholderAPI.setPlaceholders(papiTarget, text);
-
-        // color
-        if (color)
-            text = ChatColor.translateAlternateColorCodes('&', text);
-        /*try {
-            int from = 0;
-            while (text.indexOf("&#", from) >= 0) {
-                from = text.indexOf("&#", from) + 1;
-                text = text.replace(text.substring(from - 1, from + 7),
-                        net.md_5.bungee.api.ChatColor.of(text.substring(from, from + 7)).toString());
-            }
-        } catch (Throwable ignored) {
-        }*/// pretty useless
-        // MiniMessage
-        return text;
     }
 
     /**
@@ -250,8 +273,6 @@ public final class UtilsString {
         return result.toString();
     }
 
-    private static final Pattern LOWCASED_KEY_ID = Pattern.compile("[0-9a-z_]+");
-
     /**
      * @param id ID to test
      * @return id is low-cased, alphanumeric + '_' , not empty
@@ -260,8 +281,6 @@ public final class UtilsString {
         return LOWCASED_KEY_ID.matcher(id).matches();
     }
 
-    private static final Pattern KEY_ID = Pattern.compile("[0-9a-zA-Z_]+");
-
     /**
      * @param id ID to test
      * @return id alphanumeric + '_' , not empty
@@ -269,22 +288,6 @@ public final class UtilsString {
     public static boolean isValidID(String id) {
         return KEY_ID.matcher(id).matches();
     }
-
-    private static final Map<Character, Integer> roman = new HashMap<>() {
-        {
-            put('I', 1);
-            put('V', 5);
-            put('X', 10);
-            put('L', 50);
-            put('C', 100);
-            put('D', 500);
-            put('M', 1000);
-        }
-    };
-
-    private static final int[] romanValues = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
-    private static final String[] romanLiterals = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV",
-            "I"};
 
     public static int romanToInt(String s) {
         int sum = 0;
@@ -311,13 +314,6 @@ public final class UtilsString {
         }
         return roman.toString();
     }
-
-    private static final DecimalFormat optional1Digit = new DecimalFormat("0.#");
-    private static final DecimalFormat optional2Digit = new DecimalFormat("0.##");
-    private static final DecimalFormat optional10Digit = new DecimalFormat("0.##########");
-    private static final DecimalFormat forced1Digit = new DecimalFormat("0.0");
-    private static final DecimalFormat forced2Digit = new DecimalFormat("0.00");
-    private static final DecimalFormat forcedIntDigit = new DecimalFormat("0");
 
     public static @NotNull String formatForced2Digit(@NotNull Number num) {
         return forced2Digit.format(num);

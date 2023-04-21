@@ -74,18 +74,20 @@ public abstract class AnvilGui implements TextGui {
     }
 
     @Override
-    public final Player getTargetPlayer() {
-        return player;
-    }
-
-
-    @Override
     public Gui getPreviousGui() {
         return previousHolder;
     }
 
     @Override
     public void onClose(@NotNull InventoryCloseEvent event) {
+    }
+
+    /**
+     * @return true if the inventory is updated when a player open it
+     */
+    @Override
+    public boolean isUpdateOnOpen() {
+        return this.updateOnOpen;
     }
 
     /**
@@ -98,12 +100,9 @@ public abstract class AnvilGui implements TextGui {
         this.updateOnOpen = value;
     }
 
-    /**
-     * @return true if the inventory is updated when a player open it
-     */
     @Override
-    public boolean isUpdateOnOpen() {
-        return this.updateOnOpen;
+    public final Player getTargetPlayer() {
+        return player;
     }
 
     @Override

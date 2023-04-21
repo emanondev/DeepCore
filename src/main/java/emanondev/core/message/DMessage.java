@@ -34,14 +34,14 @@ public class DMessage {
         this(plugin, null, null);
     }
 
-    public DMessage(@NotNull CorePlugin plugin, @Nullable CommandSender target) {
-        this(plugin, target, target instanceof Player ? (Player) target : null);
-    }
-
     public DMessage(@NotNull CorePlugin plugin, @Nullable CommandSender target, @Nullable Player papiTarget) {
         this.plugin = plugin;
         this.target = target;
         this.papiTarget = papiTarget;
+    }
+
+    public DMessage(@NotNull CorePlugin plugin, @Nullable CommandSender target) {
+        this(plugin, target, target instanceof Player ? (Player) target : null);
     }
 
     @Contract("_ -> this")
@@ -49,38 +49,6 @@ public class DMessage {
     public DMessage setPapiTarget(@Nullable Player target) {
         this.papiTarget = target;
         return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@Nullable String text) {
-        if (text != null)
-            raw.append(text);
-        return this;
-    }
-
-    @Contract("_, _ -> this")
-    @NotNull
-    public DMessage append(@Nullable String text, String... holders) {
-        if (text != null)
-            raw.append(format(text, holders));
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    public DMessage append(@Nullable DMessage message) {
-        if (message != null && !message.raw.isEmpty())
-            raw.append(message.raw);
-        return this;
-    }
-
-    @Contract("_, _ -> this")
-    @NotNull
-    public DMessage append(@Nullable List<String> text, String... holders) {
-        if (text == null || text.isEmpty())
-            return this;
-        return append(String.join("\n", text), holders);
     }
 
     @Contract("_ -> this")
@@ -96,22 +64,6 @@ public class DMessage {
 
     @Contract("_ -> this")
     @NotNull
-    public DMessage append(@Nullable org.bukkit.ChatColor color) {
-        if (color != null)
-            appendDirectly("<").appendDirectly(color).appendDirectly(">");
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    public DMessage append(@Nullable Color color) {
-        if (color != null)
-            appendDirectly("<").appendDirectly(color).appendDirectly(">");
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
     public DMessage append(@Nullable java.awt.Color color) {
         if (color != null)
             appendDirectly("<").appendDirectly(color).appendDirectly(">");
@@ -120,25 +72,16 @@ public class DMessage {
 
     @Contract("_ -> this")
     @NotNull
+    private DMessage appendDirectly(@Nullable String text) {
+        if (text != null)
+            raw.append(text);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
     private DMessage appendDirectly(@NotNull ChatColor color) {
         raw.append(color.name()); //for formats
-        return this;
-    }
-
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull org.bukkit.ChatColor color) {
-        raw.append(color.name());
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull Color color) {
-        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
-                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
-                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
         return this;
     }
 
@@ -153,9 +96,41 @@ public class DMessage {
 
     @Contract("_ -> this")
     @NotNull
+    public DMessage append(@Nullable org.bukkit.ChatColor color) {
+        if (color != null)
+            appendDirectly("<").appendDirectly(color).appendDirectly(">");
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull org.bukkit.ChatColor color) {
+        raw.append(color.name());
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
     public DMessage append(@Nullable DyeColor color) {
         if (color != null)
             return append(color.getColor());
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    public DMessage append(@Nullable Color color) {
+        if (color != null)
+            appendDirectly("<").appendDirectly(color).appendDirectly(">");
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull Color color) {
+        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
+                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
+                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
         return this;
     }
 
@@ -189,6 +164,42 @@ public class DMessage {
         return append(plugin.getLanguageConfig(target).getMultiMessage(path, false, null, holders));
     }
 
+    @Contract("_, _ -> this")
+    @NotNull
+    public DMessage append(@Nullable List<String> text, String... holders) {
+        if (text == null || text.isEmpty())
+            return this;
+        return append(String.join("\n", text), holders);
+    }
+
+    @Contract("_, _ -> this")
+    @NotNull
+    public DMessage append(@Nullable String text, String... holders) {
+        if (text != null)
+            raw.append(format(text, holders));
+        return this;
+    }
+
+    @NotNull
+    private String format(@NotNull String text, String... holders) {
+        text = UtilsString.fix(text, papiTarget, false, holders);
+        text = text.replace('§', '&');
+        for (ChatColor color : ChatColor.values()) //formats
+            text = text.replace("&" + color.toString().charAt(1),
+                    (color.getColor() == null ? "" : "<reset>") +
+                            "<" + color.getName()
+                            .toLowerCase(Locale.ENGLISH) + ">");
+        try {
+            int from = 0;
+            while (text.indexOf("&#", from) >= 0) {
+                from = text.indexOf("&#", from) + 1;
+                text = text.replace(text.substring(from - 1, from + 7),
+                        "<reset><#" + text.substring(from, from + 7) + ">");
+            }
+        } catch (Throwable ignored) {
+        }
+        return text;
+    }
 
     @Contract("_, _, _ -> this")
     @NotNull
@@ -220,6 +231,14 @@ public class DMessage {
                 appendDirectly("<hover:show_text:\"").append(String.join("\n", hoverText).replace("\"", "\\\""), holders).appendDirectly("\">").append(message).appendDirectly("</hover>");
             else
                 append(message);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    public DMessage append(@Nullable DMessage message) {
+        if (message != null && !message.raw.isEmpty())
+            raw.append(message.raw);
         return this;
     }
 
@@ -255,7 +274,6 @@ public class DMessage {
                 append(message);
         return this;
     }
-
 
     @Contract("_, _, _ -> this")
     @NotNull
@@ -433,6 +451,16 @@ public class DMessage {
         return appendDirectly("\n");
     }
 
+    @Contract("_, _ -> this")
+    @NotNull
+    public DMessage gradient(@Nullable String message, Color... colors) {
+        if (message == null || message.isEmpty())
+            return this;
+        if (colors.length == 0)
+            return append(message);
+        return gradient(colors).append(message).appendDirectly("</gradient>");
+    }
+
     @Contract("_ -> this")
     @NotNull
     public DMessage gradient(Color... colors) {
@@ -446,8 +474,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable String message, Color... colors) {
-        if (message == null || message.isEmpty())
+    public DMessage gradient(@Nullable DMessage message, Color... colors) {
+        if (message == null || message.raw.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -456,8 +484,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable DMessage message, Color... colors) {
-        if (message == null || message.raw.isEmpty())
+    public DMessage gradient(@Nullable String message, java.awt.Color... colors) {
+        if (message == null || message.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -477,8 +505,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable String message, java.awt.Color... colors) {
-        if (message == null || message.isEmpty())
+    public DMessage gradient(@Nullable DMessage message, java.awt.Color... colors) {
+        if (message == null || message.raw.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -487,8 +515,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable DMessage message, java.awt.Color... colors) {
-        if (message == null || message.raw.isEmpty())
+    public DMessage gradient(@Nullable String message, ChatColor... colors) {
+        if (message == null || message.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -508,8 +536,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable String message, ChatColor... colors) {
-        if (message == null || message.isEmpty())
+    public DMessage gradient(@Nullable DMessage message, ChatColor... colors) {
+        if (message == null || message.raw.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -518,8 +546,8 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable DMessage message, ChatColor... colors) {
-        if (message == null || message.raw.isEmpty())
+    public DMessage gradient(@Nullable String message, org.bukkit.ChatColor... colors) {
+        if (message == null || message.isEmpty())
             return this;
         if (colors.length == 0)
             return append(message);
@@ -539,16 +567,6 @@ public class DMessage {
 
     @Contract("_, _ -> this")
     @NotNull
-    public DMessage gradient(@Nullable String message, org.bukkit.ChatColor... colors) {
-        if (message == null || message.isEmpty())
-            return this;
-        if (colors.length == 0)
-            return append(message);
-        return gradient(colors).append(message).appendDirectly("</gradient>");
-    }
-
-    @Contract("_, _ -> this")
-    @NotNull
     public DMessage gradient(@Nullable DMessage message, org.bukkit.ChatColor... colors) {
         if (message == null || message.raw.isEmpty())
             return this;
@@ -556,28 +574,6 @@ public class DMessage {
             return append(message);
         return gradient(colors).append(message).appendDirectly("</gradient>");
     }
-
-    @NotNull
-    private String format(@NotNull String text, String... holders) {
-        text = UtilsString.fix(text, papiTarget, false, holders);
-        text = text.replace('§', '&');
-        for (ChatColor color : ChatColor.values()) //formats
-            text = text.replace("&" + color.toString().charAt(1),
-                    (color.getColor() == null ? "" : "<reset>") +
-                            "<" + color.getName()
-                            .toLowerCase(Locale.ENGLISH) + ">");
-        try {
-            int from = 0;
-            while (text.indexOf("&#", from) >= 0) {
-                from = text.indexOf("&#", from) + 1;
-                text = text.replace(text.substring(from - 1, from + 7),
-                        "<reset><#" + text.substring(from, from + 7) + ">");
-            }
-        } catch (Throwable ignored) {
-        }
-        return text;
-    }
-
 
     @Contract(pure = true)
     public void send() {
@@ -591,6 +587,11 @@ public class DMessage {
                 plugin.adventure().player(player).sendMessage(toMiniComponent());
             else //???
                 plugin.adventure().sender(target).sendMessage(toMiniComponent());
+    }
+
+    @Contract(pure = true)
+    public Component toMiniComponent() {
+        return MiniMessage.miniMessage().deserialize(raw.toString());
     }
 
     @Contract(pure = true)
@@ -632,20 +633,9 @@ public class DMessage {
     }
 
     @Contract(pure = true)
-    public String toJson() {
-        return GsonComponentSerializer.gson().serialize(toMiniComponent());
-    }
-
-    @Contract(pure = true)
     public String toLegacy() {
         return UNGLY_LEGACY.serialize(toMiniComponent());
     }
-
-    @Contract(pure = true)
-    public Component toMiniComponent() {
-        return MiniMessage.miniMessage().deserialize(raw.toString());
-    }
-
 
     /**
      * Note: this also force non italic white text, since this parte of the api is
@@ -667,7 +657,6 @@ public class DMessage {
         return List.of(lines);
     }
 
-
     @Contract(pure = true)
     public List<String> toStringList() {
         String[] lines = raw.toString().replaceAll("(?i)<newline>", "\n").split("\n");
@@ -679,6 +668,16 @@ public class DMessage {
         return ComponentSerializer.parse(toJson());
     }
 
+    @Contract(pure = true)
+    public String toJson() {
+        return GsonComponentSerializer.gson().serialize(toMiniComponent());
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    public DMessage applyHolders(String... placeholders) {
+        return applyHolders(null, placeholders);
+    }
 
     @Contract("_, _ -> this")
     @NotNull
@@ -687,12 +686,6 @@ public class DMessage {
         raw.delete(0, raw.length());
         raw.append(str);
         return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    public DMessage applyHolders(String... placeholders) {
-        return applyHolders(null, placeholders);
     }
 
 }

@@ -11,14 +11,6 @@ public abstract class CoreListener implements Listener, ConsoleLogger {
     private final String id;
     private final CorePlugin plugin;
 
-    public String getID() {
-        return id;
-    }
-
-    public CorePlugin getPlugin() {
-        return plugin;
-    }
-
     public CoreListener(@NotNull CorePlugin plugin, @NotNull String id) {
         if (!UtilsString.isLowcasedValidID(id))
             throw new IllegalArgumentException();
@@ -31,5 +23,13 @@ public abstract class CoreListener implements Listener, ConsoleLogger {
                 .sendMessage(ChatColor.translateAlternateColorCodes('&',
                         ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + getPlugin().getName() + ChatColor.DARK_BLUE + "|Listener "
                                 + ChatColor.WHITE + getID() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
+    }
+
+    public CorePlugin getPlugin() {
+        return plugin;
+    }
+
+    public String getID() {
+        return id;
     }
 }

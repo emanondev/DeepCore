@@ -123,16 +123,6 @@ public class CustomEventListener implements Listener {
         anvilCheck(event);
     }
 
-    private static void anvilCheck(InventoryClickEvent event) {
-        if (!(event.getClickedInventory() instanceof AnvilInventory))
-            return;
-        if (event.getSlot() != 2)
-            return;
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
-            return;
-        Bukkit.getPluginManager().callEvent(new AnvilResultCreationEvent(event));
-    }
-
     private static void merchantCheck(InventoryClickEvent event) {
         if (!(event.getClickedInventory() instanceof MerchantInventory))
             return;
@@ -142,6 +132,16 @@ public class CustomEventListener implements Listener {
                 || event.getClickedInventory().getItem(2).getType() == Material.AIR)
             return;
         Bukkit.getPluginManager().callEvent(new PlayerBuyMerchantRecipeEvent(event));
+    }
+
+    private static void anvilCheck(InventoryClickEvent event) {
+        if (!(event.getClickedInventory() instanceof AnvilInventory))
+            return;
+        if (event.getSlot() != 2)
+            return;
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)
+            return;
+        Bukkit.getPluginManager().callEvent(new AnvilResultCreationEvent(event));
     }
 
 }

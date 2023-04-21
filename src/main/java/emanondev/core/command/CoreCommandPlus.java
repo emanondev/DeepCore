@@ -21,6 +21,12 @@ import java.util.function.Predicate;
 
 public class CoreCommandPlus extends CoreCommand {
 
+    private final HashMap<String, TriConsumer<CommandSender, String, String[]>> subExecutors = new HashMap<>();
+    private final HashMap<String, TriFunction<CommandSender, String, String[], List<String>>> subCompleter = new HashMap<>();
+    private final HashMap<String, Permission> subPerms = new HashMap<>();
+    private final HashMap<String, String> subNicks = new HashMap<>();
+    private final List<String> ids = new ArrayList<>();
+
     /**
      * Construct a new Command. Note: id is used for both config file of the command
      * and default command name.
@@ -42,10 +48,12 @@ public class CoreCommandPlus extends CoreCommand {
      * @param permission         Permission required to use this Command if exists.
      * @param defaultDescription Default description of the Command, might be updated on Command
      *                           file.
+     * @param defaultAliases     Default aliases of the Command, might be changed on Command file
+     *                           and applied with Server restart or Plugin restart.
      */
     public CoreCommandPlus(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
-                           @Nullable String defaultDescription) {
-        this(id, plugin, permission, defaultDescription, null);
+                           @Nullable String defaultDescription, @Nullable List<String> defaultAliases) {
+        super(id, plugin, permission, defaultDescription, defaultAliases);
     }
 
     /**
@@ -57,12 +65,10 @@ public class CoreCommandPlus extends CoreCommand {
      * @param permission         Permission required to use this Command if exists.
      * @param defaultDescription Default description of the Command, might be updated on Command
      *                           file.
-     * @param defaultAliases     Default aliases of the Command, might be changed on Command file
-     *                           and applied with Server restart or Plugin restart.
      */
     public CoreCommandPlus(@NotNull String id, @NotNull CorePlugin plugin, @Nullable Permission permission,
-                           @Nullable String defaultDescription, @Nullable List<String> defaultAliases) {
-        super(id, plugin, permission, defaultDescription, defaultAliases);
+                           @Nullable String defaultDescription) {
+        this(id, plugin, permission, defaultDescription, null);
     }
 
     /**
@@ -112,12 +118,6 @@ public class CoreCommandPlus extends CoreCommand {
             this.logProblem("already used sub command nick &e" + nick + "&f, sub command (&e" + id + "&f) skipped (check &e/plugins/" + getPlugin().getName() + "/Commands/" + getID() + ".yml&f on &esubCommands." + id + ".nick&f and reload the plugin)");
         subNicks.put(nick, id);
     }
-
-    private final HashMap<String, TriConsumer<CommandSender, String, String[]>> subExecutors = new HashMap<>();
-    private final HashMap<String, TriFunction<CommandSender, String, String[], List<String>>> subCompleter = new HashMap<>();
-    private final HashMap<String, Permission> subPerms = new HashMap<>();
-    private final HashMap<String, String> subNicks = new HashMap<>();
-    private final List<String> ids = new ArrayList<>();
 
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {

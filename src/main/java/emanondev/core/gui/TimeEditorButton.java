@@ -18,17 +18,12 @@ import java.util.List;
 @Deprecated
 public abstract class TimeEditorButton extends AGuiButton {
 
-    private Long changeAmount;
     private final Long maxChangeAmount;
     private final Long minChangeAmount;
-    private ItemStack base;
-
-    public void setBaseItem(ItemStack baseItem) {
-        base = baseItem;
-    }
-
     private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L,
             4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
+    private Long changeAmount;
+    private ItemStack base;
 
     /**
      * @param gui              parent gui
@@ -45,16 +40,6 @@ public abstract class TimeEditorButton extends AGuiButton {
      */
     public TimeEditorButton(Gui gui, ItemStack base, Long changeAmountBase) {
         this(gui, base == null ? null : new ItemBuilder(base).setGuiProperty().build(), changeAmountBase, null, null);
-    }
-
-    /**
-     * @param gui
-     * @param changeAmountBase
-     * @param minChangeValue
-     * @param maxChangeValue
-     */
-    public TimeEditorButton(Gui gui, Long changeAmountBase, Long minChangeValue, Long maxChangeValue) {
-        this(gui, null, changeAmountBase, null, null);
     }
 
     /**
@@ -82,6 +67,41 @@ public abstract class TimeEditorButton extends AGuiButton {
         } else
             this.minChangeAmount = minChangeValue;
         checkBounds();
+    }
+
+    /**
+     * @param gui
+     * @param changeAmountBase
+     * @param minChangeValue
+     * @param maxChangeValue
+     */
+    public TimeEditorButton(Gui gui, Long changeAmountBase, Long minChangeValue, Long maxChangeValue) {
+        this(gui, null, changeAmountBase, null, null);
+    }
+
+    private static Long addNumbers(Long a, Long b) {
+        return a + b;
+    }
+
+    private static Long subtractNumbers(Long a, Long b) {
+        return a - b;
+    }
+
+    private void checkBounds() {
+
+        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
+            throw new IllegalArgumentException();
+        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+
+    }
+
+    public void setBaseItem(ItemStack baseItem) {
+        base = baseItem;
     }
 
     @Override
@@ -138,6 +158,10 @@ public abstract class TimeEditorButton extends AGuiButton {
                 "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9+&b/&9- &e%amount% &9-> &9+&b/&9- &e%amountx10%&b/&e%amount/10%");
     }
 
+    public abstract Long getValue();
+
+    public abstract void onValueChange(Long value);
+
     public Long getChangeAmount() {
         return changeAmount;
     }
@@ -146,18 +170,6 @@ public abstract class TimeEditorButton extends AGuiButton {
         if (changeAmount.doubleValue() < 0)
             throw new IllegalArgumentException();
         this.changeAmount = changeAmount;
-    }
-
-    public abstract void onValueChange(Long value);
-
-    public abstract Long getValue();
-
-    private static Long addNumbers(Long a, Long b) {
-        return a + b;
-    }
-
-    private static Long subtractNumbers(Long a, Long b) {
-        return a - b;
     }
 
     private Long multiply() {
@@ -172,19 +184,6 @@ public abstract class TimeEditorButton extends AGuiButton {
             if (ranges[i] < this.changeAmount)
                 return bound(ranges[i]);
         return bound(ranges[ranges.length - 1]);
-    }
-
-    private void checkBounds() {
-
-        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
-            throw new IllegalArgumentException();
-        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-
     }
 
     private Long bound(Long num) {

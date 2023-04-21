@@ -20,6 +20,13 @@ import java.util.List;
 public abstract class ChestGui implements Gui {
 
 
+    private final Gui previousHolder;
+    private final Player player;
+    private final Inventory inv;
+    private final CorePlugin plugin;
+    private boolean updateOnOpen = true;
+    private boolean timerUpdated = false;
+
     /**
      * Create a chest-type gui
      *
@@ -37,13 +44,6 @@ public abstract class ChestGui implements Gui {
         this.inv = Bukkit.createInventory(this, rows * 9, title == null ? "" : title.toLegacy());
         this.plugin = plugin;
     }
-
-    private final Gui previousHolder;
-    private final Player player;
-    private final Inventory inv;
-    private final CorePlugin plugin;
-    private boolean updateOnOpen = true;
-    private boolean timerUpdated = false;
 
     /**
      * Create a chest-type gui
@@ -77,47 +77,9 @@ public abstract class ChestGui implements Gui {
         this.plugin = plugin;
     }
 
-    public @NotNull CorePlugin getPlugin() {
-        return plugin;
-    }
-
-    @Override
-    public @NotNull Inventory getInventory() {
-        return inv;
-    }
-
-    @Override
-    public final Player getTargetPlayer() {
-        return player;
-    }
-
-    @Override
-    public Gui getPreviousGui() {
-        return previousHolder;
-    }
-
-    @Override
-    public void onClose(@NotNull InventoryCloseEvent event) {
-    }
-
-    @Override
-    public void setUpdateOnOpen(boolean value) {
-        this.updateOnOpen = value;
-    }
-
-    @Override
-    public boolean isUpdateOnOpen() {
-        return this.updateOnOpen;
-    }
-
-    @Override
-    public boolean isTimerUpdated() {
-        return timerUpdated;
-    }
-
-    @Override
-    public void setTimerUpdated(boolean value) {
-        timerUpdated = value;
+    @Deprecated
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
+        giveMessageFeedback(receiver, path, def, color, receiver, holders);
     }
 
     @Deprecated
@@ -131,26 +93,58 @@ public abstract class ChestGui implements Gui {
                 def, color, target, holders);
     }
 
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
-                def, color, target, holders));
+    public @NotNull CorePlugin getPlugin() {
+        return plugin;
     }
 
-    @Deprecated
-    protected String getMessage(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
-                def, color, target, holders);
+    @Override
+    public @NotNull Inventory getInventory() {
+        return inv;
     }
 
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
-        giveMessageFeedback(receiver, path, def, color, receiver, holders);
+    @Override
+    public Gui getPreviousGui() {
+        return previousHolder;
+    }
+
+    @Override
+    public void onClose(@NotNull InventoryCloseEvent event) {
+    }
+
+    @Override
+    public boolean isUpdateOnOpen() {
+        return this.updateOnOpen;
+    }
+
+    @Override
+    public void setUpdateOnOpen(boolean value) {
+        this.updateOnOpen = value;
+    }
+
+    @Override
+    public final Player getTargetPlayer() {
+        return player;
+    }
+
+    @Override
+    public boolean isTimerUpdated() {
+        return timerUpdated;
+    }
+
+    @Override
+    public void setTimerUpdated(boolean value) {
+        timerUpdated = value;
     }
 
     @Deprecated
     protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, String... holders) {
         giveMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    @Deprecated
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
+                def, color, target, holders));
     }
 
     @Deprecated
@@ -184,6 +178,12 @@ public abstract class ChestGui implements Gui {
     }
 
     @Deprecated
+    protected String getMessage(CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
+                def, color, target, holders);
+    }
+
+    @Deprecated
     protected String getMessage(CommandSender receiver, @NotNull String path, String def, String... holders) {
         return getMessage(receiver, path, def, true, receiver, holders);
     }
@@ -204,13 +204,13 @@ public abstract class ChestGui implements Gui {
     }
 
     @Deprecated
-    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path, defMessage, defHover, defClick, action, color, target, holders);
+    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, String... holders) {
+        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     @Deprecated
-    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, String... holders) {
-        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
+    protected ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path, String defMessage, String defHover, String defClick, ClickEvent.Action action, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path, defMessage, defHover, defClick, action, color, target, holders);
     }
 
     @Deprecated
@@ -244,6 +244,11 @@ public abstract class ChestGui implements Gui {
     }
 
     @Deprecated
+    protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui." + path, def, color, receiver, holders);
+    }
+
+    @Deprecated
     protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, CommandSender target, String... holders) {
         return getMultiMessage(receiver, path, def, true, target, holders);
     }
@@ -251,10 +256,5 @@ public abstract class ChestGui implements Gui {
     @Deprecated
     protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, String... holders) {
         return getMultiMessage(receiver, path, def, true, receiver, holders);
-    }
-
-    @Deprecated
-    protected List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path, List<String> def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("gui." + path, def, color, receiver, holders);
     }
 }

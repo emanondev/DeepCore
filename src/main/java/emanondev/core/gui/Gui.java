@@ -32,9 +32,19 @@ public interface Gui extends InventoryHolder, FileLogger {
         return getPlugin().getLanguageConfig(who).loadSection("guis");
     }
 
+    /**
+     * @return plugin responsible for the gui, cannot be null
+     */
+    @NotNull CorePlugin getPlugin();
+
     default void open(@NotNull HumanEntity p) {
         p.openInventory(getInventory());
     }
+
+    /**
+     * @return inventory of this holder, cannot be null
+     */
+    @NotNull Inventory getInventory();
 
     /**
      * @return parent Gui or null
@@ -154,6 +164,23 @@ public interface Gui extends InventoryHolder, FileLogger {
     }
 
     /**
+     * @return true if the inventory is updated when a player open it
+     */
+    boolean isUpdateOnOpen();
+
+    /**
+     * Sets whenever the inventory should be updated when a player open it
+     *
+     * @param value whenever the inventory should be updated when a player open it or not
+     */
+    void setUpdateOnOpen(boolean value);
+
+    /**
+     * Update the slots of the inventory
+     */
+    void updateInventory();
+
+    /**
      * @param slot - slot position
      * @return button at slot position or null
      * @throws UnsupportedOperationException if the get operation is not supported by this gui
@@ -174,36 +201,9 @@ public interface Gui extends InventoryHolder, FileLogger {
     void addButton(@NotNull GuiButton button);
 
     /**
-     * Update the slots of the inventory
-     */
-    void updateInventory();
-
-    /**
-     * @return inventory of this holder, cannot be null
-     */
-    @NotNull Inventory getInventory();
-
-    /**
-     * @return plugin responsible for the gui, cannot be null
-     */
-    @NotNull CorePlugin getPlugin();
-
-    /**
      * @return target player or null
      */
     @Nullable Player getTargetPlayer();
-
-    /**
-     * Sets whenever the inventory should be updated when a player open it
-     *
-     * @param value whenever the inventory should be updated when a player open it or not
-     */
-    void setUpdateOnOpen(boolean value);
-
-    /**
-     * @return true if the inventory is updated when a player open it
-     */
-    boolean isUpdateOnOpen();
 
     default boolean isTimerUpdated() {
         return false;

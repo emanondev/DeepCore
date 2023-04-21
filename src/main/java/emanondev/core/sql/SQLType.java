@@ -17,12 +17,12 @@ public enum SQLType {
         this.DRIVER = driver;
     }
 
-    public String getUrl(String host, int port, String database) {
-        return PATH + host + ":" + port + "/" + database;
-    }
-
     public Connection getConnection(String host, String user, String password, String database, int port) throws SQLException, ClassNotFoundException {
         Class.forName(DRIVER);
         return DriverManager.getConnection(getUrl(host, port, database), user, password);
+    }
+
+    public String getUrl(String host, int port, String database) {
+        return PATH + host + ":" + port + "/" + database;
     }
 }

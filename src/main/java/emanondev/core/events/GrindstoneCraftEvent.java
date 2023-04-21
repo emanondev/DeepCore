@@ -11,12 +11,12 @@ public class GrindstoneCraftEvent extends CraftEvent {
         super(clickEvent);
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
+    public static @NotNull HandlerList getHandlerList() {
         return HANDLERS_LIST;
     }
 
-    public static @NotNull HandlerList getHandlerList() {
+    @Override
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS_LIST;
     }
 

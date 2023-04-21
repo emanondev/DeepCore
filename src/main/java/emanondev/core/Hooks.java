@@ -10,6 +10,10 @@ public class Hooks {
         return isEnabled("Vault");
     }
 
+    public static boolean isEnabled(String pluginName) {
+        return Bukkit.getPluginManager().isPluginEnabled(pluginName);
+    }
+
     public static boolean isVaultEnabled() {
         return isEnabled("Vault");
     }
@@ -76,9 +80,5 @@ public class Hooks {
 
     public static boolean isPartiesEnabled() {
         return isEnabled("Parties");
-    }
-
-    public static boolean isEnabled(String pluginName) {
-        return Bukkit.getPluginManager().isPluginEnabled(pluginName);
     }
 }

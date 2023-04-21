@@ -22,6 +22,10 @@ import java.util.*;
 
 public class PacketManager {
 
+    private final Plugin plugin;
+    private final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+    private final Set<PacketEntity> packetEntities = Collections.newSetFromMap(new WeakHashMap<>());
+
     public PacketManager(Plugin plugin) {
         if (plugin == null)
             throw new NullPointerException();
@@ -31,9 +35,17 @@ public class PacketManager {
             throw new IllegalStateException("unsupported version");
     }
 
-    private final Plugin plugin;
-
-    private final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+    private static EnumWrappers.ItemSlot equipmentSlotToWrapper(EquipmentSlot slot) {
+        return switch (slot) {
+            case CHEST -> EnumWrappers.ItemSlot.CHEST;
+            case FEET -> EnumWrappers.ItemSlot.FEET;
+            case HAND -> EnumWrappers.ItemSlot.MAINHAND;
+            case HEAD -> EnumWrappers.ItemSlot.HEAD;
+            case LEGS -> EnumWrappers.ItemSlot.LEGS;
+            case OFF_HAND -> EnumWrappers.ItemSlot.OFFHAND;
+            default -> throw new IllegalStateException("unable to check equipment slot");
+        };
+    }
 
     public void clearAll() {
         for (PacketEntity pEntity : packetEntities)
@@ -114,18 +126,6 @@ public class PacketManager {
                 }
             }
         });
-    }
-
-    private static EnumWrappers.ItemSlot equipmentSlotToWrapper(EquipmentSlot slot) {
-        return switch (slot) {
-            case CHEST -> EnumWrappers.ItemSlot.CHEST;
-            case FEET -> EnumWrappers.ItemSlot.FEET;
-            case HAND -> EnumWrappers.ItemSlot.MAINHAND;
-            case HEAD -> EnumWrappers.ItemSlot.HEAD;
-            case LEGS -> EnumWrappers.ItemSlot.LEGS;
-            case OFF_HAND -> EnumWrappers.ItemSlot.OFFHAND;
-            default -> throw new IllegalStateException("unable to check equipment slot");
-        };
     }
 
     protected void updateArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
@@ -385,8 +385,6 @@ public class PacketManager {
             }
         }, 1L);
     }
-
-    private final Set<PacketEntity> packetEntities = Collections.newSetFromMap(new WeakHashMap<>());
 
     void trackPacketEntity(PacketEntity p) {
         packetEntities.add(p);

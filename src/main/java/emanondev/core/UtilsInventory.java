@@ -19,13 +19,6 @@ public final class UtilsInventory {
         throw new AssertionError();
     }
 
-    /**
-     * A utility method to support versions that use null or air ItemStacks.
-     */
-    public static boolean isAirOrNull(ItemStack item) {
-        return item == null || item.getType().equals(Material.AIR);
-    }
-
     public static boolean isSimilarIgnoreDamage(ItemStack item, ItemStack item2) {
         if (isAirOrNull(item))
             return isAirOrNull(item2);
@@ -43,6 +36,13 @@ public final class UtilsInventory {
             return false;
         ((Damageable) meta2).setDamage(((Damageable) meta1).getDamage());
         return meta1.equals(meta2);
+    }
+
+    /**
+     * A utility method to support versions that use null or air ItemStacks.
+     */
+    public static boolean isAirOrNull(ItemStack item) {
+        return item == null || item.getType().equals(Material.AIR);
     }
 
     @Deprecated

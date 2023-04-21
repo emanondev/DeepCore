@@ -25,6 +25,15 @@ public class ItemBuilder {
     private final ItemStack result;
     private ItemMeta resultMeta;
 
+    public ItemBuilder(@NotNull Material result) {
+        this(new ItemStack(result));
+    }
+
+    public ItemBuilder(@NotNull ItemStack result) {
+        this.result = new ItemStack(result);
+        this.resultMeta = this.result.getItemMeta();
+    }
+
     /**
      * Sets unbreakable.<br>
      * Sets all {@link ItemFlag}.
@@ -40,13 +49,25 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder(@NotNull Material result) {
-        this(new ItemStack(result));
+    /**
+     * @param value Should this be unbreakable?
+     * @return this for chaining.
+     */
+    @Contract("_ -> this")
+    public ItemBuilder setUnbreakable(boolean value) {
+        this.resultMeta.setUnbreakable(value);
+        return this;
     }
 
-    public ItemBuilder(@NotNull ItemStack result) {
-        this.result = new ItemStack(result);
-        this.resultMeta = this.result.getItemMeta();
+    /**
+     * Sets all {@link ItemFlag} on this
+     *
+     * @return this for chaining.
+     */
+    @Contract(" -> this")
+    public ItemBuilder hideAllFlags() {
+        this.resultMeta.addItemFlags(ItemFlag.values());
+        return this;
     }
 
     /**
@@ -56,16 +77,6 @@ public class ItemBuilder {
     public ItemStack build() {
         this.result.setItemMeta(this.resultMeta);
         return this.result;
-    }
-
-    /**
-     * @param value Should this be unbreakable?
-     * @return this for chaining.
-     */
-    @Contract("_ -> this")
-    public ItemBuilder setUnbreakable(boolean value) {
-        this.resultMeta.setUnbreakable(value);
-        return this;
     }
 
     /**
@@ -269,17 +280,6 @@ public class ItemBuilder {
         return copy;
     }
 
-    /**
-     * Sets all {@link ItemFlag} on this
-     *
-     * @return this for chaining.
-     */
-    @Contract(" -> this")
-    public ItemBuilder hideAllFlags() {
-        this.resultMeta.addItemFlags(ItemFlag.values());
-        return this;
-    }
-
     @Contract("_, _ -> this")
     public ItemBuilder addPattern(DyeColor color, PatternType patternType) {
         if (this.resultMeta instanceof BannerMeta)
@@ -300,6 +300,37 @@ public class ItemBuilder {
     @Contract("_, _ -> this")
     public ItemBuilder setDescription(List<String> description, String... holders) {
         return setDescription(description, true, null, holders);
+    }
+
+    /**
+     * update both title and lore
+     *
+     * @param description Text to set
+     * @param color       Whether translate color codes or not
+     * @param player      Player target for PlaceHolderAPI holders
+     * @param holders     Additional placeholders to replace in the format
+     *                    "holder1", "value1", "holder2", "value2"...
+     * @return this for chaining.
+     */
+    @Contract("_, _, _, _ -> this")
+    public ItemBuilder setDescription(List<String> description, boolean color, Player player, String... holders) {
+        List<String> list = UtilsString.fix(description, player, color, holders);
+        if (list == null || list.isEmpty()) {
+            this.resultMeta.setDisplayName(null);
+            this.resultMeta.setLore(null);
+        } else if (list.size() == 1) {
+            this.resultMeta.setDisplayName(list.get(0));
+            this.resultMeta.setLore(null);
+        } else {
+            try {
+                this.resultMeta.setDisplayName(list.remove(0));
+            } catch (UnsupportedOperationException e) {
+                list = new ArrayList<>(list);
+                this.resultMeta.setDisplayName(list.remove(0));
+            }
+            this.resultMeta.setLore(list);
+        }
+        return this;
     }
 
     /**
@@ -375,35 +406,65 @@ public class ItemBuilder {
         return GsonComponentSerializer.gson().serialize(MiniMessage.miniMessage().deserialize(text));
     }
 
-    /**
-     * update both title and lore
-     *
-     * @param description Text to set
-     * @param color       Whether translate color codes or not
-     * @param player      Player target for PlaceHolderAPI holders
-     * @param holders     Additional placeholders to replace in the format
-     *                    "holder1", "value1", "holder2", "value2"...
-     * @return this for chaining.
-     */
-    @Contract("_, _, _, _ -> this")
-    public ItemBuilder setDescription(List<String> description, boolean color, Player player, String... holders) {
-        List<String> list = UtilsString.fix(description, player, color, holders);
-        if (list == null || list.isEmpty()) {
-            this.resultMeta.setDisplayName(null);
-            this.resultMeta.setLore(null);
-        } else if (list.size() == 1) {
-            this.resultMeta.setDisplayName(list.get(0));
-            this.resultMeta.setLore(null);
-        } else {
-            try {
-                this.resultMeta.setDisplayName(list.remove(0));
-            } catch (UnsupportedOperationException e) {
-                list = new ArrayList<>(list);
-                this.resultMeta.setDisplayName(list.remove(0));
-            }
-            this.resultMeta.setLore(list);
-        }
+    @Contract("_ -> this")
+    public ItemBuilder addDescription(@NotNull DMessage message) {
+        List<String> list = message.toJsonMulti();
+        if (list == null || list.isEmpty())
+            return this;
+        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
+        List<String> lore = map.containsKey("lore") ? new ArrayList<>((List<String>) map.get("lore")) : new ArrayList<>();
+        lore.addAll(list);
+        map.put("lore", lore);
+        map.put("==", "ItemMeta");
+        this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
         return this;
+    }
+
+    @Contract("_, _ -> this")
+    public ItemBuilder setPage(int page, @NotNull DMessage message) {
+        if (this.resultMeta instanceof BookMeta)
+            ((BookMeta) this.resultMeta).spigot().setPage(page, message.toBaseComponent());
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public ItemBuilder setPages(DMessage... messages) {
+        if (this.resultMeta instanceof BookMeta)
+            for (DMessage message : messages)
+                addPage(message);
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
+    @Contract("_ -> this")
+    public ItemBuilder addPage(@NotNull DMessage message) {
+        if (this.resultMeta instanceof BookMeta)
+            ((BookMeta) this.resultMeta).spigot().addPage(message.toBaseComponent());
+        else
+            new IllegalStateException("meta is not BookMeta").printStackTrace();
+        return this;
+    }
+
+    @Contract("_, _, _ -> this")
+    public ItemBuilder applyPlaceholders(@NotNull CorePlugin plugin, @Nullable Player target, String... placeholders) {
+        DMessage msg = getDescription(plugin);
+        msg.applyHolders(target, placeholders);
+        return setDescription(msg);
+    }
+
+    public DMessage getDescription(@NotNull CorePlugin plugin) {
+        DMessage msg = new DMessage(plugin, null);
+        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
+        if (map.containsKey("display-name"))
+            msg.append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize((String) map.get("display-name"))));
+        msg.append("\n");
+        if (map.containsKey("lore"))
+            for (String line : (List<String>) map.get("lore"))
+                msg.append("\n").append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize(line)));
+        return msg;
     }
 
     @Contract("_ -> this")
@@ -431,67 +492,6 @@ public class ItemBuilder {
         return this;
     }
 
-    @Contract("_ -> this")
-    public ItemBuilder addDescription(@NotNull DMessage message) {
-        List<String> list = message.toJsonMulti();
-        if (list == null || list.isEmpty())
-            return this;
-        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
-        List<String> lore = map.containsKey("lore") ? new ArrayList<>((List<String>) map.get("lore")) : new ArrayList<>();
-        lore.addAll(list);
-        map.put("lore", lore);
-        map.put("==", "ItemMeta");
-        this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
-        return this;
-    }
-
-    @Contract("_, _ -> this")
-    public ItemBuilder setPage(int page, @NotNull DMessage message) {
-        if (this.resultMeta instanceof BookMeta)
-            ((BookMeta) this.resultMeta).spigot().setPage(page, message.toBaseComponent());
-        else
-            new IllegalStateException("meta is not BookMeta").printStackTrace();
-        return this;
-    }
-
-    @Contract("_ -> this")
-    public ItemBuilder addPage(@NotNull DMessage message) {
-        if (this.resultMeta instanceof BookMeta)
-            ((BookMeta) this.resultMeta).spigot().addPage(message.toBaseComponent());
-        else
-            new IllegalStateException("meta is not BookMeta").printStackTrace();
-        return this;
-    }
-
-    @Contract("_ -> this")
-    public ItemBuilder setPages(DMessage... messages) {
-        if (this.resultMeta instanceof BookMeta)
-            for (DMessage message : messages)
-                addPage(message);
-        else
-            new IllegalStateException("meta is not BookMeta").printStackTrace();
-        return this;
-    }
-
-    public DMessage getDescription(@NotNull CorePlugin plugin) {
-        DMessage msg = new DMessage(plugin, null);
-        Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
-        if (map.containsKey("display-name"))
-            msg.append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize((String) map.get("display-name"))));
-        msg.append("\n");
-        if (map.containsKey("lore"))
-            for (String line : (List<String>) map.get("lore"))
-                msg.append("\n").append(MiniMessage.miniMessage().serialize(GsonComponentSerializer.gson().deserialize(line)));
-        return msg;
-    }
-
-    @Contract("_, _, _ -> this")
-    public ItemBuilder applyPlaceholders(@NotNull CorePlugin plugin, @Nullable Player target, String... placeholders) {
-        DMessage msg = getDescription(plugin);
-        msg.applyHolders(target, placeholders);
-        return setDescription(msg);
-    }
-
     @Contract("_, _, _ -> this")
     public <T, Z> ItemBuilder addNamespacedKey(@NotNull NamespacedKey key, @NotNull PersistentDataType<T, Z> type, Z value) {
         resultMeta.getPersistentDataContainer().set(key, type, value);
@@ -507,7 +507,7 @@ public class ItemBuilder {
 
     @Contract("_ -> this")
     public ItemBuilder setColor(@Nullable DyeColor color) {
-        if (color==null)
+        if (color == null)
             return this;
         if (resultMeta instanceof LeatherArmorMeta meta) {
             meta.setColor(color.getColor());

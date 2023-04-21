@@ -19,14 +19,13 @@ public class TimeEditorFButton extends AGuiButton {
 
     private final Consumer<Long> changeRequest;
     private final Supplier<Long> grabValue;
-    private Long changeAmount;
     private final Long maxChangeAmount;
     private final Long minChangeAmount;
     private final Supplier<ItemStack> baseItem;
+    private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L, 4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
+    private Long changeAmount;
     private Supplier<List<String>> baseDescription = null;
     private Supplier<List<String>> fullDescription = null;
-
-    private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L, 4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
 
 
     /**
@@ -38,6 +37,32 @@ public class TimeEditorFButton extends AGuiButton {
     public TimeEditorFButton(Gui gui, Supplier<Long> grabValue, Consumer<Long> changeRequest, @Nullable Supplier<ItemStack> baseItem) {
         this(gui, grabValue, changeRequest, baseItem,
                 null, null, null);
+    }
+
+    /**
+     * @param gui              parent gui
+     * @param grabValue        Supply the current value (seconds)
+     * @param changeRequest    Apply changes to current value (seconds)
+     * @param baseItem         Which item should be used for the button
+     * @param changeAmountBase Which should be the starting change value by click
+     * @param maxChangeValue   maximus allowed change amount by click amount
+     * @param minChangeValue   minimum allowed change amount by click amount
+     * @throws IllegalArgumentException if maxChangeValue is less than
+     *                                  minChangeValue
+     * @throws IllegalArgumentException if maxChangeValue or minChangeValue are less
+     *                                  or equals to 0
+     */
+
+    public TimeEditorFButton(Gui gui, @NotNull Supplier<Long> grabValue, @NotNull Consumer<Long> changeRequest, @Nullable Supplier<ItemStack> baseItem,
+                             @Nullable Long changeAmountBase, @Nullable Long minChangeValue, @Nullable Long maxChangeValue) {
+        super(gui);
+        this.changeRequest = changeRequest;
+        this.grabValue = grabValue;
+        this.baseItem = baseItem;
+        this.changeAmount = changeAmountBase == null ? 60L : changeAmountBase;
+        this.maxChangeAmount = Objects.requireNonNullElse(maxChangeValue, Long.MAX_VALUE);
+        this.minChangeAmount = Objects.requireNonNullElse(minChangeValue, 1L);
+        checkBounds();
     }
 
     /**
@@ -65,30 +90,23 @@ public class TimeEditorFButton extends AGuiButton {
                 changeAmountBase, null, null);
     }
 
-    /**
-     * @param gui              parent gui
-     * @param grabValue        Supply the current value (seconds)
-     * @param changeRequest    Apply changes to current value (seconds)
-     * @param baseItem         Which item should be used for the button
-     * @param changeAmountBase Which should be the starting change value by click
-     * @param maxChangeValue   maximus allowed change amount by click amount
-     * @param minChangeValue   minimum allowed change amount by click amount
-     * @throws IllegalArgumentException if maxChangeValue is less than
-     *                                  minChangeValue
-     * @throws IllegalArgumentException if maxChangeValue or minChangeValue are less
-     *                                  or equals to 0
-     */
+    private static Long addNumbers(Long a, Long b) {
+        return a + b;
+    }
 
-    public TimeEditorFButton(Gui gui, @NotNull Supplier<Long> grabValue, @NotNull Consumer<Long> changeRequest, @Nullable Supplier<ItemStack> baseItem,
-                             @Nullable Long changeAmountBase, @Nullable Long minChangeValue, @Nullable Long maxChangeValue) {
-        super(gui);
-        this.changeRequest = changeRequest;
-        this.grabValue = grabValue;
-        this.baseItem = baseItem;
-        this.changeAmount = changeAmountBase == null ? 60L : changeAmountBase;
-        this.maxChangeAmount = Objects.requireNonNullElse(maxChangeValue, Long.MAX_VALUE);
-        this.minChangeAmount = Objects.requireNonNullElse(minChangeValue, 1L);
-        checkBounds();
+    private static Long subtractNumbers(Long a, Long b) {
+        return a - b;
+    }
+
+    private void checkBounds() {
+        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
+            throw new IllegalArgumentException();
+        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
     }
 
     @Override
@@ -120,33 +138,6 @@ public class TimeEditorFButton extends AGuiButton {
         }
     }
 
-    public ItemStack getBaseItem() {
-        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
-                .loadGuiItem("time_editor", Material.REPEATER).build() : baseItem.get();
-    }
-
-    /**
-     * holder %value% for current value
-     *
-     * @param baseDescription
-     * @return this
-     */
-    public TimeEditorFButton setBaseDescription(Supplier<List<String>> baseDescription) {
-        this.baseDescription = baseDescription;
-        return this;
-    }
-
-    /**
-     * holder %value% for current value, %amount% for amount editor, %amount_inc%, %amount_dec%
-     *
-     * @param fullDescription
-     * @return this
-     */
-    public TimeEditorFButton setFullDescription(Supplier<List<String>> fullDescription) {
-        this.fullDescription = fullDescription;
-        return this;
-    }
-
     @Override
     public ItemStack getItem() {
         ItemStack base = getBaseItem();
@@ -172,6 +163,19 @@ public class TimeEditorFButton extends AGuiButton {
                 "%amount_dec%", UtilsString.getTimeStringSeconds(getTargetPlayer(), divide())).build();
     }
 
+    public ItemStack getBaseItem() {
+        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("time_editor", Material.REPEATER).build() : baseItem.get();
+    }
+
+    public Long getValue() {
+        return grabValue.get();
+    }
+
+    public void changeRequest(Long value) {
+        changeRequest.accept(value);
+    }
+
     public Long getChangeAmount() {
         return changeAmount;
     }
@@ -181,24 +185,6 @@ public class TimeEditorFButton extends AGuiButton {
             throw new IllegalArgumentException();
         this.changeAmount = changeAmount;
         checkBounds();
-    }
-
-    public void changeRequest(Long value) {
-        changeRequest.accept(value);
-    }
-
-    public Long getValue() {
-        return grabValue.get();
-    }
-
-
-    private static Long addNumbers(Long a, Long b) {
-        return a + b;
-    }
-
-
-    private static Long subtractNumbers(Long a, Long b) {
-        return a - b;
     }
 
     private Long multiply() {
@@ -215,17 +201,6 @@ public class TimeEditorFButton extends AGuiButton {
         return bound(ranges[ranges.length - 1]);
     }
 
-    private void checkBounds() {
-        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
-            throw new IllegalArgumentException();
-        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-    }
-
     private Long bound(Long num) {
         if (num > maxChangeAmount)
             num = maxChangeAmount;
@@ -233,6 +208,28 @@ public class TimeEditorFButton extends AGuiButton {
             num = minChangeAmount;
         return num;
 
+    }
+
+    /**
+     * holder %value% for current value
+     *
+     * @param baseDescription
+     * @return this
+     */
+    public TimeEditorFButton setBaseDescription(Supplier<List<String>> baseDescription) {
+        this.baseDescription = baseDescription;
+        return this;
+    }
+
+    /**
+     * holder %value% for current value, %amount% for amount editor, %amount_inc%, %amount_dec%
+     *
+     * @param fullDescription
+     * @return this
+     */
+    public TimeEditorFButton setFullDescription(Supplier<List<String>> fullDescription) {
+        this.fullDescription = fullDescription;
+        return this;
     }
 
 }

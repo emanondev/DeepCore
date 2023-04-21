@@ -29,14 +29,6 @@ public abstract class StringListEditorButton extends AGuiButton {
         subTitle = value;
     }
 
-    public void setBaseItem(ItemStack item) {
-        baseItem = item;
-    }
-
-    public abstract List<String> getValue();
-
-    public abstract void onChange(List<String> list);
-
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
@@ -61,10 +53,6 @@ public abstract class StringListEditorButton extends AGuiButton {
         return false;
     }
 
-    private void setLine(int value) {
-        line = value;
-    }
-
     private int getLine() {
         List<String> value = getValue();
         if (value == null) {
@@ -77,6 +65,10 @@ public abstract class StringListEditorButton extends AGuiButton {
         if (r == 0 && action == Action.MOVE_UP)
             action = Action.MOVE_DOWN;
         return r;
+    }
+
+    private void setLine(int value) {
+        line = value;
     }
 
     void applyAction() {
@@ -150,9 +142,9 @@ public abstract class StringListEditorButton extends AGuiButton {
 
     }
 
-    public ItemStack getBaseItem() {
-        return baseItem;
-    }
+    public abstract List<String> getValue();
+
+    public abstract void onChange(List<String> list);
 
     @Override
     public ItemStack getItem() {
@@ -160,6 +152,14 @@ public abstract class StringListEditorButton extends AGuiButton {
         if (item == null)
             return null;
         return new ItemBuilder(item).setDescription(getDescription()).build();
+    }
+
+    public ItemStack getBaseItem() {
+        return baseItem;
+    }
+
+    public void setBaseItem(ItemStack item) {
+        baseItem = item;
     }
 
     public List<String> getDescription() {

@@ -33,12 +33,12 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
     }
 
     /**
-     * Returns module description
+     * Returns module plugin
      *
-     * @return module description
+     * @return module plugin
      */
-    public final String getDescription() {
-        return this.description;
+    public final @NotNull CorePlugin getPlugin() {
+        return this.plugin;
     }
 
     /**
@@ -51,12 +51,12 @@ public abstract class Module implements Listener, ConsoleLogger, FileLogger {
     }
 
     /**
-     * Returns module plugin
+     * Returns module description
      *
-     * @return module plugin
+     * @return module description
      */
-    public final @NotNull CorePlugin getPlugin() {
-        return this.plugin;
+    public final String getDescription() {
+        return this.description;
     }
 
     public YMLConfig getConfig() {

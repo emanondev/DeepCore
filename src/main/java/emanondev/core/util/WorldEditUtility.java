@@ -44,19 +44,13 @@ import java.util.concurrent.CompletableFuture;
 
 public final class WorldEditUtility {
 
+    /**
+     * One time generated ID.
+     */
+    private static final UUID DEFAULT_ID = UUID.fromString("a233eb4b-4cab-42cd-9fd9-7e7b9a3f74be");
+
     private WorldEditUtility() {
         throw new AssertionError();
-    }
-
-    @Deprecated
-    public static Clipboard load(@NotNull File dest, @NotNull Plugin plugin) {
-        ClipboardFormat format = ClipboardFormats.findByFile(dest);
-        try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
-            return new ClipboardContainer(reader.read());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static CompletableFuture<Clipboard> load(@NotNull File dest, @NotNull Plugin plugin, boolean async) {
@@ -107,23 +101,6 @@ public final class WorldEditUtility {
         return clipboard;
     }
 
-    public static boolean save(File dest, Clipboard clip) {
-        dest.getParentFile().mkdirs();
-        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(dest))) {
-            writer.write(clip);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * One time generated ID.
-     */
-    private static final UUID DEFAULT_ID = UUID.fromString("a233eb4b-4cab-42cd-9fd9-7e7b9a3f74be");
-
-
     private static Actor getActor(boolean persistent) {
         if (persistent)
             return BukkitAdapter.adapt(Bukkit.getConsoleSender());
@@ -154,6 +131,17 @@ public final class WorldEditUtility {
                 };
             }
         };
+    }
+
+    public static boolean save(File dest, Clipboard clip) {
+        dest.getParentFile().mkdirs();
+        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(dest))) {
+            writer.write(clip);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     public static CompletableFuture<EditSession> paste(Location location, Clipboard clipboard, boolean async, CorePlugin plugin,
@@ -220,27 +208,10 @@ public final class WorldEditUtility {
         return future;
     }
 
-
     @Deprecated
     public static boolean paste(Location dest, Clipboard clip) {
         return paste(dest, clip, true);
     }
-
-    @Deprecated
-    public static boolean paste(Location dest, Clipboard clip, double rotationDegree) {
-        return paste(dest, clip, rotationDegree, true);
-    }
-
-    @Deprecated
-    public static void clearArea(Location corner1, Location corner2) {
-        clearArea(corner1, corner2, true);
-    }
-
-    @Deprecated
-    public static void clearArea(World w, BoundingBox area) {
-        clearArea(w, area, true);
-    }
-
 
     @Deprecated
     public static boolean paste(Location dest, Clipboard clip, boolean async) {
@@ -257,6 +228,10 @@ public final class WorldEditUtility {
         return true;
     }
 
+    @Deprecated
+    public static boolean paste(Location dest, Clipboard clip, double rotationDegree) {
+        return paste(dest, clip, rotationDegree, true);
+    }
 
     @Deprecated
     public static boolean paste(Location dest, Clipboard clip, double rotationDegree, boolean async) {
@@ -293,12 +268,21 @@ public final class WorldEditUtility {
         return true;
     }
 
+    @Deprecated
+    public static void clearArea(Location corner1, Location corner2) {
+        clearArea(corner1, corner2, true);
+    }
 
     @Deprecated
     public static void clearArea(Location corner1, Location corner2, boolean async) {
         if (!Objects.equals(corner1.getWorld(), corner2.getWorld()))
             throw new IllegalArgumentException();
         clearArea(corner1.getWorld(), BoundingBox.of(corner1, corner2));
+    }
+
+    @Deprecated
+    public static void clearArea(World w, BoundingBox area) {
+        clearArea(w, area, true);
     }
 
     @Deprecated
@@ -331,8 +315,20 @@ public final class WorldEditUtility {
     }
 
     @Deprecated
+    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
+        if (!corner1.getWorld().equals(corner2.getWorld()))
+            throw new IllegalArgumentException();
+        return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
+    }
+
+    @Deprecated
     public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes) {
         return copy(w, area, copyEntity, copyBiomes, true);
+    }
+
+    @Deprecated
+    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async) {
+        return copy(w, area, copyEntity, copyBiomes, async, CoreMain.get());
     }
 
     @Deprecated
@@ -341,14 +337,13 @@ public final class WorldEditUtility {
     }
 
     @Deprecated
-    public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
-        if (!corner1.getWorld().equals(corner2.getWorld()))
-            throw new IllegalArgumentException();
-        return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
-    }
-
-    @Deprecated
-    public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async) {
-        return copy(w, area, copyEntity, copyBiomes, async, CoreMain.get());
+    public static Clipboard load(@NotNull File dest, @NotNull Plugin plugin) {
+        ClipboardFormat format = ClipboardFormats.findByFile(dest);
+        try (ClipboardReader reader = format.getReader(new FileInputStream(dest))) {
+            return new ClipboardContainer(reader.read());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

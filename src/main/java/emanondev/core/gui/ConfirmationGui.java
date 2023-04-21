@@ -26,6 +26,8 @@ public abstract class ConfirmationGui extends ChestGui {
             this.getInventory().setItem(i, item);
     }
 
+    public abstract ItemStack getConfirmationItem(boolean value);
+
     @Override
     public void onClick(@NotNull InventoryClickEvent event) {
         if (event.getSlot() >= 0 && event.getSlot() < 3)
@@ -35,6 +37,16 @@ public abstract class ConfirmationGui extends ChestGui {
     }
 
     public abstract void onConfirmation(boolean value);
+
+    @Override
+    public void updateInventory() {
+        ItemStack item = getConfirmationItem(false);
+        for (int i = 0; i < 3; i++)
+            this.getInventory().setItem(i, item);
+        item = getConfirmationItem(true);
+        for (int i = 6; i < 9; i++)
+            this.getInventory().setItem(i, item);
+    }
 
     @Override
     public GuiButton getButton(int slot) {
@@ -50,18 +62,6 @@ public abstract class ConfirmationGui extends ChestGui {
     public void addButton(@NotNull GuiButton button) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public void updateInventory() {
-        ItemStack item = getConfirmationItem(false);
-        for (int i = 0; i < 3; i++)
-            this.getInventory().setItem(i, item);
-        item = getConfirmationItem(true);
-        for (int i = 6; i < 9; i++)
-            this.getInventory().setItem(i, item);
-    }
-
-    public abstract ItemStack getConfirmationItem(boolean value);
 
 
 }

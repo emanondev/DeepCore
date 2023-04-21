@@ -32,38 +32,8 @@ public class PlayerBuyMerchantRecipeEvent extends PlayerEvent implements Cancell
         this.clickEvent = event;
     }
 
-    public MerchantInventory getMerchantInventory() {
-        return (MerchantInventory) clickEvent.getView().getTopInventory();
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return clickEvent.isCancelled();
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        clickEvent.setCancelled(cancelled);
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return HANDLERS_LIST;
-    }
-
     public static HandlerList getHandlerList() {
         return HANDLERS_LIST;
-    }
-
-    /**
-     * Get amount of expected transactions.
-     * Usually the amount of reiceved items is equals or less than (result item amount * amount of transcations)
-     * and is always bigger or equals than (result item amount * (amount of transcations - 1) +1)
-     *
-     * @return amount of transactions expected for this event, changing player inventory and ingredients may change this result
-     */
-    public int getTradingTimes() {
-        return getTradeAmount(this.clickEvent);
     }
 
     private static int getTradeAmount(InventoryClickEvent event) {
@@ -124,6 +94,36 @@ public class PlayerBuyMerchantRecipeEvent extends PlayerEvent implements Cancell
                 return 0;
         }
 
+    }
+
+    public MerchantInventory getMerchantInventory() {
+        return (MerchantInventory) clickEvent.getView().getTopInventory();
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return clickEvent.isCancelled();
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        clickEvent.setCancelled(cancelled);
+    }
+
+    @Override
+    public HandlerList getHandlers() {
+        return HANDLERS_LIST;
+    }
+
+    /**
+     * Get amount of expected transactions.
+     * Usually the amount of reiceved items is equals or less than (result item amount * amount of transcations)
+     * and is always bigger or equals than (result item amount * (amount of transcations - 1) +1)
+     *
+     * @return amount of transactions expected for this event, changing player inventory and ingredients may change this result
+     */
+    public int getTradingTimes() {
+        return getTradeAmount(this.clickEvent);
     }
 
 }

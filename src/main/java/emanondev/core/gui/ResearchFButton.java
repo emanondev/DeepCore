@@ -27,6 +27,8 @@ public class ResearchFButton<T> extends AGuiButton {
     private final Comparator<T> sort;
     @Deprecated
     private final Function<InventoryClickEvent, Boolean> overrideClick;
+    private final HashMap<Integer, Function<Gui, GuiButton>> cButtons = new HashMap<>();
+
 
     /**
      * @param parent
@@ -41,25 +43,6 @@ public class ResearchFButton<T> extends AGuiButton {
                            @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
                            @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements) {
         this(parent, getItem, null, null, match, elementClick, elementItem, getElements, null);
-    }
-
-
-    /**
-     * @param parent
-     * @param getItem             create the item for this button
-     * @param shouldOverrideClick override click
-     * @param match               select which string match which elements
-     * @param elementClick        what happens when clicked
-     * @param elementItem         create the item for element
-     * @param getElements         get allowed values
-     * @param sort                how to sort entities
-     */
-    @Deprecated
-    public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
-                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, @NotNull BiFunction<String, T, Boolean> match,
-                           @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
-                           @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
-        this(parent, getItem, shouldOverrideClick, null, match, elementClick, elementItem, getElements, sort);
     }
 
     /**
@@ -89,8 +72,22 @@ public class ResearchFButton<T> extends AGuiButton {
         this.sort = sort;
     }
 
-    public ItemStack getItem() {
-        return getItem.get();
+    /**
+     * @param parent
+     * @param getItem             create the item for this button
+     * @param shouldOverrideClick override click
+     * @param match               select which string match which elements
+     * @param elementClick        what happens when clicked
+     * @param elementItem         create the item for element
+     * @param getElements         get allowed values
+     * @param sort                how to sort entities
+     */
+    @Deprecated
+    public ResearchFButton(Gui parent, @NotNull Supplier<ItemStack> getItem,
+                           Function<InventoryClickEvent, Boolean> shouldOverrideClick, @NotNull BiFunction<String, T, Boolean> match,
+                           @NotNull BiFunction<InventoryClickEvent, T, Boolean> elementClick,
+                           @NotNull Function<T, ItemStack> elementItem, @NotNull Supplier<Collection<T>> getElements, Comparator<T> sort) {
+        this(parent, getItem, shouldOverrideClick, null, match, elementClick, elementItem, getElements, sort);
     }
 
     public boolean onClick(@NotNull InventoryClickEvent event) {
@@ -100,6 +97,10 @@ public class ResearchFButton<T> extends AGuiButton {
             return overrideClick != null && overrideClick.apply(event);
         else
             return defaultOnClick(event);
+    }
+
+    public ItemStack getItem() {
+        return getItem.get();
     }
 
     @Deprecated
@@ -133,8 +134,6 @@ public class ResearchFButton<T> extends AGuiButton {
         gui.open(event.getWhoClicked());
         return false;
     }
-
-    private final HashMap<Integer, Function<Gui, GuiButton>> cButtons = new HashMap<>();
 
     public void setControlButton(int slot, Function<Gui, GuiButton> controlButton) {
         if (slot < 0 || slot > 8)

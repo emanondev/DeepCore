@@ -13,11 +13,11 @@ import java.util.function.Supplier;
 @Deprecated
 public class EditorButton<T> implements GuiButton {
 
+    private final Gui gui;
     private Function<InventoryClickEvent, Boolean> onClick;
     private Supplier<ItemStack> item;
     private Consumer<T> changeRequest;
     private Supplier<T> grabValue;
-    private final Gui gui;
 
     public EditorButton(Gui gui) {
         if (gui == null)
@@ -57,6 +57,16 @@ public class EditorButton<T> implements GuiButton {
         return onClick.apply(event);
     }
 
+    @Override
+    public ItemStack getItem() {
+        return item == null ? null : item.get();
+    }
+
+    @Override
+    public @NotNull Gui getGui() {
+        return gui;
+    }
+
     public void changeRequest(T value) {
         if (changeRequest == null)
             throw new IllegalStateException();
@@ -67,16 +77,6 @@ public class EditorButton<T> implements GuiButton {
         if (grabValue == null)
             throw new IllegalStateException();
         return grabValue.get();
-    }
-
-    @Override
-    public ItemStack getItem() {
-        return item == null ? null : item.get();
-    }
-
-    @Override
-    public @NotNull Gui getGui() {
-        return gui;
     }
 
 }

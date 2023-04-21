@@ -13,16 +13,14 @@ public enum MCVersion {
     V1_10("1.10", 5), V1_9_4("1.9.4", 4), V1_9("1.9", 3), V1_8_4("1.8.4", 2), V1_8_3("1.8.3", 1), V1_8("1.8", 0),
     V1_7("1.7", -1);
 
+    private static final MCVersion version = fromPackageName(Bukkit.getServer().getClass().getPackage().getName());
     private final String name;
-
     private final int shortNum;
 
     MCVersion(String name, int shortNum) {
         this.name = name;
         this.shortNum = shortNum;
     }
-
-    private static final MCVersion version = fromPackageName(Bukkit.getServer().getClass().getPackage().getName());
 
     public static MCVersion getCurrentVersion() {
         return version;
@@ -68,65 +66,6 @@ public enum MCVersion {
         return UNKNOWN;
     }
 
-    public String toString() {
-        return this.name;
-    }
-
-    public int getNumber() {
-        return this.shortNum;
-    }
-
-    public int compareWith(MCVersion version) {
-        return this.shortNum - version.shortNum;
-    }
-
-    public boolean isOlderThan(MCVersion version) {
-        return (compareWith(version) < 0);
-    }
-
-    public int getMetaVersion() {
-        if (this.isNewerOrEqualTo(V1_17))
-            return 4;
-        if (this.isNewerOrEqualTo(V1_15))
-            return 3;
-        if (this.isNewerOrEqualTo(V1_14))
-            return 2;
-        if (this.isNewerOrEqualTo(V1_13))
-            return 1;
-        if (this.isNewerOrEqualTo(V1_11))
-            return 0;
-        return -1;
-    }
-
-    public boolean isOlderOrEqualTo(MCVersion version) {
-        return (compareWith(version) <= 0);
-    }
-
-    public boolean isNewerThan(MCVersion version) {
-        return (compareWith(version) > 0);
-    }
-
-    public boolean isNewerOrEqualTo(MCVersion version) {
-        return (compareWith(version) >= 0);
-    }
-
-    public boolean isBetweenInclusively(MCVersion v1, MCVersion v2) {
-        int difference = v1.compareWith(v2);
-        if (difference == 0)
-            return equals(v1);
-        if (difference < 0)
-            return (isNewerOrEqualTo(v1) && isOlderOrEqualTo(v2));
-        return (isNewerOrEqualTo(v2) && isOlderOrEqualTo(v1));
-    }
-
-    public boolean isLegacy() {
-        return isOlderOrEqualTo(V1_12);
-    }
-
-    public boolean isOld() {
-        return isOlderOrEqualTo(V1_8_4);
-    }
-
     public static boolean isCraftBukkit() {
         return !hasSpigotAPI();
     }
@@ -147,6 +86,65 @@ public enum MCVersion {
         } catch (ClassNotFoundException ignored) {
         }
         return false;
+    }
+
+    public String toString() {
+        return this.name;
+    }
+
+    public int getNumber() {
+        return this.shortNum;
+    }
+
+    public boolean isOlderThan(MCVersion version) {
+        return (compareWith(version) < 0);
+    }
+
+    public int compareWith(MCVersion version) {
+        return this.shortNum - version.shortNum;
+    }
+
+    public int getMetaVersion() {
+        if (this.isNewerOrEqualTo(V1_17))
+            return 4;
+        if (this.isNewerOrEqualTo(V1_15))
+            return 3;
+        if (this.isNewerOrEqualTo(V1_14))
+            return 2;
+        if (this.isNewerOrEqualTo(V1_13))
+            return 1;
+        if (this.isNewerOrEqualTo(V1_11))
+            return 0;
+        return -1;
+    }
+
+    public boolean isNewerOrEqualTo(MCVersion version) {
+        return (compareWith(version) >= 0);
+    }
+
+    public boolean isNewerThan(MCVersion version) {
+        return (compareWith(version) > 0);
+    }
+
+    public boolean isBetweenInclusively(MCVersion v1, MCVersion v2) {
+        int difference = v1.compareWith(v2);
+        if (difference == 0)
+            return equals(v1);
+        if (difference < 0)
+            return (isNewerOrEqualTo(v1) && isOlderOrEqualTo(v2));
+        return (isNewerOrEqualTo(v2) && isOlderOrEqualTo(v1));
+    }
+
+    public boolean isOlderOrEqualTo(MCVersion version) {
+        return (compareWith(version) <= 0);
+    }
+
+    public boolean isLegacy() {
+        return isOlderOrEqualTo(V1_12);
+    }
+
+    public boolean isOld() {
+        return isOlderOrEqualTo(V1_8_4);
     }
 
 }

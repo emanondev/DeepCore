@@ -73,22 +73,6 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      */
     protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
@@ -104,11 +88,43 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, loadMessage(receiver, path, def, color, target, holders));
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      */
     protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
                                        boolean color, String... holders) {
         sendMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    /**
+     * Sends a message to receiver
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     */
+    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
     }
 
     /**
@@ -170,7 +186,7 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     }
 
     /**
-     * Sends a message to receiver
+     * Returns message and set default if absent
      *
      * @param receiver message target
      * @param path     final configuration path is
@@ -179,30 +195,14 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      * @param color    Whether translate color codes or not
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, loadMessage(receiver, path, def, color, target, holders));
-    }
-
-    /**
-     * Gets text based on sender language.<br>
-     * Shortcut for
-     * {@link #getPlugin()}.{@link CorePlugin#getLanguageConfig(CommandSender)
-     * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
-     * loadString(path, def, sender, true, args)}
-     *
-     * @param sender Target of the message, also used for PAPI compatibility.
-     * @param path   Path to get the message.
-     * @param def    Default message
-     * @param args   Holders and Replacers in the format
-     *               ["holder#1","replacer#1","holder#2","replacer#2"...]
-     * @return Message based on sender language
+     * @return message and set default if absent
+     * @see #getLanguageSection(CommandSender)
      */
     @Deprecated
-    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path,
-                                                @Nullable String def, String... args) {
-        return getPlugin().getLanguageConfig(sender).loadMessage(path, def, true, args);
+    protected String loadMessage(CommandSender receiver, @NotNull String path, @Nullable String def, boolean color,
+                                 @Nullable CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
+                target, holders);
     }
 
     /**
@@ -226,43 +226,23 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     }
 
     /**
-     * Returns message and set default if absent
+     * Gets text based on sender language.<br>
+     * Shortcut for
+     * {@link #getPlugin()}.{@link CorePlugin#getLanguageConfig(CommandSender)
+     * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
+     * loadString(path, def, sender, true, args)}
      *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     * @return message and set default if absent
-     * @see #getLanguageSection(CommandSender)
+     * @param sender Target of the message, also used for PAPI compatibility.
+     * @param path   Path to get the message.
+     * @param def    Default message
+     * @param args   Holders and Replacers in the format
+     *               ["holder#1","replacer#1","holder#2","replacer#2"...]
+     * @return Message based on sender language
      */
     @Deprecated
-    protected String loadMessage(CommandSender receiver, @NotNull String path, @Nullable String def, boolean color,
-                                 @Nullable CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
-                target, holders);
-    }
-
-    /**
-     * Returns message and set default if absent
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     * @return message and set default if absent
-     * @see #getLanguageSection(CommandSender)
-     */
-    @Deprecated
-    protected String loadMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                 boolean color, @Nullable CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
-                target, holders);
+    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path,
+                                                @Nullable String def, String... args) {
+        return getPlugin().getLanguageConfig(sender).loadMessage(path, def, true, args);
     }
 
     /**
@@ -308,6 +288,26 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      * @param path     final configuration path is
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     * @return message and set default if absent
+     * @see #getLanguageSection(CommandSender)
+     */
+    @Deprecated
+    protected String loadMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
+                                 boolean color, @Nullable CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
+                target, holders);
+    }
+
+    /**
+     * Returns message and set default if absent
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      * @return message and set default if absent
      * @see #getLanguageSection(CommandSender)
@@ -369,6 +369,28 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     protected String loadMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
                                  @Nullable CommandSender target, String... holders) {
         return loadMessage(receiver, path, def, true, target, holders);
+    }
+
+    /**
+     * Returns message and set default if absent
+     *
+     * @param receiver   message target
+     * @param path       final configuration path is
+     *                   <b>'command.'+this.getID()+'.'+path</b>
+     * @param defMessage Default message
+     * @param defHover   Default hover message
+     * @param defClick   Default click suggestion
+     * @param action     Default click action type
+     * @param color      Whether translate color codes or not
+     * @param holders    Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
+     * @return message and set default if absent
+     * @see #getLanguageSection(CommandSender)
+     */
+    @Deprecated
+    protected @Nullable ComponentBuilder loadComponentMessage(@NotNull CommandSender receiver, @NotNull String path,
+                                                              @Nullable String defMessage, @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action,
+                                                              boolean color, String... holders) {
+        return loadComponentMessage(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     /**
@@ -393,28 +415,6 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
                                                               boolean color, @Nullable CommandSender target, String... holders) {
         return getPlugin().getLanguageConfig(receiver).loadComponentMessage("command." + this.getID() + "." + path,
                 defMessage, defHover, defClick, action, color, target, holders);
-    }
-
-    /**
-     * Returns message and set default if absent
-     *
-     * @param receiver   message target
-     * @param path       final configuration path is
-     *                   <b>'command.'+this.getID()+'.'+path</b>
-     * @param defMessage Default message
-     * @param defHover   Default hover message
-     * @param defClick   Default click suggestion
-     * @param action     Default click action type
-     * @param color      Whether translate color codes or not
-     * @param holders    Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"...
-     * @return message and set default if absent
-     * @see #getLanguageSection(CommandSender)
-     */
-    @Deprecated
-    protected @Nullable ComponentBuilder loadComponentMessage(@NotNull CommandSender receiver, @NotNull String path,
-                                                              @Nullable String defMessage, @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action,
-                                                              boolean color, String... holders) {
-        return loadComponentMessage(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     /**
@@ -546,6 +546,26 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      * @param path     final configuration path is
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
+     * @param color    Whether translate color codes or not
+     * @param target   Player target for PlaceHolderAPI holders
+     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
+     * @return message list and set default if absent
+     * @see #getLanguageSection(CommandSender)
+     */
+    @Deprecated
+    protected @Nullable List<String> loadMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
+                                                      @Nullable List<String> def, boolean color, @Nullable CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("command." + this.getID() + "." + path, def,
+                color, target, holders);
+    }
+
+    /**
+     * Get message list and set default if absent
+     *
+     * @param receiver message target
+     * @param path     final configuration path is
+     *                 <b>'command.'+this.getID()+'.'+path</b>
+     * @param def      Default message
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      * @return message list and set default if absent
@@ -574,24 +594,10 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
         return loadMultiMessage(receiver, path, def, true, receiver, holders);
     }
 
-    /**
-     * Get message list and set default if absent
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     * @return message list and set default if absent
-     * @see #getLanguageSection(CommandSender)
-     */
     @Deprecated
-    protected @Nullable List<String> loadMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
-                                                      @Nullable List<String> def, boolean color, @Nullable CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("command." + this.getID() + "." + path, def,
-                color, target, holders);
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
+                                       boolean color, String... holders) {
+        giveMessageFeedback(receiver, path, def, color, receiver, holders);
     }
 
     @Deprecated
@@ -609,28 +615,15 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
 
     @Deprecated
     protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getPlugin().getLanguageConfig(receiver)
-                .loadMessage("command." + this.getID() + "." + path, def, color, target, holders));
-    }
-
-    @Deprecated
-    protected String getMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def, boolean color,
-                                @Nullable CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
-                target, holders);
-    }
-
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
                                        boolean color, String... holders) {
         giveMessageFeedback(receiver, path, def, color, receiver, holders);
     }
 
     @Deprecated
     protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, String... holders) {
-        giveMessageFeedback(receiver, path, def, color, receiver, holders);
+                                       boolean color, @Nullable CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getPlugin().getLanguageConfig(receiver)
+                .loadMessage("command." + this.getID() + "." + path, def, color, target, holders));
     }
 
     @Deprecated
@@ -668,6 +661,13 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     protected String getMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def, boolean color,
                                 String... holders) {
         return getMessage(receiver, path, def, color, receiver, holders);
+    }
+
+    @Deprecated
+    protected String getMessage(CommandSender receiver, @NotNull String path, @Nullable List<String> def, boolean color,
+                                @Nullable CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, def, color,
+                target, holders);
     }
 
     @Deprecated
@@ -694,19 +694,19 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     }
 
     @Deprecated
+    protected @Nullable ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path,
+                                                      @Nullable String defMessage, @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action,
+                                                      boolean color, String... holders) {
+        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
+    }
+
+    @Deprecated
 
     protected @Nullable ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path,
                                                       @Nullable String defMessage, @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action,
                                                       boolean color, @Nullable CommandSender target, String... holders) {
         return getPlugin().getLanguageConfig(receiver).loadMessage("command." + this.getID() + "." + path, defMessage,
                 defHover, defClick, action, color, target, holders);
-    }
-
-    @Deprecated
-    protected @Nullable ComponentBuilder getComponent(@NotNull CommandSender receiver, @NotNull String path,
-                                                      @Nullable String defMessage, @Nullable String defHover, @Nullable String defClick, ClickEvent.Action action,
-                                                      boolean color, String... holders) {
-        return getComponent(receiver, path, defMessage, defHover, defClick, action, color, receiver, holders);
     }
 
     @Deprecated
@@ -751,6 +751,13 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
 
     @Deprecated
     protected @Nullable List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
+                                                     @Nullable List<String> def, boolean color, @Nullable CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("command." + this.getID() + "." + path, def,
+                color, target, holders);
+    }
+
+    @Deprecated
+    protected @Nullable List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
                                                      @Nullable List<String> def, @Nullable CommandSender target, String... holders) {
         return getMultiMessage(receiver, path, def, true, target, holders);
     }
@@ -759,13 +766,6 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
     protected @Nullable List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
                                                      @Nullable List<String> def, String... holders) {
         return getMultiMessage(receiver, path, def, true, receiver, holders);
-    }
-
-    @Deprecated
-    protected @Nullable List<String> getMultiMessage(@NotNull CommandSender receiver, @NotNull String path,
-                                                     @Nullable List<String> def, boolean color, @Nullable CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMultiMessage("command." + this.getID() + "." + path, def,
-                color, target, holders);
     }
 
 }

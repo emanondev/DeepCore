@@ -21,10 +21,10 @@ public class UpdateChecker {
 
     private final CorePlugin plugin;
     private final String localPluginVersion;
-    private String spigotPluginVersion;
     private final int ID; // The ID of your resource. Can be found in the resource URL.
     private final boolean notifyOP;
     private final Permission updatePerm;
+    private String spigotPluginVersion;
 
 
     public UpdateChecker(CorePlugin plugin, int id) {

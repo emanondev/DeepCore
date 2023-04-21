@@ -38,6 +38,19 @@ public class ItemEditorFButton extends AGuiButton {
         return false;
     }
 
+    @Override
+    public ItemStack getItem() {
+        return getItem.get();
+    }
+
+    public ItemStack getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(ItemStack item) {
+        setValue.accept(item);
+    }
+
     private class ItemGui extends MapGui {
         public ItemGui() {
             super("&9Item Selector", 1, ItemEditorFButton.this.getTargetPlayer(), ItemEditorFButton.this.getGui(),
@@ -62,19 +75,6 @@ public class ItemEditorFButton extends AGuiButton {
         public void onClose(@NotNull InventoryCloseEvent event) {
             onClose.accept(event);
         }
-    }
-
-    public ItemStack getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(ItemStack item) {
-        setValue.accept(item);
-    }
-
-    @Override
-    public ItemStack getItem() {
-        return getItem.get();
     }
 
 }

@@ -27,16 +27,16 @@ public class VoidWorldGenerator extends ChunkGenerator {
         return true;
     }
 
-    public byte[] generate(World world, Random rand, int chunkx, int chunkz) {
-        return this.bytes;
-    }
-
     public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
         return this.blockPopulator;
     }
 
     public Location getFixedSpawnLocation(@NotNull World world, @NotNull Random random) {
         return new Location(world, 0, 128, 0);
+    }
+
+    public byte[] generate(World world, Random rand, int chunkx, int chunkz) {
+        return this.bytes;
     }
 
 }

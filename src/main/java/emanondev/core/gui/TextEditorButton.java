@@ -15,6 +15,7 @@ import java.util.List;
 public abstract class TextEditorButton extends AGuiButton {
 
     private ItemStack baseItem = new ItemBuilder(Material.PAPER).setGuiProperty().build();
+    private String title = "&9Text editor";
 
     public TextEditorButton(Gui parent) {
         super(parent);
@@ -43,6 +44,14 @@ public abstract class TextEditorButton extends AGuiButton {
         return new ItemBuilder(baseItem).setDescription(getDescription(), true).build();
     }
 
+    public ItemStack getBaseItem() {
+        return baseItem;
+    }
+
+    public void setBaseItem(ItemStack item) {
+        baseItem = item;
+    }
+
     public List<String> getDescription() {
         List<String> desc = new ArrayList<>();
         desc.addAll(getBaseDescription());
@@ -54,10 +63,6 @@ public abstract class TextEditorButton extends AGuiButton {
     public List<String> getBaseDescription() {
         return List.of("&6&lText:");
     }
-
-    public abstract String getValue();
-
-    public abstract void onTextChange(String text);
 
     public List<String> getValueDescription() {
         String text = getValue();
@@ -73,21 +78,15 @@ public abstract class TextEditorButton extends AGuiButton {
         return List.of("&7[&fClick&7] &9Left &7> &9Change Text");
     }
 
-    public void setBaseItem(ItemStack item) {
-        baseItem = item;
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem;
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String value) {
         title = value;
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public abstract String getValue();
 
-    private String title = "&9Text editor";
+    public abstract void onTextChange(String text);
 }

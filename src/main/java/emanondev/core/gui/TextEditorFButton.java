@@ -28,6 +28,7 @@ public class TextEditorFButton extends AGuiButton {
     private final Supplier<List<String>> baseDescription;
     private final Supplier<List<String>> valueDescription;
     private final Supplier<List<String>> instructionsDescription;
+    private String title = "&9Text editor";
 
     /**
      * @param parent
@@ -73,6 +74,10 @@ public class TextEditorFButton extends AGuiButton {
         return new ItemBuilder(baseItem).setDescription(getDescription(), true).build();
     }
 
+    public ItemStack getBaseItem() {
+        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
+    }
+
     public List<String> getDescription() {
         List<String> desc = new ArrayList<>();
         List<String> tmp = getBaseDescription();
@@ -91,18 +96,6 @@ public class TextEditorFButton extends AGuiButton {
         return baseDescription == null ? List.of("&6&lText:") : baseDescription.get();
     }
 
-    public String getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(String value) {
-        setValue.accept(value);
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
-    }
-
     public List<String> getValueDescription() {
         return valueDescription == null ? List.of(getValue() == null ? "" : getValue()) : valueDescription.get();
     }
@@ -113,13 +106,19 @@ public class TextEditorFButton extends AGuiButton {
                 : instructionsDescription.get();
     }
 
-    public void setTitle(String value) {
-        title = value;
-    }
-
     public String getTitle() {
         return title;
     }
 
-    private String title = "&9Text editor";
+    public void setTitle(String value) {
+        title = value;
+    }
+
+    public String getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(String value) {
+        setValue.accept(value);
+    }
 }

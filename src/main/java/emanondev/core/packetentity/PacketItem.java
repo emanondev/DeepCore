@@ -52,6 +52,25 @@ public class PacketItem extends PacketEntity {
         return result;
     }
 
+    @Override
+    protected void handleRemovePackets(Collection<? extends Player> players) {
+        getManager().removeItem(players, this);
+    }
+
+    @Override
+    protected void handleSpawnPackets(Collection<? extends Player> players) {
+        getManager().spawnItem(players, this);
+    }
+
+    @Override
+    protected void handleUpdatePackets(Collection<? extends Player> players) {
+        getManager().updateItem(players, this);
+    }
+
+    public BaseComponent getCustomName() {
+        return this.customName;
+    }
+
     public PacketItem setCustomName(String customName) {
         this.customName = new TextComponent(customName);
         return this;
@@ -62,8 +81,8 @@ public class PacketItem extends PacketEntity {
         return this;
     }
 
-    public BaseComponent getCustomName() {
-        return this.customName;
+    public boolean isGlowing() {
+        return this.isGlowing;
     }
 
     public PacketItem setGlowing(boolean bool) {
@@ -71,17 +90,13 @@ public class PacketItem extends PacketEntity {
         return this;
     }
 
-    public boolean isGlowing() {
-        return this.isGlowing;
+    public boolean isCustomNameVisible() {
+        return this.customNameVisible;
     }
 
     public PacketItem setCustomNameVisible(boolean bool) {
         this.customNameVisible = bool;
         return this;
-    }
-
-    public boolean isCustomNameVisible() {
-        return this.customNameVisible;
     }
 
     public EntityType getType() {
@@ -99,6 +114,10 @@ public class PacketItem extends PacketEntity {
         return this;
     }
 
+    public ItemStack getItemStack() {
+        return this.item.clone();
+    }
+
     public PacketItem setItemStack(ItemStack item) {
         if (this.lock)
             return this;
@@ -110,10 +129,6 @@ public class PacketItem extends PacketEntity {
         return this;
     }
 
-    public ItemStack getItemStack() {
-        return this.item.clone();
-    }
-
     public PacketItem setGravity(boolean bool) {
         this.hasGravity = bool;
         return this;
@@ -123,22 +138,22 @@ public class PacketItem extends PacketEntity {
         return this.hasGravity;
     }
 
+    public Vector getVelocity() {
+        return this.velocity;
+    }
+
     public PacketItem setVelocity(Vector vector) {
         this.velocity = vector.clone();
         return this;
     }
 
-    public Vector getVelocity() {
-        return this.velocity;
+    public int getPickupDelay() {
+        return this.pickupDelay;
     }
 
     public PacketItem setPickupDelay(int pickupDelay) {
         this.pickupDelay = pickupDelay;
         return this;
-    }
-
-    public int getPickupDelay() {
-        return this.pickupDelay;
     }
 
     public WrappedDataWatcher getWrappedDataWatcher() {
@@ -147,20 +162,5 @@ public class PacketItem extends PacketEntity {
 
     public double getHeight() {
         return 0.25D;
-    }
-
-    @Override
-    protected void handleRemovePackets(Collection<? extends Player> players) {
-        getManager().removeItem(players, this);
-    }
-
-    @Override
-    protected void handleSpawnPackets(Collection<? extends Player> players) {
-        getManager().spawnItem(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(Collection<? extends Player> players) {
-        getManager().updateItem(players, this);
     }
 }

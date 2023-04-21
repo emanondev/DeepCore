@@ -32,29 +32,41 @@ import java.util.*;
 
 public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
 
-    private LoggerManager loggerManager;
-
-    private boolean useMultiLanguage = true;
-    private String defaultLocale;
     private final HashMap<String, YMLConfig> languageConfigs = new HashMap<>();
     private final HashMap<String, YMLConfig> configs = new HashMap<>();
     private final HashSet<Command> registeredCommands = new HashSet<>();
     private final EnumMap<CounterAPI.ResetTime, CounterAPI> counterApiMap = new EnumMap<>(CounterAPI.ResetTime.class);
     private final EnumMap<CounterAPI.ResetTime, CounterAPI> persistentCounterApiMap = new EnumMap<>(CounterAPI.ResetTime.class);
-    private CooldownAPI cooldownApi = null;
-    private CooldownAPI persistentCooldownApi = null;
     private final Set<String> registeredPermissions = new HashSet<>();
     private final HashSet<SQLDatabase> connections = new HashSet<>();
-    private PacketManager packetManager = null;
     private final Map<String, Module> modules = new HashMap<>();
     private final Set<Module> enabledModules = new HashSet<>();
+    private LoggerManager loggerManager;
+    private boolean useMultiLanguage = true;
+    private String defaultLocale;
+    private CooldownAPI cooldownApi = null;
+    private CooldownAPI persistentCooldownApi = null;
+    private PacketManager packetManager = null;
     private BukkitAudiences adventure;
+
+    @SuppressWarnings("unchecked")
+    private static HashMap<String, Command> getKnownCommands(Object object) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field objectField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+        objectField.setAccessible(true);
+        Object result = objectField.get(object);
+        objectField.setAccessible(false);
+        return (HashMap<String, Command>) result;
+    }
 
     public @NonNull BukkitAudiences adventure() {
         if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
+    }
+
+    public String getDefaultLocale() {
+        return defaultLocale;
     }
 
     /**
@@ -75,10 +87,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         logPentaStar(ChatColor.YELLOW, "Enabled (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
-    public String getDefaultLocale() {
-        return defaultLocale;
-    }
-
     public boolean useMultiLanguage() {
         return useMultiLanguage;
     }
@@ -88,35 +96,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      */
     public Set<Command> getRegisteredCommands() {
         return Collections.unmodifiableSet(registeredCommands);
-    }
-
-    private void setupLanguageConfig() {
-        defaultLocale = getConfig().loadString("language.default-locale", "en");
-        useMultiLanguage = getConfig().loadBoolean("language.multilanguage", true);
-
-        if (useMultiLanguage) {
-            this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
-        } else this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
-    }
-
-    /**
-     * Load the plugin. <br>
-     * <br>
-     * Reset the file "permissions.yml".<br>
-     * Calls {@link #load()}.
-     */
-    public final void onLoad() {
-        long now = System.currentTimeMillis();
-        try {
-            // TODO bad
-            File file = new File(this.getDataFolder(), "permissions.yml");
-            if (file.exists() && !file.delete())
-                new Exception("Unable to delete file permissions.yml").printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        load();
-        logPentaStar(ChatColor.YELLOW, "Loaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
 
     /**
@@ -170,6 +149,93 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             if (enabledModules.contains(module)) module.reload();
         }
         logPentaStar(ChatColor.YELLOW, "Reloaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
+    }
+
+    /**
+     * Gets a Config file based on sender language, or default language if sender is
+     * not a player
+     *
+     * @param sender The target of language
+     * @return Config file for sender language
+     */
+    public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
+        String locale;
+        if (!(sender instanceof Player)) locale = this.defaultLocale;
+        else if (this.useMultiLanguage) locale = ((Player) sender).getLocale().split("_")[0];
+        else locale = this.defaultLocale;
+
+        if (this.languageConfigs.containsKey(locale)) return languageConfigs.get(locale);
+        String fileName = "language" + File.separator + locale + ".yml";
+        if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists() || this.getResource(fileName) != null) {
+            YMLConfig conf = new YMLConfig(this, fileName);
+            languageConfigs.put(locale, conf);
+            return conf;
+        }
+        if (languageConfigs.containsKey(defaultLocale)) return languageConfigs.get(defaultLocale);
+        fileName = "language" + File.separator + defaultLocale + ".yml";
+        YMLConfig conf = new YMLConfig(this, fileName);
+        languageConfigs.put(locale, conf);
+        return conf;
+    }
+
+    private void setupLanguageConfig() {
+        defaultLocale = getConfig().loadString("language.default-locale", "en");
+        useMultiLanguage = getConfig().loadBoolean("language.multilanguage", true);
+
+        if (useMultiLanguage) {
+            this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
+        } else this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
+    }
+
+    /**
+     * Reload the plugin. <br>
+     * Called by {@link #onReload()}.
+     */
+    public abstract void reload();
+
+    /**
+     * Load the plugin. <br>
+     * <br>
+     * Reset the file "permissions.yml".<br>
+     * Calls {@link #load()}.
+     */
+    public final void onLoad() {
+        long now = System.currentTimeMillis();
+        try {
+            // TODO bad
+            File file = new File(this.getDataFolder(), "permissions.yml");
+            if (file.exists() && !file.delete())
+                new Exception("Unable to delete file permissions.yml").printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        load();
+        logPentaStar(ChatColor.YELLOW, "Loaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
+    }
+
+    /**
+     * Register the Listener (remember to put @EventHandler on listener
+     * methods).<br>
+     * Shortcut for {@link #getServer()}.{@link org.bukkit.Server#getPluginManager()
+     * getPluginManager()}.{@link org.bukkit.plugin.PluginManager#registerEvents(Listener, org.bukkit.plugin.Plugin)
+     * registerEvents(listener, this)};
+     *
+     * @param listener Listener to register
+     * @throws NullPointerException if listener is null
+     */
+    public void registerListener(@NotNull Listener listener) {
+        getServer().getPluginManager().registerEvents(listener, this);
+    }
+
+    /**
+     * Unregister the Listener.<br>
+     * Shortcut for {@link org.bukkit.event.HandlerList HandlerList}.{@link org.bukkit.event.HandlerList#unregisterAll() unregisterAll()};
+     *
+     * @param listener Listener to unregister
+     * @throws NullPointerException if listener is null
+     */
+    public void unregisterListener(@NotNull Listener listener) {
+        HandlerList.unregisterAll(listener);
     }
 
     /**
@@ -239,6 +305,16 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     /**
+     * Register permission to the Server.<br>
+     * Adds it to permissions.yml file (read only).
+     *
+     * @param perm permission to register
+     */
+    public void registerPermission(@NotNull Permission perm) {
+        registerPermission(perm, true);
+    }
+
+    /**
      * Generate a reload command for this plugin?<br>
      * <p>
      * If true on enable a command "/{pluginname}reload" is registered<br>
@@ -248,138 +324,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
      * @see ReloadCommand
      */
     protected abstract boolean registerReloadCommand();
-
-    /**
-     * Disable the plugin.<br>
-     * Called by {@link #onDisable()}. <br>
-     * Do NOT start async tasks here.
-     */
-    public abstract void disable();
-
-    /**
-     * Reload the plugin. <br>
-     * Called by {@link #onReload()}.
-     */
-    public abstract void reload();
-
-    /**
-     * Enable the plugin. <br>
-     * Called by {@link #onEnable()}.<br>
-     * Should register Permissions here.<br>
-     * Register Commands and Listeners here.<br>
-     * May call {@link #onReload()}.<br>
-     *
-     * @see #registerPermission(Permission)
-     * @see #registerCommand(Command)
-     * @see #registerListener(Listener)
-     */
-    public abstract void enable();
-
-    /**
-     * Load the plugin. <br>
-     * Called by {@link #onLoad()}.<br>
-     * Should initialize static instance of the plugin.<br>
-     * Do NOT register Commands or Listeners here.<br>
-     *
-     * @see #registerPermission(Permission)
-     */
-    public abstract void load();
-
-    /**
-     * Register the Listener (remember to put @EventHandler on listener
-     * methods).<br>
-     * Shortcut for {@link #getServer()}.{@link org.bukkit.Server#getPluginManager()
-     * getPluginManager()}.{@link org.bukkit.plugin.PluginManager#registerEvents(Listener, org.bukkit.plugin.Plugin)
-     * registerEvents(listener, this)};
-     *
-     * @param listener Listener to register
-     * @throws NullPointerException if listener is null
-     */
-    public void registerListener(@NotNull Listener listener) {
-        getServer().getPluginManager().registerEvents(listener, this);
-    }
-
-    /**
-     * Unregister the Listener.<br>
-     * Shortcut for {@link org.bukkit.event.HandlerList HandlerList}.{@link org.bukkit.event.HandlerList#unregisterAll() unregisterAll()};
-     *
-     * @param listener Listener to unregister
-     * @throws NullPointerException if listener is null
-     */
-    public void unregisterListener(@NotNull Listener listener) {
-        HandlerList.unregisterAll(listener);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static HashMap<String, Command> getKnownCommands(Object object) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field objectField = SimpleCommandMap.class.getDeclaredField("knownCommands");
-        objectField.setAccessible(true);
-        Object result = objectField.get(object);
-        objectField.setAccessible(false);
-        return (HashMap<String, Command>) result;
-    }
-
-    /**
-     * Register a Command
-     *
-     * @param command Command to register
-     * @return true if command is successfully registered
-     * @see CoreCommand
-     * @see #unregisterCommand(Command)
-     */
-    public boolean registerCommand(@NotNull Command command) {
-        try {
-            Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            command.unregister(commandMap);
-            if (!commandMap.register(this.getName().toLowerCase(Locale.ENGLISH), command))
-                throw new IllegalArgumentException("Unable to register the command '" + command.getName() + "'");
-            registeredCommands.add(command);
-            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Unregister a Command
-     *
-     * @param command Command to unregister
-     * @see #registerCommand(Command)
-     */
-    public void unregisterCommand(@NotNull Command command) {
-        try {
-            Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            HashMap<String, Command> knownCommands = getKnownCommands(commandMap);
-            List<String> keys = new ArrayList<>();
-            for (String key : knownCommands.keySet())
-                if (knownCommands.get(key).equals(command)) keys.add(key);
-            for (String key : keys)
-                knownCommands.remove(key);
-            command.unregister(commandMap);
-            registeredCommands.remove(command);
-            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-        } catch (Exception e) {
-            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Register permission to the Server.<br>
-     * Adds it to permissions.yml file (read only).
-     *
-     * @param perm permission to register
-     */
-    public void registerPermission(@NotNull Permission perm) {
-        registerPermission(perm, true);
-    }
 
     /**
      * Register permission to the Server.<br>
@@ -410,60 +354,11 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     /**
-     * Gets plugin Config file.
-     *
-     * @return Plugin config file
-     * @see #getConfig(String) getConfig("config.yml");
+     * Disable the plugin.<br>
+     * Called by {@link #onDisable()}. <br>
+     * Do NOT start async tasks here.
      */
-    public @NotNull YMLConfig getConfig() {
-        return getConfig("config.yml");
-    }
-
-    /**
-     * Gets config file.<br>
-     * Also keep tracks of the file and reload it on {@link #onReload()} method
-     * calls.<br>
-     * Note: If you wish to not keep the file on memory or to not auto reload the file
-     * on {@link #onReload()} method use {@link YMLConfig} constructor.<br>
-     * Auto-append ".yml" to file name if not present.
-     *
-     * @param fileName might contains folder separator for file inside folders
-     * @return config file at specified path inside plugin folder.
-     */
-    public @NotNull YMLConfig getConfig(@NotNull String fileName) {
-        fileName = YMLConfig.fixName(fileName);
-        if (configs.containsKey(fileName)) return configs.get(fileName);
-        YMLConfig conf = new YMLConfig(this, fileName);
-        configs.put(fileName, conf);
-        return conf;
-    }
-
-    /**
-     * Gets a Config file based on sender language, or default language if sender is
-     * not a player
-     *
-     * @param sender The target of language
-     * @return Config file for sender language
-     */
-    public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
-        String locale;
-        if (!(sender instanceof Player)) locale = this.defaultLocale;
-        else if (this.useMultiLanguage) locale = ((Player) sender).getLocale().split("_")[0];
-        else locale = this.defaultLocale;
-
-        if (this.languageConfigs.containsKey(locale)) return languageConfigs.get(locale);
-        String fileName = "language" + File.separator + locale + ".yml";
-        if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists() || this.getResource(fileName) != null) {
-            YMLConfig conf = new YMLConfig(this, fileName);
-            languageConfigs.put(locale, conf);
-            return conf;
-        }
-        if (languageConfigs.containsKey(defaultLocale)) return languageConfigs.get(defaultLocale);
-        fileName = "language" + File.separator + defaultLocale + ".yml";
-        YMLConfig conf = new YMLConfig(this, fileName);
-        languageConfigs.put(locale, conf);
-        return conf;
-    }
+    public abstract void disable();
 
     public @NotNull CooldownAPI getCooldownAPI() {
         return getCooldownAPI(true);
@@ -478,10 +373,33 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         return persistentCooldownApi;
     }
 
+    /**
+     * Enable the plugin. <br>
+     * Called by {@link #onEnable()}.<br>
+     * Should register Permissions here.<br>
+     * Register Commands and Listeners here.<br>
+     * May call {@link #onReload()}.<br>
+     *
+     * @see #registerPermission(Permission)
+     * @see #registerCommand(Command)
+     * @see #registerListener(Listener)
+     */
+    public abstract void enable();
+
     public @NotNull CounterAPI getCounterAPI(@NotNull CounterAPI.ResetTime reset) {
         if (!counterApiMap.containsKey(reset)) counterApiMap.put(reset, new CounterAPI(this, reset));
         return counterApiMap.get(reset);
     }
+
+    /**
+     * Load the plugin. <br>
+     * Called by {@link #onLoad()}.<br>
+     * Should initialize static instance of the plugin.<br>
+     * Do NOT register Commands or Listeners here.<br>
+     *
+     * @see #registerPermission(Permission)
+     */
+    public abstract void load();
 
     public @NotNull CounterAPI getCounterAPI(@NotNull CounterAPI.ResetTime reset, boolean persistent) {
         if (!persistent) {
@@ -506,8 +424,74 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         getLoggerManager().logText(fileName, text);
     }
 
+    /**
+     * Gets the LoggerManager of this plugin.
+     *
+     * @return plugin's LoggerManager.
+     * @see #logOnFile(String, String)
+     * @see #logOnFile(String, List)
+     * @see #logOnFile(String, String[])
+     */
+    @Deprecated
+    public LoggerManager getLoggerManager() {
+        if (loggerManager == null) loggerManager = new LoggerManager(this);
+        return loggerManager;
+    }
+
+    /**
+     * Register a Command
+     *
+     * @param command Command to register
+     * @return true if command is successfully registered
+     * @see CoreCommand
+     * @see #unregisterCommand(Command)
+     */
+    public boolean registerCommand(@NotNull Command command) {
+        try {
+            Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            bukkitCommandMap.setAccessible(true);
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+            command.unregister(commandMap);
+            if (!commandMap.register(this.getName().toLowerCase(Locale.ENGLISH), command))
+                throw new IllegalArgumentException("Unable to register the command '" + command.getName() + "'");
+            registeredCommands.add(command);
+            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public void logOnFile(String fileName, List<String> text) {
         getLoggerManager().logText(fileName, text);
+    }
+
+    /**
+     * Unregister a Command
+     *
+     * @param command Command to unregister
+     * @see #registerCommand(Command)
+     */
+    public void unregisterCommand(@NotNull Command command) {
+        try {
+            Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            bukkitCommandMap.setAccessible(true);
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+            HashMap<String, Command> knownCommands = getKnownCommands(commandMap);
+            List<String> keys = new ArrayList<>();
+            for (String key : knownCommands.keySet())
+                if (knownCommands.get(key).equals(command)) keys.add(key);
+            for (String key : keys)
+                knownCommands.remove(key);
+            command.unregister(commandMap);
+            registeredCommands.remove(command);
+            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+        } catch (Exception e) {
+            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            e.printStackTrace();
+        }
     }
 
     public void logOnFile(String fileName, String[] text) {
@@ -526,9 +510,38 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         return createConnection(databaseName, host, port, username, password);
     }
 
+    /**
+     * Gets plugin Config file.
+     *
+     * @return Plugin config file
+     * @see #getConfig(String) getConfig("config.yml");
+     */
+    public @NotNull YMLConfig getConfig() {
+        return getConfig("config.yml");
+    }
+
     public SQLDatabase createConnection(String databaseName, String host, int port, String username, String password) throws ClassNotFoundException, SQLException {
         SQLType type = this.getConfig().loadEnum("database.type", SQLType.MYSQL, SQLType.class);
         return createConnection(type, databaseName, host, port, username, password);
+    }
+
+    /**
+     * Gets config file.<br>
+     * Also keep tracks of the file and reload it on {@link #onReload()} method
+     * calls.<br>
+     * Note: If you wish to not keep the file on memory or to not auto reload the file
+     * on {@link #onReload()} method use {@link YMLConfig} constructor.<br>
+     * Auto-append ".yml" to file name if not present.
+     *
+     * @param fileName might contains folder separator for file inside folders
+     * @return config file at specified path inside plugin folder.
+     */
+    public @NotNull YMLConfig getConfig(@NotNull String fileName) {
+        fileName = YMLConfig.fixName(fileName);
+        if (configs.containsKey(fileName)) return configs.get(fileName);
+        YMLConfig conf = new YMLConfig(this, fileName);
+        configs.put(fileName, conf);
+        return conf;
     }
 
     public SQLDatabase createConnection(SQLType type, String databaseName, String host, int port, String username, String password) throws ClassNotFoundException, SQLException {
@@ -574,25 +587,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     /**
-     * Gets text based on sender language Shortcut for
-     * {@link CorePlugin#getLanguageConfig(CommandSender)
-     * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
-     * loadString(path, def, sender, true, args)}
-     *
-     * @param sender Target of the message, also used for PAPI compatibility.
-     * @param path   Path to get the message.
-     * @param def    Default message
-     * @param args   Holders and Replacers in the format
-     *               ["holder#1","replacer#1","holder#2","replacer#2"...]
-     * @return Message based on sender language
-     * @see #getLanguageConfig(CommandSender)
-     */
-    @Deprecated
-    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path, @Nullable String def, String... args) {
-        return getLanguageConfig(sender).loadMessage(path, def, true, args);
-    }
-
-    /**
      * Send to sender a text based on sender language.<br>
      * Message is not send if text is null or empty<br>
      * Shortcut for
@@ -612,17 +606,22 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
     /**
-     * Gets the LoggerManager of this plugin.
+     * Gets text based on sender language Shortcut for
+     * {@link CorePlugin#getLanguageConfig(CommandSender)
+     * getLanguageConfig(sender)}.{@link YMLConfig#loadString(String, String, org.bukkit.entity.Player, boolean, String...)
+     * loadString(path, def, sender, true, args)}
      *
-     * @return plugin's LoggerManager.
-     * @see #logOnFile(String, String)
-     * @see #logOnFile(String, List)
-     * @see #logOnFile(String, String[])
+     * @param sender Target of the message, also used for PAPI compatibility.
+     * @param path   Path to get the message.
+     * @param def    Default message
+     * @param args   Holders and Replacers in the format
+     *               ["holder#1","replacer#1","holder#2","replacer#2"...]
+     * @return Message based on sender language
+     * @see #getLanguageConfig(CommandSender)
      */
     @Deprecated
-    public LoggerManager getLoggerManager() {
-        if (loggerManager == null) loggerManager = new LoggerManager(this);
-        return loggerManager;
+    public @Nullable String loadLanguageMessage(@Nullable CommandSender sender, @NotNull String path, @Nullable String def, String... args) {
+        return getLanguageConfig(sender).loadMessage(path, def, true, args);
     }
 
     public @NotNull Map<String, Module> getModules() {
@@ -653,4 +652,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
             return false;
         }
     }
+
+
 }
