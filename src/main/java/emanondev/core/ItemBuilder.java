@@ -493,7 +493,7 @@ public class ItemBuilder {
     }
 
     @Contract("_, _, _ -> this")
-    public <T, Z> ItemBuilder addNamespacedKey(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+    public <T, Z> ItemBuilder addNamespacedKey(@NotNull NamespacedKey key, @NotNull PersistentDataType<T, Z> type, Z value) {
         resultMeta.getPersistentDataContainer().set(key, type, value);
         return this;
     }
@@ -506,7 +506,9 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setColor(DyeColor color) {
+    public ItemBuilder setColor(@Nullable DyeColor color) {
+        if (color==null)
+            return this;
         if (resultMeta instanceof LeatherArmorMeta meta) {
             meta.setColor(color.getColor());
             return this;
