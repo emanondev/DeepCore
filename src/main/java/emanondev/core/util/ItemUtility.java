@@ -15,7 +15,7 @@ public class ItemUtility {
     private static final HashSet<ItemConverter> converters = new HashSet<>();
 
     private ItemUtility() {
-
+        throw new AssertionError();
     }
 
     public static ItemBuilder convertItem(YMLSection section) {
