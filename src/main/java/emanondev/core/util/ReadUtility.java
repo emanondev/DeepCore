@@ -49,6 +49,14 @@ public interface ReadUtility {
         }
     }
 
+    static @Nullable Boolean readBooleanValue(@NotNull String arg) {
+        if (arg.equalsIgnoreCase("true"))
+            return Boolean.TRUE;
+        if (arg.equalsIgnoreCase("false"))
+            return Boolean.FALSE;
+        return null;
+    }
+
     static @Nullable Double readDoubleValue(@NotNull String arg) {
         try {
             return Double.valueOf(arg);
@@ -112,11 +120,17 @@ public interface ReadUtility {
 
     /**
      * @param arg argument to read
+     * @return boolean value of the string or null if parsing failed
+     */
+    default @Nullable Boolean readBoolean(@NotNull String arg) {
+        return readBooleanValue(arg);
+    }
+
+    /**
+     * @param arg argument to read
      * @return double value of the string or null if parsing failed
      */
     default @Nullable Double readDouble(@NotNull String arg) {
         return readDoubleValue(arg);
     }
-
-
 }
