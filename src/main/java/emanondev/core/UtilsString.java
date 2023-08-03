@@ -213,19 +213,6 @@ public final class UtilsString {
     public static String getTimeStringSeconds(CommandSender sender, long cooldown) {
         String and = " " + CoreMain.get().getLanguageConfig(sender).loadString("conjunction.and", "and") + " ";
         StringBuilder result = new StringBuilder();
-        /*if (cooldown >= Time.WEEK.seconds) {// week
-            int val = (int) (cooldown / Time.WEEK.seconds);
-            if (val > 1)
-                result.append(val).append(" ").append(Time.WEEK.getMultipleName(sender));
-            else
-                result.append(val).append(" ").append(Time.WEEK.getSingleName(sender));
-            val = (int) (cooldown % Time.WEEK.seconds / Time.DAY.seconds);
-            if (val > 1)
-                result.append(and).append(val).append(" ").append(Time.DAY.getMultipleName(sender));
-            else if (val == 1)
-                result.append(and).append(val).append(" ").append(Time.DAY.getSingleName(sender));
-            return result.toString();
-        }*/
         if (cooldown >= Time.DAY.seconds) {// day
             int val = (int) (cooldown / Time.DAY.seconds);
             if (val > 1)
@@ -313,6 +300,29 @@ public final class UtilsString {
             }
         }
         return roman.toString();
+    }
+    public static @NotNull String formatForced2DigitWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+forced2Digit.format(num);
+    }
+
+    public static @NotNull String formatForcedIntWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+forcedIntDigit.format(num);
+    }
+
+    public static @NotNull String formatForced1DigitWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+forced1Digit.format(num);
+    }
+
+    public static @NotNull String formatOptional1DigitWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+optional1Digit.format(num);
+    }
+
+    public static @NotNull String formatOptional10DigitWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+optional10Digit.format(num);
+    }
+
+    public static @NotNull String formatOptional2DigitWithSign(@NotNull Number num) {
+        return (num.doubleValue()>0?"+":"")+optional2Digit.format(num);
     }
 
     public static @NotNull String formatForced2Digit(@NotNull Number num) {
