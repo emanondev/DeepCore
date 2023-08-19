@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class PacketEntity {
@@ -107,7 +108,7 @@ public abstract class PacketEntity {
         return remove(active);
     }
 
-    public PacketEntity remove(Collection<? extends Player> players) {
+    public PacketEntity remove(Collection<Player> players) {
         if (players == active)
             players = new HashSet<>(players);
         active.removeAll(players);
@@ -115,25 +116,30 @@ public abstract class PacketEntity {
         return this;
     }
 
-    protected abstract void handleRemovePackets(Collection<? extends Player> players);
+    protected abstract void handleRemovePackets(Collection<Player> players);
 
-    public PacketEntity spawn(Collection<? extends Player> players) {
+    public PacketEntity spawn(Collection<Player> players) {
         active.addAll(players);
         handleSpawnPackets(players);
         return this;
     }
 
-    protected abstract void handleSpawnPackets(Collection<? extends Player> players);
+
+    public PacketEntity spawn(Player player) {
+        return spawn(List.of(player));
+    }
+
+    protected abstract void handleSpawnPackets(Collection<Player> players);
 
     public PacketEntity update() {
         return update(active);
     }
 
-    public PacketEntity update(Collection<? extends Player> players) {
+    public PacketEntity update(Collection<Player> players) {
         return update(players, false);
     }
 
-    public PacketEntity update(Collection<? extends Player> players, boolean bypassCache) {
+    public PacketEntity update(Collection<Player> players, boolean bypassCache) {
         if (!bypassCache) {
             if (cache != null) {
                 if (cache == this.cacheCode()) {
@@ -157,6 +163,6 @@ public abstract class PacketEntity {
         return result;
     }
 
-    protected abstract void handleUpdatePackets(Collection<? extends Player> players);
+    protected abstract void handleUpdatePackets(Collection<Player> players);
 
 }

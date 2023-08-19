@@ -70,6 +70,71 @@ public class PacketManager {
         return p;
     }
 
+    public void spawnArmorStand(Collection<Player> players, PacketArmorStand entity) {
+        PacketContainer packet1 = protocolManager.createPacket(GameVersion.isNewerEqualsTo(1, 19, 0) ? PacketType.Play.Server.SPAWN_ENTITY : PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+        packet1.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
+        if (packet1.getUUIDs().size() > 0)
+            packet1.getUUIDs().write(0, entity.getUniqueId());
+        int i = 1;
+        if (GameVersion.isOlderThan(1, 19, 0)) {
+            packet1.getIntegers().write(i++, 1);
+        } else {
+            packet1.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
+        }
+        packet1.getIntegers().write(i++, (int) (entity.getVelocity().getX() * 8000.0D));
+        packet1.getIntegers().write(i++, (int) (entity.getVelocity().getY() * 8000.0D));
+        packet1.getIntegers().write(i++, (int) (entity.getVelocity().getZ() * 8000.0D));
+        packet1.getDoubles().write(0, entity.getLocation().getX());
+        packet1.getDoubles().write(1, entity.getLocation().getY());
+        packet1.getDoubles().write(2, entity.getLocation().getZ());
+        packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
+        packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+        packet1.getBytes().write(2, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F)); //what?
+        if (packet1.getIntegers().size() > i)
+            packet1.getIntegers().write(i, 0);
+        PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+        packet2.getIntegers().write(0, entity.getEntityId());
+        WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
+        WatchableCollection.writeMetadataPacket(packet2, wpw);
+
+        /*
+        List<ValuePairs<EquipmentSlot, ItemStack>> equipments = new ArrayList<>();
+        equipments.add(new ValuePairs(EquipmentSlot.HAND, entity.getItemInMainHand()));
+        equipments.add(new ValuePairs(EquipmentSlot.HEAD, entity.getHelmet()));
+        PacketContainer[] packet3 = nms.createEntityEquipmentPacket(entity.getEntityId(), equipments);
+        */
+        PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
+        List<Pair<EnumWrappers.ItemSlot, ItemStack>> data = new ArrayList<>();
+        packet3.getIntegers().write(0, entity.getEntityId());
+        boolean hasItems = false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            ItemStack item = entity.getItem(slot);
+            if (item != null && !item.getType().isAir()) { //what if item is changed to air/null?
+                hasItems = true;
+                data.add(new Pair<>(equipmentSlotToWrapper(slot), item));
+            }
+        }
+        packet3.getSlotStackPairLists().write(0, data);
+        //end
+
+        if (!plugin.isEnabled())
+            return;
+        boolean finalHasItems = hasItems;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            for (Player player : players) {
+                if (player.isOnline()) {
+                    protocolManager.sendServerPacket(player, packet1);
+                    protocolManager.sendServerPacket(player, packet2);
+                    if (finalHasItems)
+                    //for (PacketContainer packet : packet3)
+                        protocolManager.sendServerPacket(player, packet3);
+                }
+            }
+        });
+    }
+
+
+/* 19-8-23
     protected void spawnArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(GameVersion.isNewerEqualsTo(1, 19, 0) ? PacketType.Play.Server.SPAWN_ENTITY : PacketType.Play.Server.SPAWN_ENTITY_LIVING);
         packet1.getIntegers().write(0, entity.getEntityId());
@@ -94,7 +159,7 @@ public class PacketManager {
             packet1.getIntegers().write(i, 0);
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
-        WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
+        WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
@@ -115,18 +180,14 @@ public class PacketManager {
         boolean finalHasItems = hasItems;
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : players) {
-                try {
-                    protocolManager.sendServerPacket(player, packet1);
-                    protocolManager.sendServerPacket(player, packet2);
-                    if (finalHasItems)
-                        protocolManager.sendServerPacket(player, packet3);
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
+                if (finalHasItems)
+                    protocolManager.sendServerPacket(player, packet3);
 
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
             }
         });
-    }
+    }*/
 
     protected void updateArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
@@ -138,7 +199,7 @@ public class PacketManager {
         packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
-        WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
+        WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
         packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
 
 
@@ -154,14 +215,10 @@ public class PacketManager {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players) {
-                    protocolManager.sendServerPacket(player, packet1);
-                    protocolManager.sendServerPacket(player, packet2);
-                    protocolManager.sendServerPacket(player, packet3);
-                }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            for (Player player : players) {
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
+                protocolManager.sendServerPacket(player, packet3);
             }
         });
     }
@@ -169,32 +226,25 @@ public class PacketManager {
     protected void updateArmorStandOnlyMeta(Collection<? extends Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet1.getIntegers().write(0, entity.getEntityId());
-        WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
+        WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
         packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players)
-                    protocolManager.sendServerPacket(player, packet1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            for (Player player : players)
+                protocolManager.sendServerPacket(player, packet1);
         });
     }
 
     protected void removeArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, entity.getEntityId());
+        packet1.getIntegers().write(0, 1);
+        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            try {
-                for (Player player : players)
-                    protocolManager.sendServerPacket(player, packet1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            for (Player player : players)
+                protocolManager.sendServerPacket(player, packet1);
         }, 1L);
     }
 
@@ -246,14 +296,10 @@ public class PacketManager {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players) {
-                    protocolManager.sendServerPacket(player, packet1);
-                    protocolManager.sendServerPacket(player, packet2);
-                    protocolManager.sendServerPacket(player, packet3);
-                }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            for (Player player : players) {
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
+                protocolManager.sendServerPacket(player, packet3);
             }
         });
     }
@@ -280,30 +326,23 @@ public class PacketManager {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players) {
-                    protocolManager.sendServerPacket(player, packet1);
-                    protocolManager.sendServerPacket(player, packet2);
-                    protocolManager.sendServerPacket(player, packet3);
-                }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            for (Player player : players) {
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
+                protocolManager.sendServerPacket(player, packet3);
             }
         });
     }
 
     protected void removeItem(Collection<? extends Player> players, PacketItem entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, entity.getEntityId());
+        packet1.getIntegers().write(0, 1);
+        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            try {
-                for (Player player : players)
-                    protocolManager.sendServerPacket(player, packet1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            for (Player player : players)
+                protocolManager.sendServerPacket(player, packet1);
         }, 1L);
     }
 
@@ -331,13 +370,9 @@ public class PacketManager {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players) {
-                    protocolManager.sendServerPacket(player, packet1);
-                    protocolManager.sendServerPacket(player, packet2);
-                }
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
+            for (Player player : players) {
+                protocolManager.sendServerPacket(player, packet1);
+                protocolManager.sendServerPacket(player, packet2);
             }
         });
     }
@@ -362,27 +397,20 @@ public class PacketManager {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                for (Player player : players)
-                    protocolManager.sendServerPacket(player, packet1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            for (Player player : players)
+                protocolManager.sendServerPacket(player, packet1);
         });
     }
 
     protected void removeItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, entity.getEntityId());
+        packet1.getIntegers().write(0, 1);
+        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            try {
-                for (Player player : players)
-                    protocolManager.sendServerPacket(player, packet1);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            for (Player player : players)
+                protocolManager.sendServerPacket(player, packet1);
         }, 1L);
     }
 

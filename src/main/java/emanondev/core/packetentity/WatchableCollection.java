@@ -1,10 +1,12 @@
 package emanondev.core.packetentity;
 
-import com.comphenix.protocol.wrappers.Vector3F;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.*;
+import emanondev.core.util.GameVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 class WatchableCollection {
@@ -95,5 +97,24 @@ class WatchableCollection {
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(8, itemSerializer), frame.getItem());
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(9, intSerializer), frame.getFrameRotation());
         return watcher;
+    }
+
+    public static void writeMetadataPacket(PacketContainer packet, WrappedDataWatcher watcher) {
+        if (GameVersion.isNewerEqualsTo(1, 19, 3)) {
+            packet.getDataValueCollectionModifier().write(0, toDataValueList(watcher));
+        } else {
+            packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
+        }
+    }
+
+
+    public static List<WrappedDataValue> toDataValueList(WrappedDataWatcher wrappedDataWatcher) {
+        List<WrappedWatchableObject> watchableObjectList = wrappedDataWatcher.getWatchableObjects();
+        List<WrappedDataValue> wrappedDataValues = new ArrayList<>(watchableObjectList.size());
+        for (WrappedWatchableObject wrappedWatchableObject : wrappedDataWatcher.getWatchableObjects()) {
+            WrappedDataWatcher.WrappedDataWatcherObject wrappedDataWatcherObject = wrappedWatchableObject.getWatcherObject();
+            wrappedDataValues.add(new WrappedDataValue(wrappedDataWatcherObject.getIndex(), wrappedDataWatcherObject.getSerializer(), wrappedWatchableObject.getRawValue()));
+        }
+        return wrappedDataValues;
     }
 }

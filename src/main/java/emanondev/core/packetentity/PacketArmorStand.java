@@ -62,12 +62,12 @@ public class PacketArmorStand extends PacketEntity {
     }
 
     @Override
-    protected void handleRemovePackets(Collection<? extends Player> players) {
+    protected void handleRemovePackets(Collection<Player> players) {
         getManager().removeArmorStand(players, this);
     }
 
     @Override
-    protected void handleSpawnPackets(Collection<? extends Player> players) {
+    protected void handleSpawnPackets(Collection<Player> players) {
         getManager().spawnArmorStand(players, this);
     }
 
@@ -92,7 +92,7 @@ public class PacketArmorStand extends PacketEntity {
     }
 
     @Override
-    protected void handleUpdatePackets(Collection<? extends Player> players) {
+    protected void handleUpdatePackets(Collection<Player> players) {
         getManager().updateArmorStand(players, this);
     }
 
@@ -220,11 +220,8 @@ public class PacketArmorStand extends PacketEntity {
         return this;
     }
 
-    public WrappedDataWatcher getWrappedDataWatcher() {
-        if (getDataWatcher() == null)
-            dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
-        else
-            WatchableCollection.getWatchableCollection(this, getDataWatcher());
+    public WrappedDataWatcher updateAndGetWrappedDataWatcher() {
+        dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
         return dataWatcher;
     }
 
@@ -236,11 +233,11 @@ public class PacketArmorStand extends PacketEntity {
         return updateOnlyMeta(active);
     }
 
-    public PacketArmorStand updateOnlyMeta(Collection<? extends Player> players) {
+    public PacketArmorStand updateOnlyMeta(Collection<Player> players) {
         return updateOnlyMeta(players, false);
     }
 
-    public PacketArmorStand updateOnlyMeta(Collection<? extends Player> players, boolean bypassCache) {
+    public PacketArmorStand updateOnlyMeta(Collection<Player> players, boolean bypassCache) {
         if (!bypassCache) {
             if (cache != null) {
                 if (cache == this.cacheCode()) {

@@ -113,12 +113,12 @@ public class PacketItemFrame extends PacketEntity {
     }
 
     @Override
-    protected void handleRemovePackets(Collection<? extends Player> players) {
+    protected void handleRemovePackets(Collection<Player> players) {
         getManager().removeItemFrame(players, this);
     }
 
     @Override
-    protected void handleSpawnPackets(Collection<? extends Player> players) {
+    protected void handleSpawnPackets(Collection<Player> players) {
         getManager().spawnItemFrame(players, this);
     }
 
@@ -132,7 +132,7 @@ public class PacketItemFrame extends PacketEntity {
     }
 
     @Override
-    protected void handleUpdatePackets(Collection<? extends Player> players) {
+    protected void handleUpdatePackets(Collection<Player> players) {
         getManager().updateItemFrame(players, this);
     }
 }

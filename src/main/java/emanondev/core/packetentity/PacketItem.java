@@ -53,17 +53,17 @@ public class PacketItem extends PacketEntity {
     }
 
     @Override
-    protected void handleRemovePackets(Collection<? extends Player> players) {
+    protected void handleRemovePackets(Collection<Player> players) {
         getManager().removeItem(players, this);
     }
 
     @Override
-    protected void handleSpawnPackets(Collection<? extends Player> players) {
+    protected void handleSpawnPackets(Collection<Player> players) {
         getManager().spawnItem(players, this);
     }
 
     @Override
-    protected void handleUpdatePackets(Collection<? extends Player> players) {
+    protected void handleUpdatePackets(Collection<Player> players) {
         getManager().updateItem(players, this);
     }
 
