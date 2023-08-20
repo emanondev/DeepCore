@@ -10,6 +10,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -215,7 +216,7 @@ public class PacketArmorStand extends PacketEntity {
         return this.velocity;
     }
 
-    public PacketArmorStand setVelocity(Vector vector) {
+    public PacketArmorStand setVelocity(@NotNull Vector vector) {
         this.velocity = vector.clone();
         return this;
     }

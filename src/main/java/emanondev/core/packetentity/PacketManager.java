@@ -17,7 +17,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PacketManager {
@@ -30,7 +29,7 @@ public class PacketManager {
         if (plugin == null)
             throw new NullPointerException();
         this.plugin = plugin;
-        WatchableCollection.setup();
+        //WatchableCollection.setup();
         if (!GameVersion.isNewerEqualsTo(1, 16, 0))
             throw new IllegalStateException("unsupported version");
     }
@@ -72,15 +71,16 @@ public class PacketManager {
 
     public void spawnArmorStand(Collection<Player> players, PacketArmorStand entity) {
         PacketContainer packet1 = protocolManager.createPacket(GameVersion.isNewerEqualsTo(1, 19, 0) ? PacketType.Play.Server.SPAWN_ENTITY : PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-        packet1.getIntegers().write(0, Integer.valueOf(entity.getEntityId()));
+        packet1.getIntegers().write(0, entity.getEntityId());
         if (packet1.getUUIDs().size() > 0)
             packet1.getUUIDs().write(0, entity.getUniqueId());
         int i = 1;
-        if (GameVersion.isOlderThan(1, 19, 0)) {
+        if (GameVersion.isOlderThan(1, 19, 0))
             packet1.getIntegers().write(i++, 1);
-        } else {
+        else
             packet1.getEntityTypeModifier().write(0, EntityType.ARMOR_STAND);
-        }
+        if (!GameVersion.isOlderThan(1, 19, 0)) //se da errore è qui
+            packet1.getIntegers().write(i++, 0);
         packet1.getIntegers().write(i++, (int) (entity.getVelocity().getX() * 8000.0D));
         packet1.getIntegers().write(i++, (int) (entity.getVelocity().getY() * 8000.0D));
         packet1.getIntegers().write(i++, (int) (entity.getVelocity().getZ() * 8000.0D));
@@ -89,7 +89,8 @@ public class PacketManager {
         packet1.getDoubles().write(2, entity.getLocation().getZ());
         packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
         packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
-        packet1.getBytes().write(2, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F)); //what?
+        packet1.getBytes().write(2, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F)); //head yaw
+
         if (packet1.getIntegers().size() > i)
             packet1.getIntegers().write(i, 0);
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
@@ -97,12 +98,6 @@ public class PacketManager {
         WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
         WatchableCollection.writeMetadataPacket(packet2, wpw);
 
-        /*
-        List<ValuePairs<EquipmentSlot, ItemStack>> equipments = new ArrayList<>();
-        equipments.add(new ValuePairs(EquipmentSlot.HAND, entity.getItemInMainHand()));
-        equipments.add(new ValuePairs(EquipmentSlot.HEAD, entity.getHelmet()));
-        PacketContainer[] packet3 = nms.createEntityEquipmentPacket(entity.getEntityId(), equipments);
-        */
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
         List<Pair<EnumWrappers.ItemSlot, ItemStack>> data = new ArrayList<>();
         packet3.getIntegers().write(0, entity.getEntityId());
@@ -115,7 +110,6 @@ public class PacketManager {
             }
         }
         packet3.getSlotStackPairLists().write(0, data);
-        //end
 
         if (!plugin.isEnabled())
             return;
@@ -126,7 +120,7 @@ public class PacketManager {
                     protocolManager.sendServerPacket(player, packet1);
                     protocolManager.sendServerPacket(player, packet2);
                     if (finalHasItems)
-                    //for (PacketContainer packet : packet3)
+                        //for (PacketContainer packet : packet3)
                         protocolManager.sendServerPacket(player, packet3);
                 }
             }
@@ -197,10 +191,19 @@ public class PacketManager {
         packet1.getDoubles().write(2, entity.getLocation().getZ());
         packet1.getBytes().write(0, (byte) (int) (entity.getLocation().getYaw() * 256.0F / 360.0F));
         packet1.getBytes().write(1, (byte) (int) (entity.getLocation().getPitch() * 256.0F / 360.0F));
+
+
+
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
-        packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet2, wpw);
+
+
+       /* PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+        packet2.getIntegers().write(0, entity.getEntityId());
+        WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
+        packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());*/
 
 
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
@@ -227,7 +230,7 @@ public class PacketManager {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet1.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.updateAndGetWrappedDataWatcher();
-        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet1, wpw);
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -237,15 +240,7 @@ public class PacketManager {
     }
 
     protected void removeArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
-        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, 1);
-        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
-        if (!plugin.isEnabled())
-            return;
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player player : players)
-                protocolManager.sendServerPacket(player, packet1);
-        }, 1L);
+        removePacketEntity(players, entity);
     }
 
     protected void spawnItem(Collection<? extends Player> players, PacketItem entity) {
@@ -287,7 +282,7 @@ public class PacketManager {
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
-        packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet2, wpw);
         PacketContainer packet3 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_VELOCITY);
         packet3.getIntegers().write(0, entity.getEntityId());
         packet3.getIntegers().write(1, (int) (entity.getVelocity().getX() * 8000.0D));
@@ -310,7 +305,7 @@ public class PacketManager {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet1.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
-        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet1, wpw);
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
         packet2.getIntegers().write(0, entity.getEntityId());
         packet2.getDoubles().write(0, entity.getLocation().getX());
@@ -335,15 +330,7 @@ public class PacketManager {
     }
 
     protected void removeItem(Collection<? extends Player> players, PacketItem entity) {
-        PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, 1);
-        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
-        if (!plugin.isEnabled())
-            return;
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player player : players)
-                protocolManager.sendServerPacket(player, packet1);
-        }, 1L);
+        removePacketEntity(players, entity);
     }
 
     protected void spawnItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
@@ -366,7 +353,7 @@ public class PacketManager {
         PacketContainer packet2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet2.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
-        packet2.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet2, wpw);
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -393,7 +380,7 @@ public class PacketManager {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_METADATA);
         packet1.getIntegers().write(0, entity.getEntityId());
         WrappedDataWatcher wpw = entity.getWrappedDataWatcher();
-        packet1.getWatchableCollectionModifier().write(0, wpw.getWatchableObjects());
+        WatchableCollection.writeMetadataPacket(packet1, wpw);
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -403,9 +390,12 @@ public class PacketManager {
     }
 
     protected void removeItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
+        removePacketEntity(players, entity);
+    }
+
+    protected void removePacketEntity(Collection<? extends Player> players, PacketEntity entity) {
         PacketContainer packet1 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
-        packet1.getIntegers().write(0, 1);
-        packet1.getIntegerArrays().write(0,new int[]{entity.getEntityId()});
+        packet1.getIntLists().write(0, List.of(entity.getEntityId()));
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {

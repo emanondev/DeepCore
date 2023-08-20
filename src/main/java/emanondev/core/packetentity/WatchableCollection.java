@@ -11,29 +11,18 @@ import java.util.Optional;
 
 class WatchableCollection {
 
-    private static final int metaversion = 4;
+    private static final WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
 
-    private static WrappedDataWatcher.Serializer booleanSerializer;
+    private static final WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
 
-    private static WrappedDataWatcher.Serializer byteSerializer;
+    private static final WrappedDataWatcher.Serializer intSerializer = WrappedDataWatcher.Registry.get(Integer.class);
 
-    private static WrappedDataWatcher.Serializer intSerializer;
+    private static final WrappedDataWatcher.Serializer itemSerializer = WrappedDataWatcher.Registry.getItemStackSerializer(false);
 
-    private static WrappedDataWatcher.Serializer itemSerializer;
+    private static final WrappedDataWatcher.Serializer optChatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
 
-    private static WrappedDataWatcher.Serializer optChatSerializer;
+    private static final WrappedDataWatcher.Serializer vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
 
-    private static WrappedDataWatcher.Serializer vectorSerializer;
-
-    public static void setup() {
-        booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
-        WrappedDataWatcher.Serializer stringSerializer = WrappedDataWatcher.Registry.get(String.class);
-        byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
-        intSerializer = WrappedDataWatcher.Registry.get(Integer.class);
-        itemSerializer = WrappedDataWatcher.Registry.getItemStackSerializer(false);
-        optChatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
-        vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
-    }
 
     public static WrappedDataWatcher getWatchableCollection(PacketArmorStand stand, WrappedDataWatcher watcher) {
         //WrappedDataWatcher watcher = new WrappedDataWatcher();
@@ -59,17 +48,14 @@ class WatchableCollection {
         standbitmask = stand.isMarker() ? (byte) (standbitmask | 0x10) : standbitmask;
 
 
-        switch (metaversion) {
-            case 0, 1 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(11, byteSerializer), standbitmask);
-            case 2 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(13, byteSerializer), standbitmask);
-            case 3 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(14, byteSerializer), standbitmask);
-            case 4 -> watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, byteSerializer), standbitmask);
-        }
+        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, byteSerializer), standbitmask);
+
         Vector3F headrotation = new Vector3F();
         headrotation.setX((float) Math.toDegrees(stand.getHeadPose().getX()));
         headrotation.setY((float) Math.toDegrees(stand.getHeadPose().getY()));
         headrotation.setZ((float) Math.toDegrees(stand.getHeadPose().getZ()));
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, vectorSerializer), headrotation);
+
         Vector3F rightarmrotation = new Vector3F();
         rightarmrotation.setX((float) Math.toDegrees(stand.getRightArmPose().getX()));
         rightarmrotation.setY((float) Math.toDegrees(stand.getRightArmPose().getY()));
@@ -100,11 +86,7 @@ class WatchableCollection {
     }
 
     public static void writeMetadataPacket(PacketContainer packet, WrappedDataWatcher watcher) {
-        if (GameVersion.isNewerEqualsTo(1, 19, 3)) {
-            packet.getDataValueCollectionModifier().write(0, toDataValueList(watcher));
-        } else {
-            packet.getWatchableCollectionModifier().write(0, watcher.getWatchableObjects());
-        }
+        packet.getDataValueCollectionModifier().write(0, toDataValueList(watcher));
     }
 
 
