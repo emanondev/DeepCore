@@ -2,7 +2,6 @@ package emanondev.core.packetentity;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
-import emanondev.core.util.GameVersion;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.ArrayList;
@@ -11,58 +10,19 @@ import java.util.Optional;
 
 class WatchableCollection {
 
-    private static final WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
+    public static final WrappedDataWatcher.Serializer booleanSerializer = WrappedDataWatcher.Registry.get(Boolean.class);
 
-    private static final WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
+    public static final WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
 
-    private static final WrappedDataWatcher.Serializer intSerializer = WrappedDataWatcher.Registry.get(Integer.class);
+    public static final WrappedDataWatcher.Serializer intSerializer = WrappedDataWatcher.Registry.get(Integer.class);
 
-    private static final WrappedDataWatcher.Serializer itemSerializer = WrappedDataWatcher.Registry.getItemStackSerializer(false);
+    public static final WrappedDataWatcher.Serializer itemSerializer = WrappedDataWatcher.Registry.getItemStackSerializer(false);
 
-    private static final WrappedDataWatcher.Serializer optChatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+    public static final WrappedDataWatcher.Serializer optChatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(true);
+    public static final WrappedDataWatcher.Serializer chatSerializer = WrappedDataWatcher.Registry.getChatComponentSerializer(false);
 
-    private static final WrappedDataWatcher.Serializer vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
-
-
-    public static WrappedDataWatcher getWatchableCollection(PacketArmorStand stand, WrappedDataWatcher watcher) {
-        //WrappedDataWatcher watcher = new WrappedDataWatcher();
-        // ###
-        if (watcher == null)
-            watcher = new WrappedDataWatcher();
-        byte bitmask = 0;
-        bitmask = !stand.isVisible() ? (byte) (bitmask | 0x20) : bitmask;
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, byteSerializer), bitmask);
-
-        if (stand.getCustomName() != null && !stand.getCustomName().toPlainText().equals(""))
-            watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(stand.getCustomName())).getHandle()));
-        else
-            watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.empty());
-
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), stand.isCustomNameVisible());
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(4, booleanSerializer), stand.isSilent());
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(5, booleanSerializer), !stand.hasGravity());
-        byte standbitmask = 0;
-        standbitmask = stand.isSmall() ? (byte) (standbitmask | 0x1) : standbitmask;
-        standbitmask = stand.hasArms() ? (byte) (standbitmask | 0x4) : standbitmask;
-        standbitmask = !stand.hasBasePlate() ? (byte) (standbitmask | 0x8) : standbitmask;
-        standbitmask = stand.isMarker() ? (byte) (standbitmask | 0x10) : standbitmask;
-
-
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, byteSerializer), standbitmask);
-
-        Vector3F headrotation = new Vector3F();
-        headrotation.setX((float) Math.toDegrees(stand.getHeadPose().getX()));
-        headrotation.setY((float) Math.toDegrees(stand.getHeadPose().getY()));
-        headrotation.setZ((float) Math.toDegrees(stand.getHeadPose().getZ()));
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, vectorSerializer), headrotation);
-
-        Vector3F rightarmrotation = new Vector3F();
-        rightarmrotation.setX((float) Math.toDegrees(stand.getRightArmPose().getX()));
-        rightarmrotation.setY((float) Math.toDegrees(stand.getRightArmPose().getY()));
-        rightarmrotation.setZ((float) Math.toDegrees(stand.getRightArmPose().getZ()));
-        watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(19, vectorSerializer), rightarmrotation);
-        return watcher;
-    }
+    public static final WrappedDataWatcher.Serializer vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
+    public static final WrappedDataWatcher.Serializer floatSerializer = WrappedDataWatcher.Registry.get(Float.class);
 
     public static WrappedDataWatcher getWatchableCollection(PacketItem item) {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
@@ -84,6 +44,8 @@ class WatchableCollection {
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(9, intSerializer), frame.getFrameRotation());
         return watcher;
     }
+
+
 
     public static void writeMetadataPacket(PacketContainer packet, WrappedDataWatcher watcher) {
         packet.getDataValueCollectionModifier().write(0, toDataValueList(watcher));

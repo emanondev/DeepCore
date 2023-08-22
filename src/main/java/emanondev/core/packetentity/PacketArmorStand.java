@@ -1,19 +1,25 @@
 package emanondev.core.packetentity;
 
+import com.comphenix.protocol.wrappers.Vector3F;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import emanondev.core.UtilsInventory;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.Optional;
 
 public class PacketArmorStand extends PacketEntity {
     private final EnumMap<EquipmentSlot, ItemStack> equip = new EnumMap<>(EquipmentSlot.class);
@@ -23,7 +29,6 @@ public class PacketArmorStand extends PacketEntity {
     private boolean hasGravity;
     private boolean isSmall;
     private boolean isInvulnerable;
-    private boolean isVisible;
     private EulerAngle rightArmPose;
     private EulerAngle headPose;
     private BaseComponent customName;
@@ -31,6 +36,7 @@ public class PacketArmorStand extends PacketEntity {
     private boolean customNameVisible;
 
     private Vector velocity;
+    private boolean shouldUpdateEquipment = false;
 
     PacketArmorStand(Location location, PacketManager manager) {
         super(location, manager);
@@ -40,7 +46,6 @@ public class PacketArmorStand extends PacketEntity {
         this.hasGravity = true;
         this.isSmall = false;
         this.isInvulnerable = false;
-        this.isVisible = true;
         this.rightArmPose = new EulerAngle(0.0D, 0.0D, 0.0D);
         this.headPose = new EulerAngle(0.0D, 0.0D, 0.0D);
         this.customName = new TextComponent();
@@ -48,13 +53,22 @@ public class PacketArmorStand extends PacketEntity {
         this.velocity = new Vector(0.0D, 0.0D, 0.0D);
     }
 
+    /**
+     * @see PacketHologram
+     */
+    @Deprecated
     public PacketArmorStand setAsHologram(String displayName) {
         return this.setCustomName(displayName).setInvulnerable(true).setSmall(true).setMarker(true).setSilent(true)
                 .setGravity(false).setVisible(false).setCustomNameVisible(true);
     }
 
+    @Deprecated
+    @Contract("_->this")
     public PacketArmorStand setGravity(boolean bool) {
-        this.hasGravity = bool;
+        if (this.hasGravity != bool) {
+            this.hasGravity = bool;
+            shouldUpdateMeta = !active.isEmpty();
+        }
         return this;
     }
 
@@ -62,38 +76,17 @@ public class PacketArmorStand extends PacketEntity {
         return (PacketArmorStand) super.setSilent(value);
     }
 
-    @Override
-    protected void handleRemovePackets(Collection<Player> players) {
-        getManager().removeArmorStand(players, this);
+    public PacketArmorStand setVisible(boolean value) {
+        return (PacketArmorStand) super.setVisible(value);
     }
 
     @Override
-    protected void handleSpawnPackets(Collection<Player> players) {
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
         getManager().spawnArmorStand(players, this);
     }
 
-    public int cacheCode() {
-        int prime = 17;
-        int result = super.cacheCode();
-        result = prime * result + (this.hasArms ? 5351 : 8923);
-        result = prime * result + (this.hasBasePlate ? 2861 : 6607);
-        result = prime * result + (this.isMarker ? 9199 : 3163);
-        result = prime * result + (this.hasGravity ? 6719 : 2753);
-        result = prime * result + (this.isSmall ? 1373 : 3037);
-        result = prime * result + (this.isInvulnerable ? 2111 : 2251);
-        result = prime * result + (this.isVisible ? 6779 : 6679);
-        result = prime * result + ((this.rightArmPose == null) ? 0 : this.rightArmPose.hashCode());
-        result = prime * result + ((this.headPose == null) ? 0 : this.headPose.hashCode());
-        for (ItemStack item : equip.values())
-            result = prime * result + ((item == null) ? 0 : item.hashCode());
-        result = prime * result + ((this.customName == null) ? 0 : this.customName.hashCode());
-        result = prime * result + (this.customNameVisible ? 6199 : 8647);
-        result = prime * result + ((this.velocity == null) ? 0 : this.velocity.hashCode());
-        return result;
-    }
-
     @Override
-    protected void handleUpdatePackets(Collection<Player> players) {
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
         getManager().updateArmorStand(players, this);
     }
 
@@ -101,12 +94,14 @@ public class PacketArmorStand extends PacketEntity {
         return this.customName;
     }
 
-    public PacketArmorStand setCustomName(String customName) {
+    @Contract("_->this")
+    public PacketArmorStand setCustomName(@NotNull String customName) {
         this.customName = new TextComponent(customName);
         return this;
     }
 
-    public PacketArmorStand setCustomName(BaseComponent customName) {
+    @Contract("_->this")
+    public PacketArmorStand setCustomName(@Nullable BaseComponent customName) {
         this.customName = customName;
         return this;
     }
@@ -115,13 +110,21 @@ public class PacketArmorStand extends PacketEntity {
         return this.customNameVisible;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setCustomNameVisible(boolean bool) {
-        this.customNameVisible = bool;
+        if (this.customNameVisible != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.customNameVisible = bool;
+        }
         return this;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setArms(boolean bool) {
-        this.hasArms = bool;
+        if (this.hasArms != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.hasArms = bool;
+        }
         return this;
     }
 
@@ -129,8 +132,12 @@ public class PacketArmorStand extends PacketEntity {
         return this.hasArms;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setBasePlate(boolean bool) {
-        this.hasBasePlate = bool;
+        if (this.hasBasePlate != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.hasBasePlate = bool;
+        }
         return this;
     }
 
@@ -142,11 +149,16 @@ public class PacketArmorStand extends PacketEntity {
         return this.isMarker;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setMarker(boolean bool) {
-        this.isMarker = bool;
+        if (this.isMarker != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.isMarker = bool;
+        }
         return this;
     }
 
+    @Deprecated
     public boolean hasGravity() {
         return this.hasGravity;
     }
@@ -155,8 +167,12 @@ public class PacketArmorStand extends PacketEntity {
         return this.isSmall;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setSmall(boolean bool) {
-        this.isSmall = bool;
+        if (this.isSmall != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.isSmall = bool;
+        }
         return this;
     }
 
@@ -164,65 +180,107 @@ public class PacketArmorStand extends PacketEntity {
         return this.isInvulnerable;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setInvulnerable(boolean bool) {
-        this.isInvulnerable = bool;
+        if (this.isInvulnerable != bool) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.isInvulnerable = bool;
+        }
         return this;
     }
 
-    public boolean isVisible() {
-        return this.isVisible;
-    }
-
-    public PacketArmorStand setVisible(boolean bool) {
-        this.isVisible = bool;
-        return this;
-    }
-
-    public EulerAngle getRightArmPose() {
+    public @NotNull EulerAngle getRightArmPose() {
         return this.rightArmPose;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setRightArmPose(EulerAngle angle) {
-        if (this.lock)
-            return this;
-        this.rightArmPose = angle;
+        if (this.rightArmPose != angle) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.rightArmPose = angle;
+        }
         return this;
     }
 
-    public EulerAngle getHeadPose() {
+    public @NotNull EulerAngle getHeadPose() {
         return this.headPose;
     }
 
+    @Contract("_->this")
     public PacketArmorStand setHeadPose(EulerAngle angle) {
-        if (this.lock)
-            return this;
-        this.headPose = angle;
+        if (this.headPose != angle) {
+            shouldUpdateMeta = !active.isEmpty();
+            this.headPose = angle;
+        }
         return this;
     }
 
-    public PacketArmorStand setItem(EquipmentSlot slot, ItemStack item) {
+    @Contract("_,_->this")
+    public PacketArmorStand setItem(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
         if (UtilsInventory.isAirOrNull(item))
             equip.remove(slot);
         else
             equip.put(slot, item);
+        this.shouldUpdateEquipment = !active.isEmpty();
         return this;
     }
 
-    public ItemStack getItem(EquipmentSlot slot) {
+    public @Nullable ItemStack getItem(@NotNull EquipmentSlot slot) {
         return equip.get(slot);
     }
 
-    public Vector getVelocity() {
+    @Deprecated
+    public @NotNull Vector getVelocity() {
         return this.velocity;
     }
 
+    @Deprecated
+    @Contract("_->this")
     public PacketArmorStand setVelocity(@NotNull Vector vector) {
         this.velocity = vector.clone();
         return this;
     }
-
+/*
     public WrappedDataWatcher updateAndGetWrappedDataWatcher() {
         dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
+        return dataWatcher;
+    }*/
+
+    public WrappedDataWatcher getWrappedDataWatcher() {
+        //WrappedDataWatcher watcher = new WrappedDataWatcher();
+        // ###
+        if (dataWatcher == null)
+            dataWatcher = new WrappedDataWatcher();
+        byte bitmask = 0;
+        bitmask = !this.isVisible() ? (byte) (bitmask | 0x20) : bitmask;
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, WatchableCollection.byteSerializer), bitmask);
+
+        if (this.getCustomName() != null && !this.getCustomName().toPlainText().equals(""))
+            dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, WatchableCollection.optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(this.getCustomName())).getHandle()));
+        else
+            dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, WatchableCollection.optChatSerializer), Optional.empty());
+
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, WatchableCollection.booleanSerializer), this.isCustomNameVisible());
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(4, WatchableCollection.booleanSerializer), this.isSilent());
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(5, WatchableCollection.booleanSerializer), !this.hasGravity());
+        byte standbitmask = 0;
+        standbitmask = this.isSmall() ? (byte) (standbitmask | 0x1) : standbitmask;
+        standbitmask = this.hasArms() ? (byte) (standbitmask | 0x4) : standbitmask;
+        standbitmask = !this.hasBasePlate() ? (byte) (standbitmask | 0x8) : standbitmask;
+        standbitmask = this.isMarker() ? (byte) (standbitmask | 0x10) : standbitmask;
+
+
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(15, WatchableCollection.byteSerializer), standbitmask);
+
+        Vector3F headrotation = new Vector3F((float) Math.toDegrees(this.getHeadPose().getX()),
+                (float) Math.toDegrees(this.getHeadPose().getY()),
+                (float) Math.toDegrees(this.getHeadPose().getZ()));
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WatchableCollection.vectorSerializer), headrotation);
+
+        Vector3F rightarmrotation = new Vector3F((float) Math.toDegrees(this.getRightArmPose().getX()),
+                (float) Math.toDegrees(this.getRightArmPose().getY()),
+                (float) Math.toDegrees(this.getRightArmPose().getZ()));
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(19, WatchableCollection.vectorSerializer), rightarmrotation);
         return dataWatcher;
     }
 
@@ -230,6 +288,7 @@ public class PacketArmorStand extends PacketEntity {
         return this.isSmall ? 0.5D : 1.975D;
     }
 
+    /*
     public PacketArmorStand updateOnlyMeta() {
         return updateOnlyMeta(active);
     }
@@ -248,6 +307,17 @@ public class PacketArmorStand extends PacketEntity {
         }
         getManager().updateArmorStandOnlyMeta(players, this);
         return this;
+    }*/
+
+
+    @Contract("->this")
+    public PacketArmorStand update() {
+        update(active);
+        shouldUpdateEquipment = false;
+        return this;
     }
 
+    public boolean shouldUpdateEquipment() {
+        return shouldUpdateEquipment;
+    }
 }

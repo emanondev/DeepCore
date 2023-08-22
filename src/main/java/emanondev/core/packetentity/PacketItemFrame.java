@@ -8,6 +8,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -113,12 +114,7 @@ public class PacketItemFrame extends PacketEntity {
     }
 
     @Override
-    protected void handleRemovePackets(Collection<Player> players) {
-        getManager().removeItemFrame(players, this);
-    }
-
-    @Override
-    protected void handleSpawnPackets(Collection<Player> players) {
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
         getManager().spawnItemFrame(players, this);
     }
 
@@ -132,7 +128,7 @@ public class PacketItemFrame extends PacketEntity {
     }
 
     @Override
-    protected void handleUpdatePackets(Collection<Player> players) {
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
         getManager().updateItemFrame(players, this);
     }
 }

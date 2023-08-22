@@ -9,6 +9,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -53,17 +54,12 @@ public class PacketItem extends PacketEntity {
     }
 
     @Override
-    protected void handleRemovePackets(Collection<Player> players) {
-        getManager().removeItem(players, this);
-    }
-
-    @Override
-    protected void handleSpawnPackets(Collection<Player> players) {
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
         getManager().spawnItem(players, this);
     }
 
     @Override
-    protected void handleUpdatePackets(Collection<Player> players) {
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
         getManager().updateItem(players, this);
     }
 
