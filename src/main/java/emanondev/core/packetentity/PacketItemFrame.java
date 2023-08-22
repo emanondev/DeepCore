@@ -118,15 +118,6 @@ public class PacketItemFrame extends PacketEntity {
         getManager().spawnItemFrame(players, this);
     }
 
-    public int cacheCode() {
-        int prime = 17;
-        int result = super.cacheCode();
-        result = prime * result + ((this.item == null) ? 0 : this.item.hashCode());
-        result = prime * result + ((this.facing == null) ? 0 : this.facing.hashCode());
-        result = prime * result + this.frameRotation;
-        return result;
-    }
-
     @Override
     protected void handleUpdatePackets(@NotNull Collection<Player> players) {
         getManager().updateItemFrame(players, this);

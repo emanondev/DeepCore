@@ -62,10 +62,6 @@ public class PacketHologram extends PacketEntity {
         return this.viewRange;
     }
 
-    /*public boolean hasGravity() {
-        return this.hasGravity;
-    }*/
-
     public @Nullable DMessage getText() {
         return this.text;
     }
@@ -114,16 +110,6 @@ public class PacketHologram extends PacketEntity {
 
         return this;
     }
-
-    /*
-    @Contract("_->this")
-    public PacketHologram setGravity(boolean gravity) {
-        if (this.hasGravity != gravity) {
-            shouldUpdateMeta = true;
-            this.hasGravity = gravity;
-        }
-        return this;
-    }*/
 
     @Contract("_->this")
     public PacketHologram setViewRangeBlocks(float viewRange) {
