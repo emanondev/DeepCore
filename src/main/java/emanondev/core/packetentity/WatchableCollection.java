@@ -1,7 +1,10 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ class WatchableCollection {
 
     public static final WrappedDataWatcher.Serializer vectorSerializer = WrappedDataWatcher.Registry.getVectorSerializer();
     public static final WrappedDataWatcher.Serializer floatSerializer = WrappedDataWatcher.Registry.get(Float.class);
+    public static final WrappedDataWatcher.Serializer blockDataSerializer = WrappedDataWatcher.Registry.getBlockDataSerializer(false);
+
 
     public static WrappedDataWatcher getWatchableCollection(PacketItem item) {
         WrappedDataWatcher watcher = new WrappedDataWatcher();
@@ -44,7 +49,6 @@ class WatchableCollection {
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(9, intSerializer), frame.getFrameRotation());
         return watcher;
     }
-
 
 
     public static void writeMetadataPacket(PacketContainer packet, WrappedDataWatcher watcher) {

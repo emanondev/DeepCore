@@ -167,7 +167,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
         if (this.languageConfigs.containsKey(locale)) return languageConfigs.get(locale);
         String fileName = "language" + File.separator + locale + ".yml";
         if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists()
-                || this.getResource("languages/"  + locale + ".yml") != null) {
+                || this.getResource("languages/" + locale + ".yml") != null) {
             YMLConfig conf = new YMLConfig(this, fileName);
             languageConfigs.put(locale, conf);
             return conf;

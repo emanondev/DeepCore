@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
 public class ParticleUtility {
 
     private static final int RATEO = 6;
-    private static final int SEE_RADIUS = 16*6;
+    private static final int SEE_RADIUS = 16 * 6;
 
     public static void spawnParticle(Player p, Particle particle, double x, double y, double z) {
         spawnParticle(p, particle, x, y, z, 1, null);
@@ -30,19 +30,19 @@ public class ParticleUtility {
         spawnParticleCircle(p, particle, x, y, z, radius, rotateHalf, null);
     }
 
-    private static boolean canSee(Player p,double x,double z){
+    private static boolean canSee(Player p, double x, double z) {
         Location loc = p.getLocation();
         return !(loc.getX() < x - SEE_RADIUS) && !(loc.getX() > x + SEE_RADIUS) && !(loc.getZ() < z - SEE_RADIUS) && !(loc.getZ() > z + SEE_RADIUS);
     }
 
-    private static void spawnParticle(Player p, Particle particle, Object data, Location loc, int count,boolean checkDistance){
-        if (checkDistance && p.getWorld().equals(loc.getWorld()) && canSee(p,loc.getX(),loc.getZ()))
+    private static void spawnParticle(Player p, Particle particle, Object data, Location loc, int count, boolean checkDistance) {
+        if (checkDistance && p.getWorld().equals(loc.getWorld()) && canSee(p, loc.getX(), loc.getZ()))
             p.spawnParticle(particle, loc, count, 0, 0, 0, 0, data);
         p.spawnParticle(particle, loc, count, 0, 0, 0, 0, data);
     }
 
-    private static void spawnParticle(Player p, Particle particle, Object data, double x, double y, double z, int count,boolean checkDistance){
-        if (checkDistance && canSee(p,x,z))
+    private static void spawnParticle(Player p, Particle particle, Object data, double x, double y, double z, int count, boolean checkDistance) {
+        if (checkDistance && canSee(p, x, z))
             p.spawnParticle(particle, x, y, z, count, 0, 0, 0, 0, data);
         p.spawnParticle(particle, x, y, z, count, 0, 0, 0, 0, data);
     }
@@ -66,12 +66,12 @@ public class ParticleUtility {
         markEdges(p, particle, box.getMin(), box.getMax().add(new Vector(-1, -1, -1)), data);
     }
 
-    public static void spawnParticleLine(Player p, Particle particle, Location loc, double maxDistance, Object data){
-        spawnParticleLine(p,particle,loc.getX(), loc.getY(), loc.getZ(), loc.getDirection(),maxDistance,data);
+    public static void spawnParticleLine(Player p, Particle particle, Location loc, double maxDistance, Object data) {
+        spawnParticleLine(p, particle, loc.getX(), loc.getY(), loc.getZ(), loc.getDirection(), maxDistance, data);
     }
 
-    public static void spawnParticleLine(Player p, Particle particle, double x, double y, double z, Vector direction, double maxDistance,  Object data){
-        markLine(p,particle,x, y, z, direction,maxDistance,data);
+    public static void spawnParticleLine(Player p, Particle particle, double x, double y, double z, Vector direction, double maxDistance, Object data) {
+        markLine(p, particle, x, y, z, direction, maxDistance, data);
     }
 
     private static void markLine(Player p, Particle particle, double x, double y, double z, Vector direction, double maxDistance, Object data) {

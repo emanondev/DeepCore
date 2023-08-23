@@ -3,6 +3,7 @@ package emanondev.core.packetentity;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +20,27 @@ public abstract class PacketEntity {
     private final PacketManager manager;
     protected WrappedDataWatcher dataWatcher;
     protected Collection<Player> active = new HashSet<>();
+    protected boolean shouldUpdateMeta = false;
     private Location location;
     private boolean isSilent;
-
     private boolean isVisible = true;
+    private boolean shouldUpdatePosition = false;
+
+    public PacketEntity(@NotNull Location location, @NotNull PacketManager manager) {
+        this.manager = manager;
+        this.id = (int) (Math.random() * Integer.MAX_VALUE);
+        this.uuid = UUID.randomUUID();
+        this.location = location.clone();
+        this.isSilent = false;
+        this.manager.trackPacketEntity(this);
+    }
+
+    public abstract EntityType getType();
+
     public boolean isVisible() {
         return this.isVisible;
     }
+
     @Contract("_->this")
     public PacketEntity setVisible(boolean visible) {
         if (this.isVisible != visible) {
@@ -41,22 +56,6 @@ public abstract class PacketEntity {
 
     public boolean shouldUpdateMeta() {
         return shouldUpdateMeta;
-    }
-
-    private boolean shouldUpdatePosition = false;
-    protected boolean shouldUpdateMeta = false;
-
-    public PacketEntity(@NotNull Location location,@NotNull PacketManager manager) {
-        this.manager = manager;
-        this.id = (int) (Math.random() * Integer.MAX_VALUE);
-        this.uuid = UUID.randomUUID();
-        this.location = location.clone();
-        this.isSilent = false;
-        this.manager.trackPacketEntity(this);
-    }
-
-    public WrappedDataWatcher getDataWatcher() {
-        return dataWatcher;
     }
 
     public PacketEntity setRotation(float yaw, float pitch) {
@@ -128,7 +127,7 @@ public abstract class PacketEntity {
     }
 
     protected void handleRemovePackets(@NotNull Collection<Player> players) {
-        getManager().removePacketEntity(players, this);
+        getManager().entityDestroyPacket(players, this);
     }
 
     @Contract("_->this")
@@ -161,4 +160,5 @@ public abstract class PacketEntity {
 
     protected abstract void handleUpdatePackets(@NotNull Collection<Player> players);
 
+    public abstract WrappedDataWatcher getWrappedDataWatcher();
 }

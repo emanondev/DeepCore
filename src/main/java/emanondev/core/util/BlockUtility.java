@@ -6,12 +6,12 @@ import org.bukkit.block.Block;
 
 public class BlockUtility {
 
-    private BlockUtility(){
+    private BlockUtility() {
         throw new AssertionError();
     }
 
-    public static boolean setColor(Block block, DyeColor color){
-        int index = block.getType().name().indexOf("_",                 block.getType().name().startsWith("LIGHT_") ? 7 : 1);
+    public static boolean setColor(Block block, DyeColor color) {
+        int index = block.getType().name().indexOf("_", block.getType().name().startsWith("LIGHT_") ? 7 : 1);
         if (index > 0)
             try {
                 switch (block.getType().name().substring(index)) {

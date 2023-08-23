@@ -301,28 +301,29 @@ public final class UtilsString {
         }
         return roman.toString();
     }
+
     public static @NotNull String formatForced2DigitWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+forced2Digit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + forced2Digit.format(num);
     }
 
     public static @NotNull String formatForcedIntWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+forcedIntDigit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + forcedIntDigit.format(num);
     }
 
     public static @NotNull String formatForced1DigitWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+forced1Digit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + forced1Digit.format(num);
     }
 
     public static @NotNull String formatOptional1DigitWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+optional1Digit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + optional1Digit.format(num);
     }
 
     public static @NotNull String formatOptional10DigitWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+optional10Digit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + optional10Digit.format(num);
     }
 
     public static @NotNull String formatOptional2DigitWithSign(@NotNull Number num) {
-        return (num.doubleValue()>0?"+":"")+optional2Digit.format(num);
+        return (num.doubleValue() > 0 ? "+" : "") + optional2Digit.format(num);
     }
 
     public static @NotNull String formatForced2Digit(@NotNull Number num) {

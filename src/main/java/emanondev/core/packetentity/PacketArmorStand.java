@@ -8,6 +8,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -51,6 +52,11 @@ public class PacketArmorStand extends PacketEntity {
         this.customName = new TextComponent();
         this.customNameVisible = false;
         this.velocity = new Vector(0.0D, 0.0D, 0.0D);
+    }
+
+    @Override
+    public EntityType getType() {
+        return EntityType.ARMOR_STAND;
     }
 
     /**
@@ -287,27 +293,6 @@ public class PacketArmorStand extends PacketEntity {
     public double getHeight() {
         return this.isSmall ? 0.5D : 1.975D;
     }
-
-    /*
-    public PacketArmorStand updateOnlyMeta() {
-        return updateOnlyMeta(active);
-    }
-
-    public PacketArmorStand updateOnlyMeta(Collection<Player> players) {
-        return updateOnlyMeta(players, false);
-    }
-
-    public PacketArmorStand updateOnlyMeta(Collection<Player> players, boolean bypassCache) {
-        if (!bypassCache) {
-            if (cache != null) {
-                if (cache == this.cacheCode()) {
-                    return this;
-                }
-            }
-        }
-        getManager().updateArmorStandOnlyMeta(players, this);
-        return this;
-    }*/
 
 
     @Contract("->this")
