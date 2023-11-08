@@ -3,7 +3,6 @@ package emanondev.core.actions;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PermissionAction extends Action {
 
@@ -36,11 +35,7 @@ public class PermissionAction extends Action {
     }
 
     @Override
-    public List<String> getInfo() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("&b" + getID() + " &e<permission> <action>");
-        list.add("&e<permission> &bpermission required or &e-permission &bfor reversed check");
-        list.add("&e<action> &baction to execute, example: '&esound entity_bat_hurt 1 1&b'");
-        return list;
+    public String getInfo() {
+        return "permission <permission> <action>";
     }
 }

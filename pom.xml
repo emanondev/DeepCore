@@ -213,6 +213,7 @@
             <scope>provided</scope>
         </dependency>
 
+
         <!-- FAWE Bukkit API -->
         <dependency>
             <groupId>com.fastasyncworldedit</groupId>
@@ -259,6 +260,13 @@
             <groupId>io.lumine.xikage</groupId>
             <artifactId>MythicMobs</artifactId>
             <version>4.9.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- DeepQuests -->
+        <dependency>
+            <groupId>emanondev.deepquests</groupId>
+            <artifactId>DeepQuests5</artifactId>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

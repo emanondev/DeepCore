@@ -113,7 +113,7 @@ public class PacketDisplayItem extends PacketEntity {
         if (getDisplayItem() != null)
             dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(22,
                     WatchableCollection.itemSerializer), this.getDisplayItem());
-        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(23, WatchableCollection.byteSerializer), displayTransform.ordinal());
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(23, WatchableCollection.byteSerializer), (byte) displayTransform.ordinal());
 
         return dataWatcher;
     }

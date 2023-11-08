@@ -1,22 +1,17 @@
-package emanondev.core.actions;
+package emanondev.core.condition;
 
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Locale;
 
-public abstract class Action {
+public abstract class Condition {
 
     private final String id;
 
-    public Action(String id) {
+    public Condition(String id) {
         this.id = id.toLowerCase(Locale.ENGLISH);
 
-    }
-
-    @Deprecated
-    public String getID() {
-        return id;
     }
 
     public final String getId() {
@@ -33,8 +28,7 @@ public abstract class Action {
      * @param text
      * @throws IllegalArgumentException if text is not valid
      */
-    public abstract void execute(Player player, String text);
+    public abstract boolean isValid(Player player, String text);
 
-    public abstract String getInfo();
-
+    public abstract String getInfo() ;
 }

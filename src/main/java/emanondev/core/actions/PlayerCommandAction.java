@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PlayerCommandAction extends Action {
 
@@ -36,13 +35,8 @@ public class PlayerCommandAction extends Action {
 
 
     @Override
-    public List<String> getInfo() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("&b" + getID() + " &e<command>");
-        list.add("&e<command> &bcommand executed by player");
-        list.add("&b%player% may be used as placeholder for player name");
-        list.add("&bN.B. no &e/&b is required, example: '&ehome&b'");
-        return list;
+    public String getInfo() {
+        return "command <command>"; //no /
     }
 
 

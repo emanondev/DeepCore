@@ -4,9 +4,6 @@ import emanondev.core.CoreMain;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DelayedAction extends Action {
 
     public DelayedAction() {
@@ -40,11 +37,7 @@ public class DelayedAction extends Action {
     }
 
     @Override
-    public List<String> getInfo() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("&b" + getID() + " &e<delay ticks> <action>");
-        list.add("&e<delay ticks> &bhow much you want to delay the action, 20ticks = 1s");
-        list.add("&e<action> &baction to execute, example: '&esound entity_bat_hurt 1 1&b'");
-        return list;
+    public String getInfo() {
+        return "delay <delay ticks> <action>";
     }
 }

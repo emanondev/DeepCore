@@ -1,11 +1,13 @@
 package emanondev.core;
 
 import emanondev.core.actions.*;
+import emanondev.core.condition.*;
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.FAWECleaner;
 import emanondev.core.util.ItemUtility;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +56,18 @@ public final class CoreMain extends CorePlugin {
         ActionHandler.registerAction(new PlayerAsOpCommandAction());
         ActionHandler.registerAction(new ServerCommandAction());
         ActionHandler.registerAction(new SoundAction());
-        this.logDone("Enabled &aActionAPI");
+        ActionHandler.registerAction(new ConditionalAction());
+        ActionHandler.registerAction(new SequenceAction());
+        this.logDone("Enabled &aActions API");
+        ConditionHandler.registerCondition(new WorldCondition());
+        Bukkit.getScheduler().runTaskLater(this,()->{
+            if (Hooks.isEnabled("DeepQuests5")){
+                ConditionHandler.registerCondition(new CompletedMissionCondition());
+                ConditionHandler.registerCondition(new UnstartedMissionCondition());
+                ConditionHandler.registerCondition(new OngoingMissionCondition());
+            }
+        },1L);
+        this.logDone("Enabled &aConditions API");
         ItemUtility.initialize();
 
         try {

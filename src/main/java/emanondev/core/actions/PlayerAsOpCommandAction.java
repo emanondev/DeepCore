@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class PlayerAsOpCommandAction extends Action {
@@ -57,22 +56,17 @@ public class PlayerAsOpCommandAction extends Action {
             Bukkit.dispatchCommand(player, UtilsString.fix(text, player, true, "%player%", player.getName()));
         } catch (Throwable e) {
             e.printStackTrace();
-        }
-
-        if (!op) {
-            player.setOp(false);
-            data.set(player.getUniqueId().toString(), null);
+        } finally {
+            if (!op) {
+                player.setOp(false);
+                data.set(player.getUniqueId().toString(), null);
+            }
         }
     }
 
     @Override
-    public List<String> getInfo() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("&b" + getID() + " &e<command>");
-        list.add("&e<command> &bcommand executed by player as Op");
-        list.add("&b%player% may be used as placeholder for player name");
-        list.add("&bN.B. no &e/&b is required, example: '&ehome&b'");
-        return list;
+    public String getInfo() {
+        return "commandasop <command>";
     }
 
 }

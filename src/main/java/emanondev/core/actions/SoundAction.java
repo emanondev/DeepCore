@@ -3,8 +3,6 @@ package emanondev.core.actions;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class SoundAction extends Action {
@@ -56,17 +54,11 @@ public class SoundAction extends Action {
         if (self)
             player.playSound(player.getLocation(), sound, volume, pitch);
         else
-            player.getLocation().getWorld().playSound(player.getLocation(), sound, volume, pitch);
+            player.getWorld().playSound(player.getLocation(), sound, volume, pitch);
     }
 
     @Override
-    public List<String> getInfo() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("&b" + getID() + " &e<sound> [volume] [pitch] [self]");
-        list.add("&e<sound> &bthe sound to play");
-        list.add("&e[volume] &bthe volume of the sound, default 1");
-        list.add("&e[pitch] &bthe pitch of the sound, default 1");
-        list.add("&e[self] &bonly player sould heard?, by default false");
-        return list;
+    public String getInfo() {
+        return "sound <sound> [volume] [pitch] [self]";
     }
 }
