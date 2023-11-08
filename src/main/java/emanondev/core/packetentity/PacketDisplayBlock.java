@@ -1,7 +1,6 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Display;
@@ -23,15 +22,14 @@ public class PacketDisplayBlock extends PacketEntity {
 
     private float viewRangeBlocks = 32;
     private Display.Billboard billboard = Display.Billboard.FIXED;
-
-    public @Nullable BlockData getBlockData() {
-        return blockData;
-    }
-
     private BlockData blockData;
 
     public PacketDisplayBlock(Location location, PacketManager manager) {
         super(location, manager);
+    }
+
+    public @Nullable BlockData getBlockData() {
+        return blockData;
     }
 
     @Override
@@ -94,7 +92,7 @@ public class PacketDisplayBlock extends PacketEntity {
 
     @Contract("_->this")
     public PacketDisplayBlock setBlockData(@NotNull BlockData blockData) {
-        if (!Objects.equals(this.blockData,blockData)) {
+        if (!Objects.equals(this.blockData, blockData)) {
             shouldUpdateMeta = !active.isEmpty();
             this.blockData = blockData;
         }

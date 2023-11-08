@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-import java.util.ArrayList;
-
 public class PlayerCommandAction extends Action {
 
     public PlayerCommandAction() {

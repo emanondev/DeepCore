@@ -2,7 +2,6 @@ package emanondev.core.actions;
 
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Locale;
 
 public abstract class Action {

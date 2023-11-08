@@ -22,18 +22,18 @@ public class ActionHandler {
         if (actions.containsKey(action.getId()))
             throw new IllegalArgumentException();
         actions.put(action.getId().toLowerCase(Locale.ENGLISH), action);
-        CoreMain.get().logInfo("Registered Action &e"+action.getInfo());
+        CoreMain.get().logInfo("Registered Action &e" + action.getInfo());
     }
 
     public static void clearActions() {
         actions.clear();
     }
 
-    public static void validateAction(String rawAction){
+    public static void validateAction(String rawAction) {
         String type = rawAction.split(" ")[0].toLowerCase(Locale.ENGLISH);
         if (!actions.containsKey(type))
             throw new IllegalArgumentException();
-        String info = rawAction.length()>type.length()?rawAction.substring(type.length()+1):null;
+        String info = rawAction.length() > type.length() ? rawAction.substring(type.length() + 1) : null;
         actions.get(type).validateInfo(info);
     }
 

@@ -3,7 +3,6 @@ package emanondev.core.actions;
 import emanondev.core.condition.ConditionHandler;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 public class ConditionalAction extends Action {

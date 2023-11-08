@@ -105,8 +105,8 @@ public class PacketManager {
         }
         packet3.getSlotStackPairLists().write(0, data);
         if (!hasItems)
-            packet3=null;
-        sendPackets(players,packet1,packet2,packet3);
+            packet3 = null;
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void updateArmorStand(Collection<? extends Player> players, PacketArmorStand entity) {
@@ -125,7 +125,7 @@ public class PacketManager {
             packet3.getSlotStackPairLists().write(0, data);
         }
 
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void spawnItem(Collection<? extends Player> players, PacketItem entity) {
@@ -135,7 +135,7 @@ public class PacketManager {
         PacketContainer packet2 = entityMetadataPacket(entity);
         PacketContainer packet3 = entityVelocityPacket(entity, entity.getVelocity());
 
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void updateItem(Collection<? extends Player> players, PacketItem entity) {
@@ -144,7 +144,7 @@ public class PacketManager {
         PacketContainer packet1 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
         PacketContainer packet2 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
         PacketContainer packet3 = entityVelocityPacket(entity, entity.getVelocity());
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void spawnItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
@@ -158,12 +158,12 @@ public class PacketManager {
             default -> 0;
         });
         PacketContainer packet2 = entityMetadataPacket(entity);
-        sendPackets(players,packet1,packet2);
+        sendPackets(players, packet1, packet2);
     }
 
     protected void updateItemFrame(Collection<? extends Player> players, PacketItemFrame entity) {
         PacketContainer packet1 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
-        sendPackets(players,packet1);
+        sendPackets(players, packet1);
     }
 
     protected void entityDestroyPacket(Collection<? extends Player> players, PacketEntity entity) {
@@ -182,13 +182,13 @@ public class PacketManager {
         PacketContainer packet2 = entityMetadataPacket(entity);
         PacketContainer packet3 = entityVelocityPacket(entity, new Vector(0, 0, 0));
 
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void updateHologram(Collection<? extends Player> players, PacketHologram entity) {
         PacketContainer packet1 = entity.shouldUpdatePosition() ? entityTeleportPacket(entity) : null;
         PacketContainer packet2 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
-        sendPackets(players,packet1,packet2);
+        sendPackets(players, packet1, packet2);
     }
 
     protected void spawnDisplayBlock(Collection<Player> players, PacketDisplayBlock entity) {
@@ -196,13 +196,13 @@ public class PacketManager {
         PacketContainer packet2 = entityMetadataPacket(entity);
         PacketContainer packet3 = entityVelocityPacket(entity, new Vector(0, 0, 0));
 
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void updateDisplayBlock(Collection<Player> players, PacketDisplayBlock entity) {
         PacketContainer packet1 = entity.shouldUpdatePosition() ? entityTeleportPacket(entity) : null;
         PacketContainer packet2 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
-        sendPackets(players,packet1,packet2);
+        sendPackets(players, packet1, packet2);
     }
 
 
@@ -211,13 +211,13 @@ public class PacketManager {
         PacketContainer packet2 = entityMetadataPacket(entity);
         PacketContainer packet3 = entityVelocityPacket(entity, new Vector(0, 0, 0));
 
-        sendPackets(players,packet1,packet2,packet3);
+        sendPackets(players, packet1, packet2, packet3);
     }
 
     protected void updateDisplayItem(Collection<Player> players, PacketDisplayItem entity) {
         PacketContainer packet1 = entity.shouldUpdatePosition() ? entityTeleportPacket(entity) : null;
         PacketContainer packet2 = entity.shouldUpdateMeta() ? entityMetadataPacket(entity) : null;
-        sendPackets(players,packet1,packet2);
+        sendPackets(players, packet1, packet2);
     }
 
     void trackPacketEntity(PacketEntity p) {
@@ -287,12 +287,12 @@ public class PacketManager {
         return packet3;
     }
 
-    private void sendPackets(Collection<? extends Player> targets,final PacketContainer... packets){
+    private void sendPackets(Collection<? extends Player> targets, final PacketContainer... packets) {
         if (!plugin.isEnabled())
             return;
         Bukkit.getScheduler().runTask(plugin, () -> {
             for (Player player : targets) {
-                for (PacketContainer packet:packets)
+                for (PacketContainer packet : packets)
                     if (packet != null)
                         protocolManager.sendServerPacket(player, packet);
             }

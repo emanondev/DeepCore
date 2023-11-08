@@ -2,7 +2,6 @@ package emanondev.core.condition;
 
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Locale;
 
 public abstract class Condition {
@@ -30,5 +29,5 @@ public abstract class Condition {
      */
     public abstract boolean isValid(Player player, String text);
 
-    public abstract String getInfo() ;
+    public abstract String getInfo();
 }

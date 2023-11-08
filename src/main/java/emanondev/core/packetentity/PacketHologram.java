@@ -130,7 +130,7 @@ public class PacketHologram extends PacketEntity {
             this.dataWatcher = new WrappedDataWatcher();
         byte bitmask = 0;
         bitmask = !this.isVisible() ? (byte) (bitmask | 0x20) : bitmask;
-        if (bitmask!=0)
+        if (bitmask != 0)
             dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, WatchableCollection.byteSerializer), bitmask);
         //dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(4, WatchableCollection.booleanSerializer), this.isSilent());
         dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WatchableCollection.floatSerializer), this.getViewRangeBlocks() / 64);

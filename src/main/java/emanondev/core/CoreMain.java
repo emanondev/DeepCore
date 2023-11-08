@@ -60,13 +60,13 @@ public final class CoreMain extends CorePlugin {
         ActionHandler.registerAction(new SequenceAction());
         this.logDone("Enabled &aActions API");
         ConditionHandler.registerCondition(new WorldCondition());
-        Bukkit.getScheduler().runTaskLater(this,()->{
-            if (Hooks.isEnabled("DeepQuests5")){
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (Hooks.isEnabled("DeepQuests5")) {
                 ConditionHandler.registerCondition(new CompletedMissionCondition());
                 ConditionHandler.registerCondition(new UnstartedMissionCondition());
                 ConditionHandler.registerCondition(new OngoingMissionCondition());
             }
-        },1L);
+        }, 1L);
         this.logDone("Enabled &aConditions API");
         ItemUtility.initialize();
 

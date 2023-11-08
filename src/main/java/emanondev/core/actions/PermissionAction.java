@@ -2,8 +2,6 @@ package emanondev.core.actions;
 
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class PermissionAction extends Action {
 
     public PermissionAction() {

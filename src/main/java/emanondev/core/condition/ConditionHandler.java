@@ -37,7 +37,7 @@ public class ConditionHandler {
         if (conditionTypes.containsKey(condition.getId()))
             throw new IllegalArgumentException();
         conditionTypes.put(condition.getId(), condition);
-        CoreMain.get().logInfo("Registered Condition "+condition.getId()+" sintax: &e[!]"+condition.getInfo());
+        CoreMain.get().logInfo("Registered Condition " + condition.getId() + " sintax: &e[!]" + condition.getInfo());
     }
 
     public static void unregisterCondition(@NotNull String conditionId) {

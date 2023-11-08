@@ -16,7 +16,7 @@ public class CompletedMissionCondition extends Condition {
         String[] args = text.split(" ");
         QuestManager manager = Quests.get().getQuestManager(args[0]);
         Mission mission = manager.getMission(Integer.parseInt(args[1]));
-        if (mission==null)
+        if (mission == null)
             throw new IllegalArgumentException();
     }
 

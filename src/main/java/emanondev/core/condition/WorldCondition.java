@@ -1,8 +1,5 @@
 package emanondev.core.condition;
 
-import emanondev.deepquests.Quests;
-import emanondev.deepquests.interfaces.Mission;
-import emanondev.deepquests.interfaces.QuestManager;
 import org.bukkit.entity.Player;
 
 public class WorldCondition extends Condition {
@@ -21,7 +18,7 @@ public class WorldCondition extends Condition {
     @Override
     public boolean isValid(Player player, String value) {
         String world = player.getWorld().getName();
-        for (String name:value.split(","))
+        for (String name : value.split(","))
             if (name.equals(world))
                 return true;
         return false;
