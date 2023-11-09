@@ -58,8 +58,16 @@ public final class CoreMain extends CorePlugin {
         ActionHandler.registerAction(new SoundAction());
         ActionHandler.registerAction(new ConditionalAction());
         ActionHandler.registerAction(new SequenceAction());
+        ActionHandler.registerAction(new MessageAction());
+        ActionHandler.registerAction(new CooldownAction());
+        ActionHandler.registerAction(new PayMoneyAction());
         this.logDone("Enabled &aActions API");
         ConditionHandler.registerCondition(new WorldCondition());
+        ConditionHandler.registerCondition(new OrCondition());
+        ConditionHandler.registerCondition(new NoCooldownCondition());
+
+        ConditionHandler.registerCondition(new HasMoneyCondition());
+
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (Hooks.isEnabled("DeepQuests5")) {
                 ConditionHandler.registerCondition(new CompletedMissionCondition());
