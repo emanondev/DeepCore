@@ -8,8 +8,10 @@ import org.bukkit.entity.Player;
 public class OngoingMissionCondition extends Condition {
 
 
+    public static final String ID = "ongoingmission";
+
     public OngoingMissionCondition() {
-        super("ongoingmission");
+        super(ID);
     }
 
     @Override

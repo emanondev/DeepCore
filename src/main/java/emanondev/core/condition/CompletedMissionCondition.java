@@ -7,8 +7,11 @@ import org.bukkit.entity.Player;
 
 public class CompletedMissionCondition extends Condition {
 
+    public static final String ID = "completedmission";
+
+
     public CompletedMissionCondition() {
-        super("completedmission");
+        super(ID);
     }
 
     @Override

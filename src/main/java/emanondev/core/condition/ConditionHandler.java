@@ -35,9 +35,9 @@ public class ConditionHandler {
 
     public static void registerCondition(@NotNull Condition condition) {
         if (conditionTypes.containsKey(condition.getId()))
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("&e"+condition.getId()+"&f already used");
         conditionTypes.put(condition.getId(), condition);
-        CoreMain.get().logInfo("Registered Condition " + condition.getId() + " sintax: &e[!]" + condition.getInfo());
+        CoreMain.get().logInfo("Registered Condition &e" + condition.getId() + "&f sintax: &e[!]" + condition.getInfo());
     }
 
     public static void unregisterCondition(@NotNull String conditionId) {

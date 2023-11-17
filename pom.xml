@@ -246,6 +246,12 @@
             <artifactId>ItemEdit</artifactId>
             <version>3.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>*</artifactId>
+                    <groupId>*</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- DRCgui -->
         <dependency>

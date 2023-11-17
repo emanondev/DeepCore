@@ -68,13 +68,9 @@ public final class CoreMain extends CorePlugin {
 
         ConditionHandler.registerCondition(new HasMoneyCondition());
 
-        Bukkit.getScheduler().runTaskLater(this, () -> {
-            if (Hooks.isEnabled("DeepQuests5")) {
-                ConditionHandler.registerCondition(new CompletedMissionCondition());
-                ConditionHandler.registerCondition(new UnstartedMissionCondition());
-                ConditionHandler.registerCondition(new OngoingMissionCondition());
-            }
-        }, 1L);
+        registerListener(new PluginListener());
+
+
         this.logDone("Enabled &aConditions API");
         ItemUtility.initialize();
 

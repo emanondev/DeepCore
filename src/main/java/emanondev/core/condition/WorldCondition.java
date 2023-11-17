@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 public class WorldCondition extends Condition {
 
     public WorldCondition() {
-        super("completedmission");
+        super("world");
     }
 
     @Override
