@@ -24,6 +24,6 @@ public class ServerCommandAction extends Action {
 
     @Override
     public String getInfo() {
-        return "command <command>";
+        return "servercommand <command>";
     }
 }
