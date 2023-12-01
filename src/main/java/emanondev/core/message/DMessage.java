@@ -139,21 +139,19 @@ public class DMessage {
      * <p>
      * Works for both Strings and Lists of Strings
      *
-     * @param path
-     * @param holders
      * @return this
      */
     @Contract("_, _ -> this")
     @NotNull
     public DMessage appendLang(@NotNull String path, String... holders) {
+        if (plugin.debug("message") && !plugin.getLanguageConfig(target).contains(path))
+            plugin.log("Debug: Missing language message at &e"+path+" &fof file &e"+plugin.getLanguageConfig(target).getFileName());
         if (plugin.getLanguageConfig(target).isList(path))
             return append(plugin.getLanguageConfig(target).getMultiMessage(path, false, null, holders));
         return append(plugin.getLanguageConfig(target).getMessage(path, false, null, holders));
     }
 
     /**
-     * @param path
-     * @param holders
      * @return this
      * @see #appendLang(String, String...)
      */

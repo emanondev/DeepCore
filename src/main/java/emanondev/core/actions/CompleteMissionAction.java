@@ -7,8 +7,10 @@ import org.bukkit.entity.Player;
 
 public class CompleteMissionAction extends Action {
 
+    public static final String ID = "completemission";
+
     public CompleteMissionAction() {
-        super("completemission");
+        super(ID);
     }
 
     @Override

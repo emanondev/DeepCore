@@ -13,14 +13,18 @@ public class ConditionHandler {
 
     private static final HashMap<String, Condition> conditionTypes = new HashMap<>();
 
-
     public static boolean evaluateCondition(@NotNull Player player, @NotNull String rawCond) {
         String type = rawCond.split(" ")[0];
         boolean reversed = type.startsWith("!");
         try {
-            return reversed != conditionTypes.get((reversed ? type.substring(1) : type).toLowerCase(Locale.ENGLISH)).isValid(player, rawCond.substring(type.length() + 1));
+            boolean result = reversed != conditionTypes.get((reversed ? type.substring(1) : type).toLowerCase(Locale.ENGLISH)).isValid(player, rawCond.substring(type.length() + 1));
+            if (CoreMain.get().debug("conditions"))
+                CoreMain.get().logInfo("[DEBUG conditions] &e"+rawCond+" &f-> &e"+result);
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
+            if (CoreMain.get().debug("conditions"))
+                CoreMain.get().logInfo("[DEBUG conditions] &e"+rawCond+" &f-> &efalse &f(ERROR)");
             return false;
         }
     }

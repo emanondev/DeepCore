@@ -655,4 +655,23 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
     }
 
 
+    public void setDebug(boolean value) {
+        setDebug("standard", value);
+    }
+
+    public void setDebug(@NotNull String type, boolean value) {
+        if (!UtilsString.isLowcasedValidID(type))
+            throw new IllegalArgumentException();
+        getConfig().set("debug." + type, value);
+    }
+
+    public boolean debug() {
+        return debug("standard");
+    }
+
+    public boolean debug(@NotNull String type) {
+        if (!UtilsString.isLowcasedValidID(type))
+            throw new IllegalArgumentException();
+        return getConfig().loadBoolean("debug." + type, false);
+    }
 }

@@ -2,6 +2,7 @@ package emanondev.core.actions;
 
 import emanondev.core.CoreMain;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,15 @@ public class ActionHandler {
 
     public static Action getAction(String type) {
         return actions.get(type.toLowerCase(Locale.ENGLISH));
+    }
+
+
+    public static void unregisterAction(@NotNull String actionId) {
+        actionId = actionId.toLowerCase(Locale.ENGLISH);
+        if (!actions.containsKey(actionId))
+            throw new IllegalArgumentException();
+        actions.remove(actionId);
+        CoreMain.get().logInfo("Unregistered Condition Type &e" + actionId);
     }
 
 }

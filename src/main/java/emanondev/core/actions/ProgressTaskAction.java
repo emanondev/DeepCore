@@ -9,8 +9,10 @@ import org.bukkit.entity.Player;
 
 public class ProgressTaskAction extends Action {
 
+    public static final String ID = "progresstask";
+
     public ProgressTaskAction() {
-        super("progresstask");
+        super(ID);
     }
 
     @Override

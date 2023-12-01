@@ -15,7 +15,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public final class UtilsTowny {
+/**
+ *
+ * @see emanondev.core.util.TownyUtility
+ */
+@Deprecated public final class UtilsTowny {
 
     private UtilsTowny() {
 

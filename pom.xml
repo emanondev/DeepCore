@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>emanondev.core</groupId>
     <artifactId>DeepCore</artifactId>
-    <version>3.8.3</version>
+    <version>3.8.4</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -202,7 +202,7 @@
         <dependency>
             <groupId>com.palmergames.bukkit.towny</groupId>
             <artifactId>towny</artifactId>
-            <version>0.98.4.4</version>
+            <version>0.100.0.0</version>
             <scope>provided</scope>
         </dependency>
         <!-- VirginBlock -->

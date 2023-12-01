@@ -39,6 +39,11 @@ gui_button:
       description: "Move line upside"
 
 command:
+  debug:
+    pre: "<b><gold>DeepPlugins Debug</gold></b>"
+    pre_plugin: "<b><gold>%plugin% Debug</gold></b>"
+    invalid_plugin: "<red>Invalid plugin <gold>%plugin%<gold></red>"
+    usage: "/%alias% usage"
   reload:
     success: "<blue>[<white>%plugin%<blue>]<green> Plugin reloaded"
     fail: "<dark_red>[<red>%plugin%<dark_red>]<red> Plugin reload failed!"

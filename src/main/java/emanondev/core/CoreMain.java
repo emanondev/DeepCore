@@ -1,6 +1,7 @@
 package emanondev.core;
 
 import emanondev.core.actions.*;
+import emanondev.core.command.DeepCoreDebug;
 import emanondev.core.condition.*;
 import emanondev.core.events.CustomEventListener;
 import emanondev.core.events.EquipChangeListener;
@@ -69,7 +70,7 @@ public final class CoreMain extends CorePlugin {
         ConditionHandler.registerCondition(new HasMoneyCondition());
 
         registerListener(new PluginListener());
-
+        registerCommand(new DeepCoreDebug());
 
         this.logDone("Enabled &aConditions API");
         ItemUtility.initialize();

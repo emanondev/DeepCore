@@ -36,8 +36,8 @@ public class PluginListener implements Listener {
             ConditionHandler.unregisterCondition(CompletedTaskCondition.ID);
             CoreMain.get().logInfo("Unregistered conditions for DeepQuests5");
             CoreMain.get().logInfo("Unregistering actions for DeepQuests5");
-            ActionHandler.registerAction(new ProgressTaskAction());
-            ActionHandler.registerAction(new CompleteMissionAction());
+            ActionHandler.unregisterAction(ProgressTaskAction.ID);
+            ActionHandler.unregisterAction(CompleteMissionAction.ID);
             CoreMain.get().logInfo("Unregistered actions for DeepQuests5");
         }
     }

@@ -22,3 +22,5 @@ language:
   default-locale: "en"
   # use multiple languages or stick to default locale for everyone?
   multilanguage: true
+debug:
+  standard: false

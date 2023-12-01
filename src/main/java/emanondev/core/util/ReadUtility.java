@@ -36,7 +36,7 @@ public interface ReadUtility {
     static @Nullable OfflinePlayer readOfflinePlayerValue(@NotNull String arg) {
         @SuppressWarnings("deprecation")
         OfflinePlayer player = Bukkit.getOfflinePlayer(arg);
-        if (player.getFirstPlayed() == 0)
+        if (player.getLastPlayed() == 0 && !player.isOnline())
             return null;
         return player;
     }
