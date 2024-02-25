@@ -34,7 +34,6 @@ class WatchableCollection {
         byte bitmask = 0;
         bitmask = item.isGlowing() ? (byte) (bitmask | 0x40) : bitmask;
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, byteSerializer), bitmask);
-        //LanguageUtils.convert(item.getCustomName(), InteractionVisualizer.language).toLegacyText());
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(item.getCustomName())).getHandle()));
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, booleanSerializer), item.isCustomNameVisible());
         watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(5, booleanSerializer), !item.hasGravity());
