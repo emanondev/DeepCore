@@ -3,7 +3,9 @@ package emanondev.core.gui;
 import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import emanondev.core.message.DMessage;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Consumer;
@@ -22,8 +24,8 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     private final Supplier<T> getValue;
     private final Consumer<T> setValue;
     private final Supplier<ItemStack> baseItem;
-    private final Supplier<List<String>> baseDescription;
-    private final Supplier<List<String>> instructionsDescription;
+    //private final Supplier<List<String>> baseDescription;
+    //private final Supplier<List<String>> instructionsDescription;
     private T changeAmount;
 
 
@@ -42,6 +44,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
      * @throws IllegalArgumentException if maxChangeValue or minChangeValue are less
      *                                  or equals to 0
      */
+    @Deprecated
     public NumberEditorFButton(@NotNull Gui gui,
                                @NotNull T changeAmountBase, @Nullable T minChangeValue, @Nullable T maxChangeValue,
                                @NotNull Supplier<T> getValue,
@@ -69,6 +72,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
      *                                  or equals to 0
      */
     @SuppressWarnings("unchecked")
+    @Deprecated
     public NumberEditorFButton(@NotNull Gui gui,
                                @NotNull T changeAmountBase, @Nullable T minChangeValue, @Nullable T maxChangeValue,
                                @NotNull Supplier<T> getValue,
@@ -115,9 +119,70 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         checkBounds();
         this.getValue = getValue;
         this.setValue = setValue;
-        this.baseItem = baseItem;
-        this.baseDescription = baseDescription;
-        this.instructionsDescription = instructionsDescription;
+        this.baseItem = baseItem == null ? (
+                () -> getDefaultBaseItem().setDescription(getDefaultDescription(gui.getTargetPlayer(), baseDescription, instructionsDescription)).build()) : (
+                () -> new ItemBuilder(baseItem.get()).setDescription(getDefaultDescription(gui.getTargetPlayer(), baseDescription, instructionsDescription)).build());
+    }
+
+
+    public NumberEditorFButton(@NotNull Gui gui,
+                               @NotNull T changeAmountBase, @Nullable T minChangeValue, @Nullable T maxChangeValue,
+                               @NotNull Supplier<T> getValue,
+                               @NotNull Consumer<T> setValue,
+                               @NotNull Supplier<ItemStack> baseItem,
+                               boolean addInstructions) {
+        super(gui);
+        this.changeAmount = changeAmountBase;
+        if (maxChangeValue == null) {
+            if (changeAmount instanceof BigDecimal)
+                this.maxChangeAmount = (T) BigDecimal.valueOf(Double.MAX_VALUE);
+            else if (changeAmount instanceof Double)
+                this.maxChangeAmount = (T) (Double) Double.MAX_VALUE;
+            else if (changeAmount instanceof Float)
+                this.maxChangeAmount = (T) (Float) Float.MAX_VALUE;
+            else if (changeAmount instanceof Integer)
+                this.maxChangeAmount = (T) (Integer) Integer.MAX_VALUE;
+            else if (changeAmount instanceof Long)
+                this.maxChangeAmount = (T) (Long) Long.MAX_VALUE;
+            else if (changeAmount instanceof Short)
+                this.maxChangeAmount = (T) (Short) Short.MAX_VALUE;
+            else
+                throw new UnsupportedOperationException();
+        } else
+            this.maxChangeAmount = maxChangeValue;
+        if (minChangeValue == null) {
+            if (changeAmount instanceof BigDecimal)
+                this.minChangeAmount = (T) BigDecimal.valueOf(Math.pow(10, -10));
+            else if (changeAmount instanceof Double)
+                this.minChangeAmount = (T) (Double) Math.pow(10, -10);
+            else if (changeAmount instanceof Float)
+                this.minChangeAmount = (T) (Float) (float) Math.pow(10, -10);
+            else if (changeAmount instanceof Integer)
+                this.minChangeAmount = (T) (Integer) 1;
+            else if (changeAmount instanceof Long)
+                this.minChangeAmount = (T) (Long) 1L;
+            else if (changeAmount instanceof Short)
+                this.minChangeAmount = (T) (Short) ((short) 1);
+            else
+                throw new UnsupportedOperationException();
+        } else
+            this.minChangeAmount = minChangeValue;
+        checkBounds();
+        this.getValue = getValue;
+        this.setValue = setValue;
+        this.baseItem = addInstructions ? (
+                () -> new ItemBuilder(baseItem.get()).addDescription(new DMessage(CoreMain.get()).append(CoreMain.get().getLanguageConfig(getTargetPlayer())
+                        .getStringList("gui_button.number_editor.instructions"),"%amount%",
+                        UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                        UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
+                        UtilsString.formatOptional10Digit(multiplyEditor(0.1)))).build()) : (
+                () -> new ItemBuilder(baseItem.get()).applyPlaceholders(CoreMain.get(), null, "%value%",
+                        UtilsString.formatOptional10Digit(getValue()), "%amount%",
+                        UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                        UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
+                        UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build());
+        //this.baseDescription = baseDescription;
+        //this.instructionsDescription = instructionsDescription;
     }
 
     @SuppressWarnings("unchecked")
@@ -342,20 +407,24 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
 
     @Override
     public ItemStack getItem() {
+        return baseItem.get();
+        /*
         ItemStack base = getBaseItem();
         return base == null ? null
                 : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
                 UtilsString.formatOptional10Digit(getValue()), "%amount%",
                 UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
                 UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
-                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
+                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();*/
     }
 
+    @Deprecated
     public ItemStack getBaseItem() {
         return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
                 .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
     }
 
+    @Deprecated
     public List<String> getDescription() {
         List<String> desc = new ArrayList<>();
         List<String> tmp = getBaseDescription();
@@ -367,14 +436,43 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         return desc;
     }
 
+    @Deprecated
     public List<String> getBaseDescription() {
-        return baseDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.base") : baseDescription.get();
+        return CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.base");
     }
 
+    @Deprecated
     public List<String> getInstructionsDescription() {
-        return instructionsDescription == null ? CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.instructions") : instructionsDescription.get();
+        return CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.instructions");
+    }
+
+
+    private DMessage getDefaultDescription(Player player, Supplier<List<String>> base, Supplier<List<String>> instructions) {
+        DMessage msg = new DMessage(CoreMain.get());
+        String[] holders = new String[]{"%value%",
+                UtilsString.formatOptional10Digit(getValue()), "%amount%",
+                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
+                UtilsString.formatOptional10Digit(multiplyEditor(0.1))};
+        if (base == null)
+            msg.append(CoreMain.get().getLanguageConfig(player)
+                    .getStringList("gui_button.number_editor.base"), holders);
+        else
+            msg.append(base.get(), holders);
+        msg.newLine();
+        if (instructions == null)
+            msg.append(CoreMain.get().getLanguageConfig(player)
+                    .getStringList("gui_button.number_editor.instructions"), holders);
+        else
+            msg.append(instructions.get(), holders);
+        return msg;
+    }
+
+    private ItemBuilder getDefaultBaseItem() {
+        return CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("number_editor", Material.REPEATER);
     }
 
 }
