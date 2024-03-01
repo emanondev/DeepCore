@@ -8,46 +8,58 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 public class ParticleUtility {
 
     private static final int RATEO = 6;
     private static final int SEE_RADIUS = 16 * 6;
 
-    public static void spawnParticle(Player p, Particle particle, double x, double y, double z) {
+    public static void spawnParticle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z) {
         spawnParticle(p, particle, x, y, z, 1, null);
     }
 
-    public static void spawnParticle(Player p, Particle particle, double x, double y, double z, int count, Object data) {
+    public static void spawnParticle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, int count, @Nullable Object data) {
         p.spawnParticle(particle, x, y, z, count, 0, 0, 0, 0, data);
     }
 
-    public static void spawnParticle(Player p, Particle particle, double x, double y, double z, int count) {
+    public static void spawnParticle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, int count) {
         spawnParticle(p, particle, x, y, z, count, null);
     }
 
-    public static void spawnParticleCircle(Player p, Particle particle, double x, double y, double z, double radius, boolean rotateHalf) {
+    public static void spawnParticleCircle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, double radius, boolean rotateHalf) {
         spawnParticleCircle(p, particle, x, y, z, radius, rotateHalf, null);
     }
 
-    private static boolean canSee(Player p, double x, double z) {
+    private static boolean canSee(@NotNull Player p, double x, double z) {
         Location loc = p.getLocation();
         return !(loc.getX() < x - SEE_RADIUS) && !(loc.getX() > x + SEE_RADIUS) && !(loc.getZ() < z - SEE_RADIUS) && !(loc.getZ() > z + SEE_RADIUS);
     }
 
-    private static void spawnParticle(Player p, Particle particle, Object data, Location loc, int count, boolean checkDistance) {
+    private static void spawnParticle(@NotNull Player p, @NotNull Particle particle, @Nullable Object data, Location loc, int count, boolean checkDistance) {
         if (checkDistance && p.getWorld().equals(loc.getWorld()) && canSee(p, loc.getX(), loc.getZ()))
             p.spawnParticle(particle, loc, count, 0, 0, 0, 0, data);
         p.spawnParticle(particle, loc, count, 0, 0, 0, 0, data);
     }
 
-    private static void spawnParticle(Player p, Particle particle, Object data, double x, double y, double z, int count, boolean checkDistance) {
+    private static void spawnParticle(@NotNull Player p, @NotNull Particle particle, @Nullable Object data, double x, double y, double z, int count, boolean checkDistance) {
         if (checkDistance && canSee(p, x, z))
             p.spawnParticle(particle, x, y, z, count, 0, 0, 0, 0, data);
         p.spawnParticle(particle, x, y, z, count, 0, 0, 0, 0, data);
     }
 
-    public static void spawnParticleCircle(Player p, Particle particle, double x, double y, double z, double radius, boolean rotateHalf, Object data) {
+
+    public static void spawnParticleCircle(@NotNull Player p, @NotNull Particle particle, Vector center, double radius, boolean rotateHalf) {
+        spawnParticleCircle(p, particle, center.getX(), center.getY(), center.getZ(), radius, rotateHalf, null);
+    }
+
+    public static void spawnParticleCircle(@NotNull Player p, @NotNull Particle particle, Vector center, double radius, boolean rotateHalf, @Nullable Object data) {
+        spawnParticleCircle(p, particle, center.getX(), center.getY(), center.getZ(), radius, rotateHalf, data);
+    }
+
+    public static void spawnParticleCircle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, double radius, boolean rotateHalf, @Nullable Object data) {
         Location l = p.getLocation();
         if (x > l.getBlockX() - SEE_RADIUS && x < l.getBlockX() + SEE_RADIUS && z > l.getBlockZ() - SEE_RADIUS && z < l.getBlockZ() + SEE_RADIUS)
             for (int i = 0; i < 8; i++) {
@@ -58,27 +70,38 @@ public class ParticleUtility {
             }
     }
 
-    public static void spawnParticleBoxEdges(Player p, Particle particle, BoundingBox box) {
+    public static void spawnParticleBoxEdges(@NotNull Player p, @NotNull Particle particle, @Nullable BoundingBox box) {
         spawnParticleBoxEdges(p, particle, box, null);
     }
 
-    public static void spawnParticleBoxEdges(Player p, Particle particle, BoundingBox box, Object data) {
+    public static void spawnParticleBoxEdges(@NotNull Player p, @NotNull Particle particle, @Nullable BoundingBox box, @Nullable Object data) {
+        if (box == null)
+            return;
         markEdges(p, particle, box.getMin(), box.getMax().add(new Vector(-1, -1, -1)), data);
     }
 
-    public static void spawnParticleLine(Player p, Particle particle, Location loc, double maxDistance, Object data) {
-        spawnParticleLine(p, particle, loc.getX(), loc.getY(), loc.getZ(), loc.getDirection(), maxDistance, data);
+    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, Location loc, double maxDistance, double frequency, @Nullable Object data) {
+        spawnParticleLine(p, particle, loc.getX(), loc.getY(), loc.getZ(), loc.getDirection(), maxDistance, frequency, data);
     }
 
-    public static void spawnParticleLine(Player p, Particle particle, double x, double y, double z, Vector direction, double maxDistance, Object data) {
-        markLine(p, particle, x, y, z, direction, maxDistance, data);
+    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, Vector direction, double maxDistance, double frequency, @Nullable Object data) {
+        markLine(p, particle, x, y, z, direction, maxDistance, frequency, data);
     }
 
-    private static void markLine(Player p, Particle particle, double x, double y, double z, Vector direction, double maxDistance, Object data) {
-        //TODO
+    private static void markLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, Vector direction, double maxDistance, double frequency, @Nullable Object data) {
+        Location l = p.getLocation();
+        Location to = new Location(p.getWorld(), x, y, z);
+        direction.clone().normalize().multiply(frequency);
+        double counter = 0;
+        if (l.distanceSquared(to) < SEE_RADIUS + maxDistance)
+            while (counter < maxDistance) {
+                spawnParticle(p, particle, to.getX(), to.getY(), to.getZ(), 1, data);
+                to.add(direction);
+                counter+=frequency;
+            }
     }
 
-    private static void markEdges(Player p, Particle particle, Vector min, Vector max, Object data) {
+    private static void markEdges(@NotNull Player p, @NotNull Particle particle, Vector min, Vector max, @Nullable Object data) {
         Location l = p.getLocation();
         int xMin = Math.max(l.getBlockX() - SEE_RADIUS, min.getBlockX()), xMax = Math.min(l.getBlockX() + SEE_RADIUS, max.getBlockX());
         int zMin = Math.max(l.getBlockZ() - SEE_RADIUS, min.getBlockZ()), zMax = Math.min(l.getBlockZ() + SEE_RADIUS, max.getBlockZ());
@@ -102,50 +125,63 @@ public class ParticleUtility {
         }
     }
 
-    public static void spawnParticleBoxFaces(Player p, int tick, Particle particle, BoundingBox box) {
+    public static void spawnParticleBoxFaces(@NotNull Player p, @Range(from = 0, to = Integer.MAX_VALUE) int tick, @NotNull Particle particle, @Nullable BoundingBox box) {
         spawnParticleBoxFaces(p, tick, particle, box, null);
     }
 
-    public static void spawnParticleBoxFaces(Player p, int tick, Particle particle, BoundingBox box, Object data) {
+    public static void spawnParticleBoxFaces(@NotNull Player p, @Range(from = 0, to = Integer.MAX_VALUE) int tick,
+                                             @Range(from = 1, to = Integer.MAX_VALUE) int rateo, @NotNull Particle particle, @Nullable BoundingBox box, @Nullable Object data) {
+        if (box == null)
+            return;
+        markFaces(p, tick, rateo, particle, box.getMin(), box.getMax().add(new Vector(-1, -1, -1)), data);
+    }
+
+    public static void spawnParticleBoxFaces(@NotNull Player p, @Range(from = 0, to = Integer.MAX_VALUE) int tick, @NotNull Particle particle, @Nullable BoundingBox box, @Nullable Object data) {
+        if (box == null)
+            return;
         markFaces(p, tick, particle, box.getMin(), box.getMax().add(new Vector(-1, -1, -1)), data);
     }
 
-    private static void markFaces(Player p, int val, Particle particle, Vector min, Vector max, Object data) {
+    private static void markFaces(@NotNull Player p, int val, @NotNull Particle particle, Vector min, Vector max, @Nullable Object data) {
+        markFaces(p, val, RATEO, particle, min, max, data);
+    }
+
+    private static void markFaces(@NotNull Player p, int val, int rateo, @NotNull Particle particle, Vector min, Vector max, @Nullable Object data) {
         Location l = p.getLocation();
-        int xMin = Math.max(l.getBlockX() - SEE_RADIUS, min.getBlockX()), xMax = Math.min(l.getBlockX() + SEE_RADIUS, max.getBlockX());
-        int zMin = Math.max(l.getBlockZ() - SEE_RADIUS, min.getBlockZ()), zMax = Math.min(l.getBlockZ() + SEE_RADIUS, max.getBlockZ());
+        int xMin = Math.max(l.getBlockX() - SEE_RADIUS, min.getBlockX()), xMax = Math.min(l.getBlockX() + SEE_RADIUS, max.getBlockX()) + 1;
+        int zMin = Math.max(l.getBlockZ() - SEE_RADIUS, min.getBlockZ()), zMax = Math.min(l.getBlockZ() + SEE_RADIUS, max.getBlockZ()) + 1;
         for (int x = xMin; x <= xMax; x++)
             for (int z = zMin; z <= zMax; z++) {
-                if (Math.abs(x + min.getBlockY() + z) % RATEO == val % RATEO)
+                if (Math.abs(x + min.getBlockY() + z) % rateo == val % rateo)
                     spawnParticle(p, particle, x, min.getBlockY(), z, data);
-                if (Math.abs(x + max.getBlockY() + 1 + z) % RATEO == val % RATEO)
+                if (Math.abs(x + max.getBlockY() + 1 + z) % rateo == val % rateo)
                     spawnParticle(p, particle, x, max.getBlockY() + 1, z, data);
             }
         for (int x = xMin; x <= xMax; x++)
-            for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
-                if (Math.abs(x + y + min.getBlockZ()) % RATEO == val % RATEO)
+            for (int y = min.getBlockY(); y <= max.getBlockY() + 1; y++) {
+                if (Math.abs(x + y + min.getBlockZ()) % rateo == val % rateo)
                     spawnParticle(p, particle, x, y, min.getBlockZ(), data);
-                if (Math.abs(x + y + max.getBlockZ() + 1) % RATEO == val % RATEO)
+                if (Math.abs(x + y + max.getBlockZ() + 1) % rateo == val % rateo)
                     spawnParticle(p, particle, x, y, max.getBlockZ() + 1, data);
             }
         for (int z = zMin; z <= zMax; z++)
-            for (int y = min.getBlockY(); y <= max.getBlockY(); y++) {
-                if (Math.abs(min.getBlockX() + y + z) % RATEO == val % RATEO)
+            for (int y = min.getBlockY(); y <= max.getBlockY() + 1; y++) {
+                if (Math.abs(min.getBlockX() + y + z) % rateo == val % rateo)
                     spawnParticle(p, particle, min.getBlockX(), y, z, data);
-                if (Math.abs(max.getBlockX() + 1 + y + z) % RATEO == val % RATEO)
+                if (Math.abs(max.getBlockX() + 1 + y + z) % rateo == val % rateo)
                     spawnParticle(p, particle, max.getBlockX() + 1, y, z, data);
             }
     }
 
-    public static void spawnParticle(Player p, Particle particle, double x, double y, double z, Object data) {
+    public static void spawnParticle(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, @Nullable Object data) {
         spawnParticle(p, particle, x, y, z, 0, data);
     }
 
-    public static boolean spawnParticleWorldEditRegionEdges(Player p, Particle particle) {
+    public static boolean spawnParticleWorldEditRegionEdges(@NotNull Player p, @NotNull Particle particle) {
         return spawnParticleWorldEditRegionEdges(p, particle, null);
     }
 
-    public static boolean spawnParticleWorldEditRegionEdges(Player p, Particle particle, Object data) {
+    public static boolean spawnParticleWorldEditRegionEdges(@NotNull Player p, @NotNull Particle particle, @Nullable Object data) {
         try {
             Region sel = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(p))
                     .getSelection(BukkitAdapter.adapt(p.getWorld()));

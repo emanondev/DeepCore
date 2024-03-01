@@ -7,6 +7,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Color;
@@ -611,11 +612,12 @@ public class DMessage {
 
     @Contract(pure = true)
     public void sendActionBar(CommandSender target) {
-        if (target != null && !raw.isEmpty())
-            if (target instanceof Player player)
+        if (target instanceof Player player && !raw.isEmpty() )
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,toBaseComponent());
+            /*if (target instanceof Player player)
                 plugin.adventure().player(player).sendActionBar(toMiniComponent());
             else //???
-                plugin.adventure().sender(target).sendActionBar(toMiniComponent());
+                plugin.adventure().sender(target).sendActionBar(toMiniComponent());*/
     }
 
     @Contract(pure = true)

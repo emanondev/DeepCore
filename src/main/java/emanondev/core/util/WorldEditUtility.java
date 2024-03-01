@@ -1,9 +1,6 @@
 package emanondev.core.util;
 
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitCommandSender;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -19,6 +16,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -29,10 +27,12 @@ import emanondev.core.Hooks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -175,6 +175,53 @@ public final class WorldEditUtility {
         }
         return future;
     }
+
+    public static @Nullable Region getSelectionRegion(@NotNull Player player) {
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(player.getWorld());
+        if (!session.isSelectionDefined(world))
+            return null;
+        return session.getSelection(BukkitAdapter.adapt(player.getWorld()));
+    }
+
+    /**
+     * Note: do NOT use this for isInside or intersection checks on BoundingBox
+     * @param player
+     * @return bounding box, faces of corner of maximus point ARE NOT included on volume
+     */
+    public static @Nullable BoundingBox getSelectionBox(@NotNull Player player) {
+        Region region = getSelectionRegion(player);
+        if (region == null)
+            return null;
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
+        return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+    }
+
+    /**
+     * Note: do NOT use this for copy paste operation with WorldEdit
+     * @param player
+     * @return bounding box, faces of corner of maximus point ARE included on volume
+     */
+    public static @Nullable BoundingBox getSelectionBoxExpanded(@NotNull Player player) {
+        Region region = getSelectionRegion(player);
+        if (region == null)
+            return null;
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 max = region.getMaximumPoint();
+        return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX() + 1, max.getY() + 1, max.getZ() + 1);
+    }
+
+
+    public static void clearSelection(@NotNull Player player) {
+        LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
+        com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(player.getWorld());
+        if (!session.isSelectionDefined(world))
+            return;
+        session.getRegionSelector(world).clear();
+    }
+
+
 
     public static CompletableFuture<EditSession> pasteAir(BoundingBox box, World world, boolean async, CorePlugin plugin) {
         CompletableFuture<EditSession> future = new CompletableFuture<>();
@@ -346,4 +393,5 @@ public final class WorldEditUtility {
         }
         return null;
     }
+
 }
