@@ -80,20 +80,23 @@ public class ParticleUtility {
         markEdges(p, particle, box.getMin(), box.getMax().add(new Vector(-1, -1, -1)), data);
     }
 
-    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, Location loc, double maxDistance, double frequency, @Nullable Object data) {
+    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, Location loc,
+                                         double maxDistance, double frequency, @Nullable Object data) {
         spawnParticleLine(p, particle, loc.getX(), loc.getY(), loc.getZ(), loc.getDirection(), maxDistance, frequency, data);
     }
 
-    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, Vector direction, double maxDistance, double frequency, @Nullable Object data) {
+    public static void spawnParticleLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z,
+                                         Vector direction, double maxDistance, double frequency, @Nullable Object data) {
         markLine(p, particle, x, y, z, direction, maxDistance, frequency, data);
     }
 
-    private static void markLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z, Vector direction, double maxDistance, double frequency, @Nullable Object data) {
+    private static void markLine(@NotNull Player p, @NotNull Particle particle, double x, double y, double z,
+                                 Vector direction, double maxDistance, double frequency, @Nullable Object data) {
         Location l = p.getLocation();
         Location to = new Location(p.getWorld(), x, y, z);
-        direction.clone().normalize().multiply(frequency);
+        direction = direction.clone().normalize().multiply(frequency);
         double counter = 0;
-        if (l.distanceSquared(to) < SEE_RADIUS + maxDistance)
+        if (l.distanceSquared(to) < Math.pow(SEE_RADIUS + maxDistance,2))
             while (counter < maxDistance) {
                 spawnParticle(p, particle, to.getX(), to.getY(), to.getZ(), 1, data);
                 to.add(direction);
