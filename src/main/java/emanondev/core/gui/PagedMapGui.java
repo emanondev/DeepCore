@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -226,6 +227,17 @@ public class PagedMapGui extends ChestGui implements PagedGui {
             buttons.remove(slot);
         else
             buttons.put(slot, button);
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            updateInventory(); //TODO smarter check the update may be on another page so no need to update
+    }
+
+    public void setButtons(@NotNull Map<Integer,GuiButton> map) {
+        map.forEach((slot,button)->{
+            if (button == null)
+                buttons.remove(slot);
+            else
+                buttons.put(slot, button);
+        });
         if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateInventory(); //TODO smarter check the update may be on another page so no need to update
     }
