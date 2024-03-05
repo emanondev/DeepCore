@@ -146,7 +146,7 @@ public class DMessage {
     @NotNull
     public DMessage appendLang(@NotNull String path, String... holders) {
         if (plugin.debug("message") && !plugin.getLanguageConfig(target).contains(path))
-            plugin.log("Debug: Missing language message at &e"+path+" &fof file &e"+plugin.getLanguageConfig(target).getFileName());
+            plugin.log("Debug: Missing language message at &e" + path + " &fof file &e" + plugin.getLanguageConfig(target).getFileName());
         if (plugin.getLanguageConfig(target).isList(path))
             return append(plugin.getLanguageConfig(target).getMultiMessage(path, false, null, holders));
         return append(plugin.getLanguageConfig(target).getMessage(path, false, null, holders));
@@ -612,8 +612,8 @@ public class DMessage {
 
     @Contract(pure = true)
     public void sendActionBar(CommandSender target) {
-        if (target instanceof Player player && !raw.isEmpty() )
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR,toBaseComponent());
+        if (target instanceof Player player && !raw.isEmpty())
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, toBaseComponent());
             /*if (target instanceof Player player)
                 plugin.adventure().player(player).sendActionBar(toMiniComponent());
             else //???

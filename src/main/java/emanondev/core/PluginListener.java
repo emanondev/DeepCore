@@ -26,6 +26,7 @@ public class PluginListener implements Listener {
             CoreMain.get().logInfo("Registered actions for DeepQuests5");
         }
     }
+
     @EventHandler
     private void event(PluginDisableEvent event) {
         if (event.getPlugin().getName().equals("DeepQuests5")) {

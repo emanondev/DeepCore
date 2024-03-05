@@ -16,7 +16,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.session.SessionKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -186,6 +185,7 @@ public final class WorldEditUtility {
 
     /**
      * Note: do NOT use this for isInside or intersection checks on BoundingBox
+     *
      * @param player
      * @return bounding box, faces of corner of maximus point ARE NOT included on volume
      */
@@ -200,6 +200,7 @@ public final class WorldEditUtility {
 
     /**
      * Note: do NOT use this for copy paste operation with WorldEdit
+     *
      * @param player
      * @return bounding box, faces of corner of maximus point ARE included on volume
      */
@@ -220,7 +221,6 @@ public final class WorldEditUtility {
             return;
         session.getRegionSelector(world).clear();
     }
-
 
 
     public static CompletableFuture<EditSession> pasteAir(BoundingBox box, World world, boolean async, CorePlugin plugin) {

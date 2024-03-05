@@ -11,7 +11,7 @@ import java.util.HashSet;
 
 public class FAWECleaner {
 
-    private static HashSet<Path> paths = new HashSet<>();
+    private static final HashSet<Path> paths = new HashSet<>();
 
     static void clean(Clipboard clip) {
         if (clip instanceof BlockArrayClipboard bClip)

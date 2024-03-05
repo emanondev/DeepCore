@@ -37,37 +37,37 @@ public class DeepCoreDebug extends CoreCommand {
             }
             case 1 -> {
                 Plugin pl = Bukkit.getPluginManager().getPlugin(args[0]);
-                if (!(pl instanceof CorePlugin plugin)){
-                    new DMessage(getPlugin(), sender).appendLang("command.debug.invalid_plugin","%plugin%",args[0]).send();
+                if (!(pl instanceof CorePlugin plugin)) {
+                    new DMessage(getPlugin(), sender).appendLang("command.debug.invalid_plugin", "%plugin%", args[0]).send();
                     return;
                 }
-                DMessage msg = new DMessage(getPlugin(), sender).appendLang("command.debug.pre_plugin","%plugin%",plugin.getName()).newLine();
+                DMessage msg = new DMessage(getPlugin(), sender).appendLang("command.debug.pre_plugin", "%plugin%", plugin.getName()).newLine();
                 List<String> list = debugList(plugin);
                 List<String> options = new ArrayList<>(getOptions(plugin));
 
-                for (int i = 0 ; i < options.size();i++)
-                    msg.appendHover("<gold>Click to toggle</gold>",new DMessage(getPlugin(), sender)
-                            .appendRunCommand("/"+alias+" "+plugin.getName()+" "+options.get(i),list.get(i))).newLine();
+                for (int i = 0; i < options.size(); i++)
+                    msg.appendHover("<gold>Click to toggle</gold>", new DMessage(getPlugin(), sender)
+                            .appendRunCommand("/" + alias + " " + plugin.getName() + " " + options.get(i), list.get(i))).newLine();
                 msg.send();
             }
             case 2 -> {
                 Plugin pl = Bukkit.getPluginManager().getPlugin(args[0]);
-                if (!(pl instanceof CorePlugin plugin)){
-                    new DMessage(getPlugin(), sender).appendLang("command.debug.invalid_plugin","%plugin%",args[0]).send();
+                if (!(pl instanceof CorePlugin plugin)) {
+                    new DMessage(getPlugin(), sender).appendLang("command.debug.invalid_plugin", "%plugin%", args[0]).send();
                     return;
                 }
-                plugin.setDebug(args[1].toLowerCase(Locale.ENGLISH),!plugin.debug(args[1].toLowerCase(Locale.ENGLISH)));
+                plugin.setDebug(args[1].toLowerCase(Locale.ENGLISH), !plugin.debug(args[1].toLowerCase(Locale.ENGLISH)));
 
-                DMessage msg = new DMessage(getPlugin(), sender).appendLang("command.debug.pre_plugin","%plugin%",plugin.getName()).newLine();
+                DMessage msg = new DMessage(getPlugin(), sender).appendLang("command.debug.pre_plugin", "%plugin%", plugin.getName()).newLine();
                 List<String> list = debugList(plugin);
                 List<String> options = new ArrayList<>(getOptions(plugin));
 
-                for (int i = 0 ; i < options.size();i++)
-                    msg.appendHover("<gold>Click to toggle</gold>",new DMessage(getPlugin(), sender)
-                            .appendRunCommand("/"+alias+" "+plugin.getName()+" "+options.get(i),list.get(i))).newLine();
+                for (int i = 0; i < options.size(); i++)
+                    msg.appendHover("<gold>Click to toggle</gold>", new DMessage(getPlugin(), sender)
+                            .appendRunCommand("/" + alias + " " + plugin.getName() + " " + options.get(i), list.get(i))).newLine();
                 msg.send();
             }
-            default -> new DMessage(getPlugin(), sender).appendLang("command.debug.usage","%alias%",alias).send();
+            default -> new DMessage(getPlugin(), sender).appendLang("command.debug.usage", "%alias%", alias).send();
         }
     }
 

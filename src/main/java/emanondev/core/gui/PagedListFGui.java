@@ -221,6 +221,11 @@ public class PagedListFGui<T> extends ChestGui implements PagedGui {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void clearButtons() {
+        throw new UnsupportedOperationException();
+    }
+
     public GuiButton getControlButton(int slot) {
         if (slot < 0 || slot > 8)
             return null;

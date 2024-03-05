@@ -3,8 +3,6 @@ package emanondev.core.actions;
 import emanondev.deepquests.Quests;
 import emanondev.deepquests.interfaces.QuestManager;
 import emanondev.deepquests.interfaces.Task;
-import emanondev.itemedit.UtilsString;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class ProgressTaskAction extends Action {
@@ -29,7 +27,7 @@ public class ProgressTaskAction extends Action {
         String[] args = text.split(" ");
         QuestManager manager = Quests.get().getQuestManager(args[0]);
         manager.getUserManager().getUser(player).progressTask(manager.getTask(Integer.parseInt(args[1])),
-                args.length>=3?Integer.parseInt(args[2]):1,player,true);
+                args.length >= 3 ? Integer.parseInt(args[2]) : 1, player, true);
 
         //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), UtilsString.fix(text, player, true, "%player%", player.getName()));
     }

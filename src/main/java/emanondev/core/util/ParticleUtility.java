@@ -96,11 +96,11 @@ public class ParticleUtility {
         Location to = new Location(p.getWorld(), x, y, z);
         direction = direction.clone().normalize().multiply(frequency);
         double counter = 0;
-        if (l.distanceSquared(to) < Math.pow(SEE_RADIUS + maxDistance,2))
+        if (l.distanceSquared(to) < Math.pow(SEE_RADIUS + maxDistance, 2))
             while (counter < maxDistance) {
                 spawnParticle(p, particle, to.getX(), to.getY(), to.getZ(), 1, data);
                 to.add(direction);
-                counter+=frequency;
+                counter += frequency;
             }
     }
 

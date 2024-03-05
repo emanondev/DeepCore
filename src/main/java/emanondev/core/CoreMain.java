@@ -8,7 +8,6 @@ import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.FAWECleaner;
 import emanondev.core.util.ItemUtility;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
 

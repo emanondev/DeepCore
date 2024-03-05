@@ -97,6 +97,11 @@ public class MapGui extends ChestGui {
         throw new IndexOutOfBoundsException("Gui is full");
     }
 
+    @Override
+    public void clearButtons() {
+        buttonsMap.clear();
+    }
+
     /**
      * @see #setButton(int, GuiButton)
      */

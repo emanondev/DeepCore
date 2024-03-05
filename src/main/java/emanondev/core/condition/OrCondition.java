@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import java.util.regex.Pattern;
 
-public class OrCondition extends Condition{
+public class OrCondition extends Condition {
     public OrCondition() {
         super("or");
     }
@@ -34,7 +34,7 @@ public class OrCondition extends Condition{
             throw new IllegalArgumentException();
         String[] args = text.substring(separator.length()).split(separator);
         for (String arg : args)
-            if (ConditionHandler.evaluateCondition(player,arg))
+            if (ConditionHandler.evaluateCondition(player, arg))
                 return true;
         return false;
     }

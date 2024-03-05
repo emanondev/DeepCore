@@ -172,7 +172,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         this.setValue = setValue;
         this.baseItem = addInstructions ? (
                 () -> new ItemBuilder(baseItem.get()).addDescription(new DMessage(CoreMain.get()).append(CoreMain.get().getLanguageConfig(getTargetPlayer())
-                        .getStringList("gui_button.number_editor.instructions"),"%amount%",
+                                .getStringList("gui_button.number_editor.instructions"), "%amount%",
                         UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
                         UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
                         UtilsString.formatOptional10Digit(multiplyEditor(0.1)))).build()) : (

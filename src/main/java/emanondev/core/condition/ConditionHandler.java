@@ -19,12 +19,12 @@ public class ConditionHandler {
         try {
             boolean result = reversed != conditionTypes.get((reversed ? type.substring(1) : type).toLowerCase(Locale.ENGLISH)).isValid(player, rawCond.substring(type.length() + 1));
             if (CoreMain.get().debug("conditions"))
-                CoreMain.get().logInfo("[DEBUG conditions] &e"+rawCond+" &f-> &e"+result);
+                CoreMain.get().logInfo("[DEBUG conditions] &e" + rawCond + " &f-> &e" + result);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
             if (CoreMain.get().debug("conditions"))
-                CoreMain.get().logInfo("[DEBUG conditions] &e"+rawCond+" &f-> &efalse &f(ERROR)");
+                CoreMain.get().logInfo("[DEBUG conditions] &e" + rawCond + " &f-> &efalse &f(ERROR)");
             return false;
         }
     }
@@ -39,7 +39,7 @@ public class ConditionHandler {
 
     public static void registerCondition(@NotNull Condition condition) {
         if (conditionTypes.containsKey(condition.getId()))
-            throw new IllegalArgumentException("&e"+condition.getId()+"&f already used");
+            throw new IllegalArgumentException("&e" + condition.getId() + "&f already used");
         conditionTypes.put(condition.getId(), condition);
         CoreMain.get().logInfo("Registered Condition &e" + condition.getId() + "&f sintax: &e[!]" + condition.getInfo());
     }

@@ -16,10 +16,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 
 /**
- *
  * @see emanondev.core.util.TownyUtility
  */
-@Deprecated public final class UtilsTowny {
+@Deprecated
+public final class UtilsTowny {
 
     private UtilsTowny() {
 

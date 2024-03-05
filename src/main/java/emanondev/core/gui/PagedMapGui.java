@@ -263,6 +263,11 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     }
 
     @Override
+    public void clearButtons() {
+        buttons.clear();
+    }
+
+    @Override
     public void addButton(@NotNull GuiButton button) {
         for (int i = 0; i < Short.MAX_VALUE; i++) {
             if (buttons.containsKey(i))

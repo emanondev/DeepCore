@@ -18,9 +18,9 @@ public class NoCooldownCondition extends Condition {
     @Override
     public boolean isValid(Player player, String text) {
         return CoreMain.get().getCooldownAPI(true)
-                .hasCooldown(player,text)
-                ||CoreMain.get().getCooldownAPI(false)
-                .hasCooldown(player,text);
+                .hasCooldown(player, text)
+                || CoreMain.get().getCooldownAPI(false)
+                .hasCooldown(player, text);
     }
 
     @Override

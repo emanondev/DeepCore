@@ -116,6 +116,12 @@ public class TypeGui implements Gui {
     }
 
     @Override
+    public void clearButtons() {
+        for (int i = 0; i < buttons.length; i++)
+            buttons[i] = null;
+    }
+
+    @Override
     public final Player getTargetPlayer() {
         return player;
     }

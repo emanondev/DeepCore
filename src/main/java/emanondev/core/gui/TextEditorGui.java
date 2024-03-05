@@ -174,6 +174,11 @@ public abstract class TextEditorGui extends AnvilGui {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void clearButtons() {
+        throw new UnsupportedOperationException();
+    }
+
     public abstract void onTextConfirmed(String line);
 
     public String getOriginal() {

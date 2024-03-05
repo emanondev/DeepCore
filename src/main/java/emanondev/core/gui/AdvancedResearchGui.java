@@ -312,6 +312,11 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void clearButtons() {
+        throw new UnsupportedOperationException();
+    }
+
     public GuiButton getControlButton(int slot) {
         if (slot < 0 || slot > 8)
             return null;

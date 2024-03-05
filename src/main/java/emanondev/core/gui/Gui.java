@@ -201,6 +201,11 @@ public interface Gui extends InventoryHolder, FileLogger {
     void addButton(@NotNull GuiButton button);
 
     /**
+     * @throws UnsupportedOperationException if the add operation is not supported by this gui
+     */
+    void clearButtons();
+
+    /**
      * @return target player or null
      */
     @Nullable Player getTargetPlayer();

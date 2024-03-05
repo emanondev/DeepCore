@@ -12,11 +12,11 @@ public class CooldownAction extends Action {
     @Override
     public void validateInfo(String text) {
         String[] args = text.split(" ");
-        if (!UtilsString.isValidID(args[0])||Integer.parseInt(args[1])<0)
+        if (!UtilsString.isValidID(args[0]) || Integer.parseInt(args[1]) < 0)
             throw new IllegalStateException();
-        if (args.length!=3 && args.length!=2)
+        if (args.length != 3 && args.length != 2)
             throw new IllegalStateException();
-        if (args.length==3 && !args[2].equals("true") && !args[2].equals("false"))
+        if (args.length == 3 && !args[2].equals("true") && !args[2].equals("false"))
             throw new IllegalStateException();
     }
 
@@ -24,7 +24,7 @@ public class CooldownAction extends Action {
     public void execute(Player player, String text) {
         String[] args = text.split(" ");
         CoreMain.get().getCooldownAPI(args.length < 3 || Boolean.parseBoolean(args[2]))
-                .setCooldown(player,args[0],Integer.parseInt(args[1]));
+                .setCooldown(player, args[0], Integer.parseInt(args[1]));
     }
 
     @Override

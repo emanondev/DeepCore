@@ -1,7 +1,6 @@
 package emanondev.core.actions;
 
 import emanondev.core.CoreMain;
-import emanondev.core.UtilsString;
 import emanondev.core.message.DMessage;
 import org.bukkit.entity.Player;
 
@@ -18,7 +17,7 @@ public class MessageAction extends Action {
 
     @Override
     public void execute(Player player, String text) {
-        new DMessage(CoreMain.get(),player).append(text).send();
+        new DMessage(CoreMain.get(), player).append(text).send();
     }
 
     @Override

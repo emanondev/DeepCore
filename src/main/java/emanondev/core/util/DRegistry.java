@@ -13,27 +13,10 @@ import java.util.regex.Pattern;
 
 public class DRegistry<T extends DRegistryElement> implements Iterable<T>, ConsoleLogger {
 
-    public @NotNull String getRegistryId() {
-        return name;
-    }
-
-    public @NotNull CorePlugin getPlugin() {
-        return plugin;
-    }
-
     private final String name;
     private final LinkedHashMap<String, T> types = new LinkedHashMap<>();
     private final boolean doLog;
     private final CorePlugin plugin;
-
-    /**
-     * @return true if registry log on console relevant events
-     */
-    public boolean isLogging() {
-        return doLog;
-    }
-
-
     /**
      * @throws IllegalArgumentException if name doesn't match <code>[a-zA-Z][_a-zA-Z0-9]*</code>
      */
@@ -43,6 +26,21 @@ public class DRegistry<T extends DRegistryElement> implements Iterable<T>, Conso
         this.name = name;
         this.plugin = plugin;
         this.doLog = doLog;
+    }
+
+    public @NotNull String getRegistryId() {
+        return name;
+    }
+
+    public @NotNull CorePlugin getPlugin() {
+        return plugin;
+    }
+
+    /**
+     * @return true if registry log on console relevant events
+     */
+    public boolean isLogging() {
+        return doLog;
     }
 
     /**
@@ -69,7 +67,7 @@ public class DRegistry<T extends DRegistryElement> implements Iterable<T>, Conso
      */
     public boolean unregister(@NotNull String id) {
         T val = types.remove(id);
-        if (val==null)
+        if (val == null)
             return false;
         val.onUnregistered(this);
         if (doLog) log("Unregistered &e" + id);

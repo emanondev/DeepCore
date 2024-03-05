@@ -1,7 +1,6 @@
 package emanondev.core.condition;
 
 import emanondev.deepquests.Quests;
-import emanondev.deepquests.interfaces.Mission;
 import emanondev.deepquests.interfaces.QuestManager;
 import emanondev.deepquests.interfaces.Task;
 import org.bukkit.entity.Player;
