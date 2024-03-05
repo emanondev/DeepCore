@@ -27,11 +27,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
      */
     public PagedMapGui(@Nullable DMessage title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin) {
         this(title, rows, p, previousHolder, plugin, 0);
@@ -41,11 +36,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
      */
     public PagedMapGui(DMessage title, int rows, Player p, @Nullable Gui previousHolder, @NotNull CorePlugin plugin, int page) {
         super(title, rows, p, previousHolder, plugin);
@@ -61,11 +51,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin) {
         this(title, rows, p, previousHolder, plugin, false, 0);
@@ -75,13 +60,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
-     * @param timerUpdate
-     * @param page
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate,
                        int page) {
@@ -98,12 +76,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
-     * @param page
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, int page) {
         this(title, rows, p, previousHolder, plugin, false, 0);
@@ -113,12 +85,6 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * This implementation uses the last row for pages buttons, those buttons won't
      * change position changing gui page
      *
-     * @param title
-     * @param rows
-     * @param p
-     * @param previousHolder
-     * @param plugin
-     * @param timerUpdate
      */
     public PagedMapGui(String title, int rows, Player p, Gui previousHolder, CorePlugin plugin, boolean timerUpdate) {
         this(title, rows, p, previousHolder, plugin, timerUpdate, 1);
@@ -243,8 +209,10 @@ public class PagedMapGui extends ChestGui implements PagedGui {
     public void updateInventory() {
         for (int i = 0; i < this.getInventory().getSize() - 9; i++) {
             int slot = i + (page - 1) * (this.getInventory().getSize() - 9);
-            this.getInventory().setItem(i, getButton(slot) == null ? null : getButton(slot).getItem());
+            GuiButton button = getButton(slot);
+            this.getInventory().setItem(i, button == null ? null : button.getItem());
         }
+        updateControlButtons();
     }
 
     @Override
