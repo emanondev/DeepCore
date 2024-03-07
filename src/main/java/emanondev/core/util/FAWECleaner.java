@@ -22,7 +22,8 @@ public class FAWECleaner {
                 if (file.isFile())
                     Files.delete(file.toPath());
             } catch (Exception e) {
-                e.printStackTrace();
+                track(clip);
+                //e.printStackTrace();
             }
         }
     }
