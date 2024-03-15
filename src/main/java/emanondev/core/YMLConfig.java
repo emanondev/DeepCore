@@ -171,7 +171,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             if (!file.getParentFile().exists())  // Create parent folders if they don't exist
                 file.getParentFile().mkdirs();
 
-            if (plugin.getResource(name) != null)
+            if (plugin.getResource(name.replace('\\', '/')) != null)
                 plugin.saveResource(name, true); // Save the one from the JAR if possible
             else
                 try {
@@ -187,9 +187,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        InputStream resource = plugin.getResource(name);
+        InputStream resource = plugin.getResource(name.replace('\\', '/'));
         if (resource != null)
-            // Set up defaults in case their config is broked.
+            // Set up defaults in case their config is broken.
             this.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8)));
 
         return existed;
