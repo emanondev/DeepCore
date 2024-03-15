@@ -33,6 +33,18 @@ public interface CompleteUtility {
      */
     static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender, @Nullable String prefix,
                                                            @Nullable Collection<? extends Player> players) {
+        return completePlayerNamesValues(sender, prefix, players, null);
+    }
+
+    /**
+     * @param sender  the sender
+     * @param prefix  prefix to match, case-insensitive
+     * @param players which player names are considered?
+     * @return a list of player names from the given collection for the given prefix
+     * filtering visible players if vanishAPI is active
+     */
+    static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender, @Nullable String prefix,
+                                                           @Nullable Collection<? extends Player> players, @Nullable Predicate<Player> playerPredicate) {
         if (players == null)
             return Collections.emptyList();
         if (prefix != null)
@@ -44,6 +56,8 @@ public interface CompleteUtility {
         if (Hooks.isVanishEnabled() && (sender instanceof Player)) {
             for (Player p : players)
                 try {
+                    if (playerPredicate != null && !playerPredicate.test(p))
+                        continue;
                     if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix) && VanishApi.canSee(sender, p))
                         list.add(p.getName());
                 } catch (Exception e) {//HOTFIX
@@ -57,9 +71,12 @@ public interface CompleteUtility {
                         list.add(p.getName());
                 }
         } else
-            for (Player p : players)
+            for (Player p : players) {
+                if (playerPredicate != null && !playerPredicate.test(p))
+                    continue;
                 if (p.getName().toLowerCase(Locale.ENGLISH).startsWith(prefix))
                     list.add(p.getName());
+            }
         return list;
     }
 
@@ -255,6 +272,28 @@ public interface CompleteUtility {
     default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
                                                       @Nullable Collection<? extends Player> players) {
         return completePlayerNamesValues(sender, prefix, players);
+    }
+
+    /**
+     * @param sender sender
+     * @param prefix prefix to match, case-insensitive
+     * @return a list of player names from online players for the given prefix
+     * filtering visible players if vanishAPI is active
+     */
+    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix, @Nullable Predicate<Player> predicate) {
+        return completePlayerNamesValues(sender, prefix, Bukkit.getOnlinePlayers(), predicate);
+    }
+
+    /**
+     * @param sender  the sender
+     * @param prefix  prefix to match, case-insensitive
+     * @param players which player names are considered?
+     * @return a list of player names from the given collection for the given prefix
+     * filtering visible players if vanishAPI is active
+     */
+    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
+                                                      @Nullable Collection<? extends Player> players, @Nullable Predicate<Player> predicate) {
+        return completePlayerNamesValues(sender, prefix, players, predicate);
     }
 
     /**
