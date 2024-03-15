@@ -72,12 +72,14 @@ public final class WorldEditUtility {
         return future;
     }
 
+    @Deprecated
     public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async, @NotNull Plugin plugin) {
-        if (!corner1.getWorld().equals(corner2.getWorld()))
+        if (!Objects.equals(corner1.getWorld(), corner2.getWorld()))
             throw new IllegalArgumentException();
         return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes, async, plugin);
     }
 
+    @Deprecated
     public static Clipboard copy(@NotNull World w, @NotNull BoundingBox area, boolean copyEntity, boolean copyBiomes, boolean async, @NotNull Plugin plugin) {
         BlockVector3 min = BlockVector3.at((int) area.getMinX(), (int) area.getMinY(), (int) area.getMinZ());
 
@@ -92,12 +94,47 @@ public final class WorldEditUtility {
         forwardExtentCopy.setCopyingBiomes(copyBiomes);
         try {
             Operations.complete(forwardExtentCopy);
-            Optional.ofNullable(editSession).ifPresent(EditSession::close);
+            editSession.close();
         } catch (WorldEditException e) {
             e.printStackTrace();
             return null;
         }
         return clipboard;
+    }
+
+    public static CompletableFuture<Clipboard> copy(@NotNull BoundingBox area, @NotNull World w, boolean copyEntity, boolean copyBiomes, boolean async, @NotNull Plugin plugin) {
+        CompletableFuture<Clipboard> future = new CompletableFuture<>();
+        BlockVector3 min = BlockVector3.at((int) area.getMinX(), (int) area.getMinY(), (int) area.getMinZ());
+
+        CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(w), min,
+                BlockVector3.at((int) area.getMaxX(), (int) area.getMaxY(), (int) area.getMaxZ()));
+        Clipboard clipboard = new ClipboardContainer(new BlockArrayClipboard(region));
+        Runnable pasteTask = () -> {
+            try {
+                try {
+                    EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().fastMode(true).world(BukkitAdapter.adapt(w))
+                            .maxBlocks(-1).actor(getActor(false)).build();
+                    ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(editSession, region, clipboard,
+                            region.getMinimumPoint());
+                    forwardExtentCopy.setCopyingEntities(copyEntity);
+                    forwardExtentCopy.setCopyingBiomes(copyBiomes);
+                    Operations.complete(forwardExtentCopy);
+                    future.complete(clipboard);
+                    editSession.close();
+                } catch (WorldEditException e) {
+                    e.printStackTrace();
+                    future.completeExceptionally(e);
+                }
+            } catch (NullPointerException | WorldEditException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        if (Hooks.isWorldEditAsync() && async)
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, pasteTask);
+        else
+            Bukkit.getScheduler().runTask(plugin, pasteTask);
+
+        return future;
     }
 
     private static Actor getActor(boolean persistent) {
@@ -160,7 +197,7 @@ public final class WorldEditUtility {
                         .copyBiomes(copyBiomes).copyEntities(copyEntities).ignoreAirBlocks(ignoreAir).build();
                 Operations.complete(operation);
                 future.complete(editSession);
-                Optional.ofNullable(editSession).ifPresent(EditSession::close);
+                editSession.close();
             } catch (WorldEditException e) {
                 throw new RuntimeException(e);
             } catch (NullPointerException e) {
@@ -237,7 +274,7 @@ public final class WorldEditUtility {
                         BlockVector3.at(box.getMaxX(), box.getMaxY(), box.getMaxZ()));
                 editSession.setBlocks(region, block);
                 future.complete(editSession);
-                Optional.ofNullable(editSession).ifPresent(EditSession::close);
+                editSession.close();
             } catch (WorldEditException e) {
                 throw new RuntimeException(e);
             } catch (NullPointerException e) {
@@ -363,7 +400,7 @@ public final class WorldEditUtility {
 
     @Deprecated
     public static Clipboard copy(@NotNull Location corner1, @NotNull Location corner2, boolean copyEntity, boolean copyBiomes, boolean async) {
-        if (!corner1.getWorld().equals(corner2.getWorld()))
+        if (!Objects.equals(corner1.getWorld(), corner2.getWorld()))
             throw new IllegalArgumentException();
         return copy(corner1.getWorld(), BoundingBox.of(corner1, corner2), copyEntity, copyBiomes);
     }
