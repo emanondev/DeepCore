@@ -153,32 +153,25 @@ public class CounterAPI {
         MINUTE, HOUR_QUARTER, HOUR, DAY, WEEK, MONTH, YEAR, PERMANENT;
 
         public long getId() {
-            switch (this) {
-                case MINUTE:
-                    return Calendar.getInstance().getTimeInMillis() / 60000;
-                case HOUR_QUARTER:
-                    return Calendar.getInstance().getTimeInMillis() / 900000;
-                case HOUR:
-                    return Calendar.getInstance().getTimeInMillis() / 3600000;
-                case DAY: {
+            return switch (this) {
+                case MINUTE -> Calendar.getInstance().getTimeInMillis() / 60000;
+                case HOUR_QUARTER -> Calendar.getInstance().getTimeInMillis() / 900000;
+                case HOUR -> Calendar.getInstance().getTimeInMillis() / 3600000;
+                case DAY -> {
                     Calendar cal = Calendar.getInstance();
-                    return cal.get(Calendar.YEAR) * 512L + cal.get(Calendar.DAY_OF_YEAR);
+                    yield cal.get(Calendar.YEAR) * 512L + cal.get(Calendar.DAY_OF_YEAR);
                 }
-                case MONTH: {
+                case MONTH -> {
                     Calendar cal = Calendar.getInstance();
-                    return cal.get(Calendar.YEAR) * 16L + cal.get(Calendar.MONTH);
+                    yield cal.get(Calendar.YEAR) * 16L + cal.get(Calendar.MONTH);
                 }
-                case PERMANENT:
-                    return 0;
-                case WEEK: {
+                case PERMANENT -> 0;
+                case WEEK -> {
                     Calendar cal = Calendar.getInstance();
-                    return cal.get(Calendar.YEAR) * 64L + cal.get(Calendar.WEEK_OF_YEAR);
+                    yield cal.get(Calendar.YEAR) * 64L + cal.get(Calendar.WEEK_OF_YEAR);
                 }
-                case YEAR:
-                    return Calendar.getInstance().get(Calendar.YEAR);
-                default:
-                    throw new IllegalStateException();
-            }
+                case YEAR -> Calendar.getInstance().get(Calendar.YEAR);
+            };
         }
 
         public long getPreviousId() {

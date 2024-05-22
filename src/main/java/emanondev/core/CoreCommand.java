@@ -73,21 +73,6 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
      *                 <b>'command.'+this.getID()+'.'+path</b>
      * @param def      Default message
      * @param color    Whether translate color codes or not
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
-                                       boolean color, String... holders) {
-        sendMessageFeedback(receiver, path, def, color, receiver, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
      * @param target   Player target for PlaceHolderAPI holders
      * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
      */
@@ -96,94 +81,6 @@ public abstract class CoreCommand extends emanondev.core.command.CoreCommand {
         UtilsMessages.sendMessage(receiver, loadMessage(receiver, path, def, color, target, holders));
     }
 
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, String... holders) {
-        sendMessageFeedback(receiver, path, def, color, receiver, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param color    Whether translate color codes or not
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       boolean color, @Nullable CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getLanguageSection(receiver).loadMessage(path, def, color, target, holders));
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
-                                       String... holders) {
-        sendMessageFeedback(receiver, path, def, true, receiver, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                       String... holders) {
-        sendMessageFeedback(receiver, path, def, true, receiver, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable String def,
-                                       @Nullable CommandSender target, String... holders) {
-        sendMessageFeedback(receiver, path, def, true, target, holders);
-    }
-
-    /**
-     * Sends a message to receiver
-     *
-     * @param receiver message target
-     * @param path     final configuration path is
-     *                 <b>'command.'+this.getID()+'.'+path</b>
-     * @param def      Default message
-     * @param target   Player target for PlaceHolderAPI holders
-     * @param holders  Additional placeholders to replace in the format "holder1", "value1", "holder2", "value2"... additional placeholders as couples holder, value
-     */
-    protected void sendMultiMessageFeedback(CommandSender receiver, @NotNull String path, @Nullable List<String> def,
-                                            @Nullable CommandSender target, String... holders) {
-        sendMessageFeedback(receiver, path, def, true, target, holders);
-    }
 
     /**
      * Returns message and set default if absent

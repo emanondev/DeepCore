@@ -37,7 +37,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -236,7 +235,7 @@ public final class WorldEditUtility {
     }
 
     /**
-     * Note: do NOT use this for copy paste operation with WorldEdit
+     * Note: do NOT use this for copy and paste operation with WorldEdit
      *
      * @param player
      * @return bounding box, faces of corner of maximus point ARE included on volume

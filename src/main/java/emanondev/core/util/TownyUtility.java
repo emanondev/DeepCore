@@ -91,12 +91,23 @@ public class TownyUtility {
     }
 
     @Contract("!null -> !null; null -> null")
+    public static @Nullable Government getGovernment(@Nullable Town t) {
+        return t == null ? null : (t.hasNation() ? t.getNationOrNull() : t);
+    }
+
+    public static @Nullable Government getGovernment(@NotNull Player p) {
+        return getGovernment(getTown(p));
+    }
+
+    @Deprecated(forRemoval = true)
+    @Contract("!null -> !null; null -> null")
     public static @Nullable Government getGovernament(@Nullable Town t) {
         return t == null ? null : (t.hasNation() ? t.getNationOrNull() : t);
     }
 
+    @Deprecated(forRemoval = true)
     public static @Nullable Government getGovernament(@NotNull Player p) {
-        return getGovernament(getTown(p));
+        return getGovernment(getTown(p));
     }
 
     public static @NotNull Collection<Town> getTowns() {

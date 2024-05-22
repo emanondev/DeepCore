@@ -2,7 +2,7 @@ package emanondev.core.util.items;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.YMLSection;
-import io.lumine.xikage.mythicmobs.MythicMobs;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,8 +18,7 @@ public class MythicMobsItemConverter implements ItemConverter {
             amount = Integer.parseInt(parts[1]);
         }
 
-        ItemStack finalItem = MythicMobs.inst().getItemManager().getItemStack(itemName);
-
+        ItemStack finalItem = MythicBukkit.inst().getItemManager().getItemStack(itemName);
 
         return finalItem == null ? null : new ItemBuilder(finalItem).setAmount(amount);
     }

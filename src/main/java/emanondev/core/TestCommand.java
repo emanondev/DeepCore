@@ -2,11 +2,16 @@ package emanondev.core;
 
 import emanondev.core.command.CoreCommand;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.*;
 
 public class TestCommand extends CoreCommand {//TODO
 
@@ -14,93 +19,42 @@ public class TestCommand extends CoreCommand {//TODO
 
     public TestCommand() {
         super("test", CoreMain.get(), null);
-        // for (String category : List.of("barche", "alberi", "casamedioevale", "castello", "organic", "hub-spawn", "minigamearena", "statua"))
-        //     counter.put(category, 0);
-        /*new BukkitRunnable() {
-            @Override
-            public void run() {
-                Player ema = Bukkit.getPlayer("emanon___");
-                if (ema == null)
-                    return;
-                notifyMsg(ema);
+        Map< Class<?>,List<Material>> map = new LinkedHashMap<>();
+        for (Material mat: Material.values()){
+            if (mat.isItem()) {
+                ItemMeta item = new ItemStack(mat).getItemMeta();
+                if (map.containsKey(item==null?null:item.getClass()))
+                    map.get(item==null?null:item.getClass()).add(mat);
+                else
+                    map.put(item==null?null:item.getClass(),new ArrayList<>(List.of(mat)));
             }
-        }.runTaskTimer(CoreMain.get(), 20, 60 * 20);*/
+        }
+        map.forEach((k,v)-> {
+            getPlugin().logInfo((k==null?null:k.getSimpleName())+" "+(k==null?null:Arrays.toString(k.getInterfaces()))+" "+Arrays.toString(v.toArray()));
+        });
+        Map< Class<? extends BlockState> ,List<Material>> map2 = new LinkedHashMap<>();
+        map.forEach((k,v)-> {
+            if (k!=null && k.getSimpleName().equals("CraftMetaBlockState")){
+                for (Material mat:v) {
+                    BlockStateMeta meta = ((BlockStateMeta) new ItemStack(mat).getItemMeta());
+                    Class<? extends BlockState> state = meta.getBlockState().getClass();
+                    if (map2.containsKey(state))
+                        map2.get(state).add(mat);
+                    else
+                        map2.put(state,new ArrayList<>(List.of(mat)));
+                }
+            }
+        });
+        map2.forEach((k,v)-> {
+            getPlugin().logInfo((k==null?null:k.getSimpleName())+" "+(k==null?null:Arrays.toString(k.getInterfaces()))+" "+Arrays.toString(v.toArray()));
+        });
+
     }
 
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
 
-
     }
-    /*
-        if (!(sender instanceof Player player)) {
-
-            return;
-        }
-        if (args.length != 1) {
-            notifyMsg(player);
-            return;
-        }
-
-        String category = args[0].toLowerCase(Locale.ENGLISH);
-        if (category.equals("copy")) {
-            try {
-                World world = player.getWorld();
-                Region sel = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player))
-                        .getSelection(BukkitAdapter.adapt(world));
-                Location area = new Location(world, sel.getMinimumPoint().getX(), sel.getMinimumPoint().getY(),
-                        sel.getMinimumPoint().getZ());
-                player.teleport(area);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        player.performCommand("/copy ");
-                    }
-                }.runTaskLater(CoreMain.get(), 5L);
-            } catch (Exception e) {
-                new DMessage(CoreMain.get(), player).append(DyeColor.RED).append("Area non selezionata").send();
-            }
-            return;
-        }
-
-        try {
-            Location original = player.getLocation();
-            counter.putIfAbsent(category, 0);
-            int id = counter.put(category, counter.get(category) + 1);
-            World world = player.getWorld();
-            Region sel = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player))
-                    .getSelection(BukkitAdapter.adapt(world));
-            Location area = new Location(world, sel.getMinimumPoint().getX(), sel.getMinimumPoint().getY(),
-                    sel.getMinimumPoint().getZ());
-            player.teleport(area);
-            runLater(5, () -> player.performCommand("/copy "));
-            runLater(20, () -> player.teleport(original));
-            runLater(60, () -> player.performCommand(
-                    "schematic save " + category + id + "_" + (sel.getMaximumPoint().getX() - sel.getMinimumPoint().getX()) + "x"
-                            + (sel.getMaximumPoint().getZ() - sel.getMinimumPoint().getZ()) + "x"
-                            + (sel.getMaximumPoint().getY() - sel.getMinimumPoint().getY())));
-            runLater(90L, () -> notifyMsg(player));
-        } catch (IncompleteRegionException e) {
-            new DMessage(CoreMain.get(), player).append(DyeColor.RED).append("Area non selezionata").send();
-        }
-    }
-
-    private void runLater(long delay, Runnable run) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                run.run();
-            }
-        }.runTaskLater(CoreMain.get(), delay);
-    }
-
-    private void notifyMsg(Player player) {
-        DMessage msg = new DMessage(CoreMain.get(), player);
-        msg.append("\n\n\n");
-        for (String cat : counter.keySet())
-            msg.append(DyeColor.LIGHT_BLUE).appendRunCommand("/test " + cat, "[" + cat + "]").append(" ");
-        msg.send();
-    }*/
 
 
     @Override

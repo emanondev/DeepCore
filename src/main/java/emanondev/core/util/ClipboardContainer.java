@@ -385,6 +385,7 @@ public final class ClipboardContainer implements Clipboard {
         return parent.apply(positions, filter);
     }
 
+    @Override
     protected void finalize() {
         try {
             clean();

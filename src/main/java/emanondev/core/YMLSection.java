@@ -50,7 +50,8 @@ public interface YMLSection extends ConfigurationSection {
      * @param path Path of the Object
      * @return sub keys at selected path
      */
-    @NotNull Set<String> getKeys(@NotNull String path);
+    @NotNull
+    Set<String> getKeys(@NotNull String path);
 
     /**
      * Returns true if the config has been changed since the last change
@@ -714,7 +715,8 @@ public interface YMLSection extends ConfigurationSection {
      *
      * @return the file associated to the config
      */
-    @NotNull File getFile();
+    @NotNull
+    File getFile();
 
     @Contract("_, !null -> !null")
     default @Nullable Sound getSound(@NotNull String path, @Nullable Sound def) {
@@ -1038,7 +1040,8 @@ public interface YMLSection extends ConfigurationSection {
      *
      * @return Parent section containing this section.
      */
-    @Nullable YMLSection getParent();
+    @Nullable
+    YMLSection getParent();
 
     /**
      * internal use only
@@ -1169,7 +1172,7 @@ public interface YMLSection extends ConfigurationSection {
 
         ItemMeta meta = def == null ? null : def.getItemMeta();
         return new ItemBuilder(section.getMaterial("material", def == null ? Material.STONE : def.getType()))
-                .hideAllFlags().addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow",
+                .hideAllFlags().addEnchantment(Enchantment.LURE, section.getBoolean("glow",
                         def != null && def.getEnchantments().size() > 0) ? 1 : 0)
                 .setAmount(section.getInteger("amount", def == null ? 1 : def.getAmount()))
                 .setUnbreakable(section.getBoolean("unbreakable", def != null && meta.isUnbreakable()))
@@ -1197,10 +1200,7 @@ public interface YMLSection extends ConfigurationSection {
 
         ItemMeta meta = def == null ? null : def.getItemMeta();
         b = new ItemBuilder(section.loadMaterial("material", def == null ? Material.STONE : def.getType())).hideAllFlags();
-        if (def != null && def.getEnchantments().size() > 0)
-            b.addEnchantment(Enchantment.DURABILITY, section.loadBoolean("glow", true) ? 1 : 0);
-        else
-            b.addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow", true) ? 1 : 0);
+        b.glow(section.getBoolean("glow", null));
         if (def == null || def.getAmount() == 1)
             b.setAmount(section.getInteger("amount", 1));
         else
@@ -1282,7 +1282,7 @@ public interface YMLSection extends ConfigurationSection {
             return new ItemBuilder(loadItemStack(path, new ItemStack(Material.STONE)));
         YMLSection section = this.loadSection(path);
         return new ItemBuilder(section.loadMaterial("material", defMaterial))
-                .hideAllFlags().addEnchantment(Enchantment.DURABILITY, section.getBoolean("glow", defGlow) ? 1 : 0)
+                .hideAllFlags().glow(section.getBoolean("glow", defGlow))
                 .setAmount(section.getInteger("amount", defAmount)).setUnbreakable(section.getBoolean("unbreakable", defUnbreakable))
                 .setCustomModelData(section.getInteger("customModelData", 0))
                 .setDamage(section.getInteger("damage", 0));
@@ -1429,8 +1429,8 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
-     * Returns target object or default.<br>
-     * This method works like {@link #getEnum(String, T, Class<T>)} but also keep tracks of null objects:
+     * Returns target object or default.<p>
+     * This method works like {@link #getEnum(String, Enum, Class) getEnum(String, Enum, EnumClass)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
      * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.
@@ -1457,7 +1457,7 @@ public interface YMLSection extends ConfigurationSection {
     }
 
     /**
-     * Returns target object or default.<br>
+     * Returns target object or default.<p>
      * This method works like {@link #getEntityType(String, EntityType)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.

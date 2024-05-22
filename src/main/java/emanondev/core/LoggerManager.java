@@ -88,7 +88,7 @@ public class LoggerManager {
     private Logger getLogger(String fileName) {
         if (fileName == null)
             throw new NullPointerException();
-        if (fileName.equals("") || fileName.equals(".log"))
+        if (fileName.isEmpty() || fileName.equals(".log"))
             throw new IllegalArgumentException();
         if (!fileName.endsWith(".log"))
             fileName = fileName + ".log";
@@ -176,7 +176,7 @@ public class LoggerManager {
 
             if (plugin == null || fileName == null)
                 throw new NullPointerException();
-            if (fileName.equals("") || fileName.equals(".log"))
+            if (fileName.isEmpty() || fileName.equals(".log"))
                 throw new IllegalArgumentException();
             if (!fileName.endsWith(".log"))
                 fileName = fileName + ".log";

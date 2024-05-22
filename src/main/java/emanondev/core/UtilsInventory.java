@@ -1,6 +1,5 @@
 package emanondev.core;
 
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -10,8 +9,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
+import java.util.List;
 
 public final class UtilsInventory {
 
@@ -114,12 +115,8 @@ public final class UtilsInventory {
      * @throws NullPointerException     if mode is null
      * @throws IllegalArgumentException if amount is negative
      */
-    public static int removeAmount(@NotNull HumanEntity player, @NotNull ItemStack item, final int amount,
+    public static int removeAmount(@NotNull HumanEntity player, @NotNull ItemStack item, @Range(from = 0, to = Integer.MAX_VALUE) final int amount,
                                    @NotNull final LackManage mode) {
-        Validate.notNull(player, "player is null");
-        Validate.notNull(mode, "mode is null");
-        Validate.notNull(item, "item is null");
-        Validate.isTrue(amount >= 0, "negative amount");
         item = item.clone();
         if (amount == 0)
             return 0;
@@ -181,6 +178,10 @@ public final class UtilsInventory {
          * if there aren't enough items to remove, nothing is removed
          */
         CANCEL,
+    }
+
+    public static List<EquipmentSlot> getPlayerEquipmentSlots() {
+        return List.of(EquipmentSlot.HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND);
     }
 
 }

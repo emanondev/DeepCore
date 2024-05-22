@@ -1,6 +1,7 @@
 package emanondev.core;
 
 import emanondev.core.message.DMessage;
+import emanondev.core.util.GameVersion;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -526,6 +527,17 @@ public class ItemBuilder {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        return this;
+    }
+
+
+    @Contract("_ -> this")
+    public ItemBuilder glow(@Nullable Boolean value) {
+        if (GameVersion.isNewerEqualsTo(1,20,5))
+            resultMeta.setEnchantmentGlintOverride(value);
+        else
+            if (value!=null)
+                resultMeta.addEnchant(Enchantment.LURE,value?1:0,true);
         return this;
     }
 

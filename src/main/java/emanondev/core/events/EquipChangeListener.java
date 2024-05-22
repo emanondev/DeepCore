@@ -3,6 +3,7 @@ package emanondev.core.events;
 import emanondev.core.CoreMain;
 import emanondev.core.UtilsInventory;
 import emanondev.core.events.EquipmentChangeEvent.EquipMethod;
+import io.lumine.mythic.bukkit.utils.items.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -91,6 +92,7 @@ public class EquipChangeListener implements Listener {
                 case LEGS -> 7;
                 case FEET -> 8;
                 case OFF_HAND -> 45;
+                case BODY -> throw new IllegalStateException();
             };
         if (slot == EquipmentSlot.HAND)
             return p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27;
@@ -241,7 +243,7 @@ public class EquipChangeListener implements Listener {
                     }
                 else if (event.getCursor().isSimilar(p.getInventory().getItem(EquipmentSlot.HAND)))
                     slots.add(EquipmentSlot.HAND);
-                if (slots.size() > 0)
+                if (!slots.isEmpty())
                     new SlotCheck(p, EquipMethod.INVENTORY_COLLECT_TO_CURSOR, slots).runTaskLater(plugin, 1L);
                 return;
             case PICKUP_SOME:
@@ -291,7 +293,7 @@ public class EquipChangeListener implements Listener {
             return;
         if (!isValidUser(p))
             return;
-        for (EquipmentSlot type : EquipmentSlot.values()) {
+        for (EquipmentSlot type : UtilsInventory.getPlayerEquipmentSlots()) {
             int pos = getSlotPosition(type, p, event.getView());
             if (pos != -1 && event.getNewItems().containsKey(pos)) {
                 ItemStack itemOld = event.getView().getItem(pos);
@@ -323,7 +325,7 @@ public class EquipChangeListener implements Listener {
             if (e.getBrokenItem().equals(e.getPlayer().getInventory().getItem(slot)))
                 slots.add(slot);
         }
-        if (slots.size() == 0)
+        if (slots.isEmpty())
             throw new IllegalStateException();
         if (slots.size() == 1) {
             onEquipChange(e.getPlayer(), EquipMethod.BROKE, slots.get(0), e.getBrokenItem(), null);
@@ -483,7 +485,7 @@ public class EquipChangeListener implements Listener {
         @Override
         public void run() {
             if (subTask == null || subTask.isCancelled())
-                if (Bukkit.getOnlinePlayers().size() > 0) {
+                if (!Bukkit.getOnlinePlayers().isEmpty()) {
                     subTask = new PlayerCheck();
                     subTask.runTaskTimer(plugin, 1L, 1L);
                 }
@@ -561,7 +563,7 @@ public class EquipChangeListener implements Listener {
         }
 
         public SlotCheck(@NotNull Player p, @NotNull EquipMethod method, @NotNull Collection<EquipmentSlot> slots) {
-            if (slots.size() == 0)
+            if (slots.isEmpty())
                 throw new IllegalArgumentException();
             this.p = p;
             this.method = method;

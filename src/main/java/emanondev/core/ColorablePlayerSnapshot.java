@@ -35,7 +35,7 @@ public class ColorablePlayerSnapshot extends PlayerSnapshot {
                                 items.set(i, item);
                                 break;
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
 
                         }
                 }
@@ -60,7 +60,7 @@ public class ColorablePlayerSnapshot extends PlayerSnapshot {
                                 items.set(i, item);
                                 break;
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
 
                         }
                 }
@@ -85,7 +85,7 @@ public class ColorablePlayerSnapshot extends PlayerSnapshot {
                                 items.set(i, item);
                                 break;
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
 
                         }
                 }

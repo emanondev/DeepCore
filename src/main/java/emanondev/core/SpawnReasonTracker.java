@@ -13,7 +13,8 @@ import java.util.EnumMap;
 import java.util.List;
 
 /**
- * @author emanon This class keeps tracks of mob spawning reasons
+ * This class keeps tracks of mob spawning reasons
+ * @author emanon
  */
 public class SpawnReasonTracker implements Listener {
     private static final String metaName = "SpawnReason";
