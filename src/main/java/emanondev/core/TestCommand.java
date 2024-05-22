@@ -19,35 +19,6 @@ public class TestCommand extends CoreCommand {//TODO
 
     public TestCommand() {
         super("test", CoreMain.get(), null);
-        Map< Class<?>,List<Material>> map = new LinkedHashMap<>();
-        for (Material mat: Material.values()){
-            if (mat.isItem()) {
-                ItemMeta item = new ItemStack(mat).getItemMeta();
-                if (map.containsKey(item==null?null:item.getClass()))
-                    map.get(item==null?null:item.getClass()).add(mat);
-                else
-                    map.put(item==null?null:item.getClass(),new ArrayList<>(List.of(mat)));
-            }
-        }
-        map.forEach((k,v)-> {
-            getPlugin().logInfo((k==null?null:k.getSimpleName())+" "+(k==null?null:Arrays.toString(k.getInterfaces()))+" "+Arrays.toString(v.toArray()));
-        });
-        Map< Class<? extends BlockState> ,List<Material>> map2 = new LinkedHashMap<>();
-        map.forEach((k,v)-> {
-            if (k!=null && k.getSimpleName().equals("CraftMetaBlockState")){
-                for (Material mat:v) {
-                    BlockStateMeta meta = ((BlockStateMeta) new ItemStack(mat).getItemMeta());
-                    Class<? extends BlockState> state = meta.getBlockState().getClass();
-                    if (map2.containsKey(state))
-                        map2.get(state).add(mat);
-                    else
-                        map2.put(state,new ArrayList<>(List.of(mat)));
-                }
-            }
-        });
-        map2.forEach((k,v)-> {
-            getPlugin().logInfo((k==null?null:k.getSimpleName())+" "+(k==null?null:Arrays.toString(k.getInterfaces()))+" "+Arrays.toString(v.toArray()));
-        });
 
     }
 
