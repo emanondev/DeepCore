@@ -3,7 +3,6 @@ package emanondev.core.events;
 import emanondev.core.CoreMain;
 import emanondev.core.UtilsInventory;
 import emanondev.core.events.EquipmentChangeEvent.EquipMethod;
-import io.lumine.mythic.bukkit.utils.items.InventoryUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -115,7 +114,9 @@ public class EquipChangeListener implements Listener {
         if (!isValidUser(p))
             return;
         EnumMap<EquipmentSlot, ItemStack> map = new EnumMap<>(EquipmentSlot.class);
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
+        for (EquipmentSlot slot : UtilsInventory.getPlayerEquipmentSlots()) {
+            if (slot.name().equals("BODY"))
+                continue;
             ItemStack item = p.getInventory().getItem(slot);
             if (item != null) //may be null
                 map.put(slot, new ItemStack(item));
@@ -237,7 +238,7 @@ public class EquipChangeListener implements Listener {
             case COLLECT_TO_CURSOR:
                 ArrayList<EquipmentSlot> slots = new ArrayList<>();
                 if (event.getView().getTopInventory().getType() == InventoryType.CRAFTING)
-                    for (EquipmentSlot slot : EquipmentSlot.values()) {
+                    for (EquipmentSlot slot : UtilsInventory.getPlayerEquipmentSlots()) {
                         if (event.getCursor().isSimilar(p.getInventory().getItem(slot)))
                             slots.add(slot);
                     }
@@ -321,7 +322,7 @@ public class EquipChangeListener implements Listener {
         if (!isValidUser(e.getPlayer()))
             return;
         ArrayList<EquipmentSlot> slots = new ArrayList<>();
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
+        for (EquipmentSlot slot : UtilsInventory.getPlayerEquipmentSlots()) {
             if (e.getBrokenItem().equals(e.getPlayer().getInventory().getItem(slot)))
                 slots.add(slot);
         }
@@ -338,7 +339,7 @@ public class EquipChangeListener implements Listener {
     private void event(PlayerDeathEvent event) {
         if (!isValidUser(event.getEntity()))
             return;
-        for (EquipmentSlot type : EquipmentSlot.values()) {
+        for (EquipmentSlot type :UtilsInventory.getPlayerEquipmentSlots()) {
             ItemStack item = event.getEntity().getInventory().getItem(type);
             if (!UtilsInventory.isAirOrNull(item))
                 onEquipChange(event.getEntity(), EquipMethod.DEATH, type, item, null);
@@ -436,7 +437,7 @@ public class EquipChangeListener implements Listener {
     private void event(PlayerRespawnEvent event) {
         if (!isValidUser(event.getPlayer()))
             return;
-        for (EquipmentSlot type : EquipmentSlot.values()) {
+        for (EquipmentSlot type : UtilsInventory.getPlayerEquipmentSlots()) {
             ItemStack item = event.getPlayer().getInventory().getItem(type);
             if (!UtilsInventory.isAirOrNull(item))
                 onEquipChange(event.getPlayer(), EquipMethod.RESPAWN, type, null, item);
@@ -526,7 +527,7 @@ public class EquipChangeListener implements Listener {
                         continue;
                     }
                     counter++;
-                    for (EquipmentSlot slot : EquipmentSlot.values()) {
+                    for (EquipmentSlot slot : UtilsInventory.getPlayerEquipmentSlots()) {
                         ItemStack newItem = p.getInventory().getItem(slot);
                         ItemStack oldItem = equips.get(p).get(slot);
                         if (!UtilsInventory.isSimilarIgnoreDamage(oldItem, newItem))
