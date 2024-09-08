@@ -475,7 +475,7 @@ public class EquipChangeListener implements Listener {
     private void event(PlayerTeleportEvent event) {
         if (!isValidUser(event.getPlayer()))
             return;
-        new SlotCheck(event.getPlayer(), EquipMethod.PLUGIN_WORLD_CHANGE, EquipmentSlot.values()).runTaskLater(plugin,
+        new SlotCheck(event.getPlayer(), EquipMethod.PLUGIN_WORLD_CHANGE, UtilsInventory.getPlayerEquipmentSlots()).runTaskLater(plugin,
                 1L);
     }
 
