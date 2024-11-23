@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>emanondev.core</groupId>
     <artifactId>DeepCore</artifactId>
-    <version>3.9.0</version>
+    <version>3.9.1</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -47,15 +47,15 @@
                                     <pattern>io.papermc.lib</pattern>
                                     <shadedPattern>emanondev.shade.paperlib</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>net.kyori.adventure</pattern>
-                                    <shadedPattern>emanondev.shade.kyori.adventure</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>net.kyori.examination</pattern>
-                                    <shadedPattern>emanondev.shade.kyori.examination</shadedPattern><!-- TODO remove later -->
-                                </relocation>
                             </relocations>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>net/kyori/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.6-R0.1-SNAPSHOT</version>
+            <version>1.21.1-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
