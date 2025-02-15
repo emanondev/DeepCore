@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
-public class PluginListener implements Listener {
+public final class PluginListener implements Listener {
 
     @EventHandler
     private void event(PluginEnableEvent event) {

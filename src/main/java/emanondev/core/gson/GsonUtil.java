@@ -73,7 +73,8 @@ public class GsonUtil {
     }
 
     private static boolean isWeird(Object o) {
-        return o instanceof Integer || o instanceof Short || o instanceof Long || o instanceof ConfigurationSerializable || o instanceof Map || o instanceof Collection;
+        return o instanceof Integer || o instanceof Short || o instanceof Long || o instanceof ConfigurationSerializable
+                || o instanceof Map || o instanceof Collection;
     }
 
     private static Object defix(Map<String, Object> map) {

@@ -3,13 +3,14 @@ package emanondev.core.command;
 import emanondev.core.CoreMain;
 import emanondev.core.CorePlugin;
 import emanondev.core.PermissionBuilder;
-import emanondev.core.message.MessageComponent;
+import emanondev.core.message.DMessage;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ReloadCommand extends CoreCommand {
 
@@ -24,21 +25,18 @@ public class ReloadCommand extends CoreCommand {
         super(plugin.getName() + "reload", plugin,
                 PermissionBuilder.ofCommand(plugin, "reload").setDescription("Allows to reload " + plugin.getName()).build(),
                 "reload " + plugin.getName(), null);
-        assert getCommandPermission() != null; //<pluginname>.command.reload
-        getPlugin().registerPermission(getCommandPermission());
+        getPlugin().registerPermission(Objects.requireNonNull(getCommandPermission()));
     }
 
     @Override
     public void onExecute(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
         try {
             getPlugin().onReload();
-            new MessageComponent(CoreMain.get(), sender).appendConfigurable(
-                    "command.reload.success", "",
+            new DMessage(CoreMain.get(), sender).appendLang("command.reload.success",
                     "%plugin%", getPlugin().getName()).send();
         } catch (Exception e) {
             e.printStackTrace();
-            new MessageComponent(CoreMain.get(), sender).appendConfigurable(
-                    "command.reload.fail", "",
+            new DMessage(CoreMain.get(), sender).appendLang("command.reload.fail",
                     "%plugin%", getPlugin().getName()).send();
         }
     }

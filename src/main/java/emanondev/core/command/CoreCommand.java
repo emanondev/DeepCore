@@ -2,7 +2,6 @@ package emanondev.core.command;
 
 import emanondev.core.*;
 import emanondev.core.message.DMessage;
-import emanondev.core.message.MessageComponent;
 import emanondev.core.util.FileLogger;
 import emanondev.core.utility.CompletionHelper;
 import emanondev.core.utility.ConsoleHelper;
@@ -166,8 +165,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param perm   lacking permission
      */
     protected void permissionLackNotify(@NotNull CommandSender sender, @NotNull Permission perm) {
-        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
-                "command.lack_permission", "",
+        new DMessage(CoreMain.get(), sender).appendLang("command.lack_permission",
                 "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
     }
 

@@ -289,14 +289,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- DRCgui -->
-        <dependency>
-            <groupId>pro.dracarys</groupId>
-            <artifactId>DracarysGUI</artifactId>
-            <version>5.1</version>
-            <scope>system</scope>
-            <systemPath>C:/MavenDependency/DracarysGUI-5.1.jar</systemPath>
-        </dependency>
         <!-- MythicMobs -->
         <dependency>
             <groupId>io.lumine</groupId>

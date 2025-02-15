@@ -73,12 +73,6 @@ public final class CoreMain extends CorePlugin {
 
         this.logDone("Enabled &aConditions API");
         ItemUtility.initialize();
-
-        try {
-            this.registerCommand(new TestCommand());
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
     }
 
     public void load() {
