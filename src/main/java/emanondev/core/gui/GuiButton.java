@@ -112,7 +112,8 @@ public interface GuiButton extends FileLogger {
      */
     boolean onClick(@NotNull InventoryClickEvent event);
 
-    @Nullable ItemStack getItem();
+    @Nullable
+    ItemStack getItem();
 
     /**
      * Returns language section for the command sender<br>
@@ -131,7 +132,8 @@ public interface GuiButton extends FileLogger {
         return getGui().getPlugin();
     }
 
-    @NotNull Gui getGui();
+    @NotNull
+    Gui getGui();
 
     @NotNull
     default YMLSection getLanguageSection() {

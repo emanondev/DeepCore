@@ -1,11 +1,12 @@
 package emanondev.core.command;
 
 import emanondev.core.*;
+import emanondev.core.message.DMessage;
 import emanondev.core.message.MessageComponent;
-import emanondev.core.util.CompleteUtility;
-import emanondev.core.util.ConsoleLogger;
 import emanondev.core.util.FileLogger;
-import emanondev.core.util.ReadUtility;
+import emanondev.core.utility.CompletionHelper;
+import emanondev.core.utility.ConsoleHelper;
+import emanondev.core.utility.ReadHelper;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompleteUtility, ReadUtility, ConsoleLogger, FileLogger {
+public abstract class CoreCommand extends Command implements PluginIdentifiableCommand, CompletionHelper, ReadHelper, ConsoleHelper, FileLogger {
 
     private final CorePlugin plugin;
     private final YMLConfig config;
@@ -301,8 +302,7 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
      * @param sender who
      */
     protected void playerOnlyNotify(CommandSender sender) {
-        new MessageComponent(CoreMain.get(), sender).appendConfigurable(
-                "command.players_only", "",
+        new DMessage(CoreMain.get(), sender).appendLang("command.players_only",
                 "%plugin%", getPlugin().getName()).send();
     }
 

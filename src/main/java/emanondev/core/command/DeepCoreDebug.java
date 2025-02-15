@@ -83,7 +83,8 @@ public class DeepCoreDebug extends CoreCommand {
     @Override
     public @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location loc) {
         return switch (args.length) {
-            case 1 -> complete(args[0], List.of(Bukkit.getPluginManager().getPlugins()), (Plugin::getName), (p -> p instanceof CorePlugin));
+            case 1 ->
+                    complete(args[0], List.of(Bukkit.getPluginManager().getPlugins()), (Plugin::getName), (p -> p instanceof CorePlugin));
             case 2 -> {
                 Plugin pl = Bukkit.getPluginManager().getPlugin(args[0]);
                 if (!(pl instanceof CorePlugin plugin))

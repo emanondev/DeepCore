@@ -1,6 +1,7 @@
 package emanondev.core.util;
 
 import emanondev.core.Hooks;
+import emanondev.core.utility.CompletionHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,7 +13,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface CompleteUtility {
+@Deprecated
+public interface CompleteUtility extends CompletionHelper {
 
     /**
      * @param sender sender
@@ -20,6 +22,7 @@ public interface CompleteUtility {
      * @return a list of player names from online players for the given prefix
      * filtering visible players if vanishAPI is active
      */
+    @Deprecated
     static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender, @Nullable String prefix) {
         return completePlayerNamesValues(sender, prefix, Bukkit.getOnlinePlayers());
     }
@@ -31,6 +34,7 @@ public interface CompleteUtility {
      * @return a list of player names from the given collection for the given prefix
      * filtering visible players if vanishAPI is active
      */
+    @Deprecated
     static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender, @Nullable String prefix,
                                                            @Nullable Collection<? extends Player> players) {
         return completePlayerNamesValues(sender, prefix, players, null);
@@ -43,8 +47,11 @@ public interface CompleteUtility {
      * @return a list of player names from the given collection for the given prefix
      * filtering visible players if vanishAPI is active
      */
-    static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender, @Nullable String prefix,
-                                                           @Nullable Collection<? extends Player> players, @Nullable Predicate<Player> playerPredicate) {
+    @Deprecated
+    static @NotNull List<String> completePlayerNamesValues(@Nullable CommandSender sender,
+                                                           @Nullable String prefix,
+                                                           @Nullable Collection<? extends Player> players,
+                                                           @Nullable Predicate<Player> playerPredicate) {
         if (players == null)
             return Collections.emptyList();
         if (prefix != null)
@@ -86,6 +93,7 @@ public interface CompleteUtility {
      * @param eval   how to evaluate values as strings
      * @return list of strings matching prefix
      */
+    @Deprecated
     static @NotNull <K> List<String> completeValues(@Nullable String prefix, @Nullable Collection<K> values,
                                                     @NotNull Function<K, String> eval) {
         return completeValues(prefix, values, eval, null);
@@ -98,6 +106,7 @@ public interface CompleteUtility {
      * @param isValid filter on values
      * @return list of strings matching prefix
      */
+    @Deprecated
     static @NotNull <K> List<String> completeValues(@Nullable String prefix, @Nullable Collection<K> values,
                                                     @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
         if (values == null)
@@ -137,6 +146,7 @@ public interface CompleteUtility {
      * @return a list of low-cased string from enums of class type matching prefix is
      * true (ignoring caps)
      */
+    @Deprecated
     static @NotNull <K extends Enum<K>> List<String> completeValues(@Nullable String prefix, @NotNull Class<K> type) {
         List<String> results = new ArrayList<>();
         if (prefix == null || prefix.isEmpty()) {
@@ -159,6 +169,7 @@ public interface CompleteUtility {
      * @return a list of low-cased string from enums of class type matching prefix
      * and predicate.apply() is true (ignoring caps)
      */
+    @Deprecated
     static @NotNull <K extends Enum<K>> List<String> completeValues(@Nullable String prefix, @NotNull Class<K> type,
                                                                     @NotNull Predicate<K> predicate) {
         List<String> results = new ArrayList<>();
@@ -181,6 +192,7 @@ public interface CompleteUtility {
      * @param elements elements to match
      * @return a list of strings matching prefix
      */
+    @Deprecated
     static @NotNull List<String> completeValues(@Nullable String prefix, @Nullable Collection<String> elements) {
         if (elements == null)
             return Collections.emptyList();
@@ -200,6 +212,7 @@ public interface CompleteUtility {
      * @param predicate function to choose if elements should be selected or discarded
      * @return a list of strings matching prefix
      */
+    @Deprecated
     static @NotNull List<String> completeValues(@Nullable String prefix, @Nullable Collection<String> elements,
                                                 @NotNull Predicate<String> predicate) {
         if (elements == null)
@@ -223,6 +236,7 @@ public interface CompleteUtility {
      * @param elements elements to match
      * @return a list of strings matching prefix
      */
+    @Deprecated
     static @NotNull List<String> completeValues(@Nullable String prefix, @Nullable String[] elements) {
         if (elements == null)
             return new ArrayList<>();
@@ -240,6 +254,7 @@ public interface CompleteUtility {
      * @param prefix prefix to match, case-insensitive
      * @return a list of boolean strings matching prefix
      */
+    @Deprecated
     static @NotNull List<String> completeBooleanValues(@Nullable String prefix) {
         if (prefix == null || prefix.isEmpty())
             return List.of("false", "true");
@@ -250,134 +265,6 @@ public interface CompleteUtility {
         if ("false".startsWith(prefix))
             results.add("false");
         return results;
-    }
-
-    /**
-     * @param sender sender
-     * @param prefix prefix to match, case-insensitive
-     * @return a list of player names from online players for the given prefix
-     * filtering visible players if vanishAPI is active
-     */
-    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix) {
-        return completePlayerNamesValues(sender, prefix, Bukkit.getOnlinePlayers());
-    }
-
-    /**
-     * @param sender  the sender
-     * @param prefix  prefix to match, case-insensitive
-     * @param players which player names are considered?
-     * @return a list of player names from the given collection for the given prefix
-     * filtering visible players if vanishAPI is active
-     */
-    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
-                                                      @Nullable Collection<? extends Player> players) {
-        return completePlayerNamesValues(sender, prefix, players);
-    }
-
-    /**
-     * @param sender sender
-     * @param prefix prefix to match, case-insensitive
-     * @return a list of player names from online players for the given prefix
-     * filtering visible players if vanishAPI is active
-     */
-    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix, @Nullable Predicate<Player> predicate) {
-        return completePlayerNamesValues(sender, prefix, Bukkit.getOnlinePlayers(), predicate);
-    }
-
-    /**
-     * @param sender  the sender
-     * @param prefix  prefix to match, case-insensitive
-     * @param players which player names are considered?
-     * @return a list of player names from the given collection for the given prefix
-     * filtering visible players if vanishAPI is active
-     */
-    default @NotNull List<String> completePlayerNames(@Nullable CommandSender sender, @Nullable String prefix,
-                                                      @Nullable Collection<? extends Player> players, @Nullable Predicate<Player> predicate) {
-        return completePlayerNamesValues(sender, prefix, players, predicate);
-    }
-
-    /**
-     * @param prefix prefix to match, case-insensitive
-     * @param values values to match
-     * @param eval   how to evaluate values as strings
-     * @return list of strings matching prefix
-     */
-    default @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
-                                               @NotNull Function<K, String> eval) {
-        return completeValues(prefix, values, eval, null);
-    }
-
-    /**
-     * @param prefix  prefix to match, case-insensitive
-     * @param values  values to match
-     * @param eval    how to evaluate values as strings
-     * @param isValid filter on values
-     * @return list of strings matching prefix
-     */
-    default @NotNull <K> List<String> complete(@Nullable String prefix, @Nullable Collection<K> values,
-                                               @NotNull Function<K, String> eval, @Nullable Predicate<K> isValid) {
-        return completeValues(prefix, values, eval, isValid);
-    }
-
-    /**
-     * @param <K>    the class of the enum
-     * @param prefix prefix to match, case-insensitive
-     * @param type   class of enums
-     * @return a list of low-cased string from enums of class type matching prefix is
-     * true (ignoring caps)
-     */
-    default @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type) {
-        return completeValues(prefix, type);
-    }
-
-    /**
-     * @param <K>       the class of the enum
-     * @param prefix    prefix to match, case-insensitive
-     * @param type      class of enums
-     * @param predicate filter
-     * @return a list of low-cased string from enums of class type matching prefix
-     * and predicate.apply() is true (ignoring caps)
-     */
-    default @NotNull <K extends Enum<K>> List<String> complete(@Nullable String prefix, @NotNull Class<K> type,
-                                                               @NotNull Predicate<K> predicate) {
-        return completeValues(prefix, type, predicate);
-    }
-
-    /**
-     * @param prefix   prefix to match, case-insensitive
-     * @param elements elements to match
-     * @return a list of strings matching prefix
-     */
-    default @NotNull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements) {
-        return completeValues(prefix, elements);
-    }
-
-    /**
-     * @param prefix    prefix to match, case-insensitive
-     * @param elements  elements to match
-     * @param predicate function to choose if elements should be selected or discarded
-     * @return a list of strings matching prefix
-     */
-    default @NotNull List<String> complete(@Nullable String prefix, @Nullable Collection<String> elements,
-                                           @NotNull Predicate<String> predicate) {
-        return completeValues(prefix, elements, predicate);
-    }
-
-    /**
-     * @param prefix   prefix to match, case-insensitive
-     * @param elements elements to match
-     * @return a list of strings matching prefix
-     */
-    default @NotNull List<String> complete(@Nullable String prefix, @Nullable String[] elements) {
-        return completeValues(prefix, elements);
-    }
-
-    /**
-     * @param prefix prefix to match, case-insensitive
-     * @return a list of boolean strings matching prefix
-     */
-    default @NotNull List<String> completeBoolean(@Nullable String prefix) {
-        return completeBooleanValues(prefix);
     }
 
 }

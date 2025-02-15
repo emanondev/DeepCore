@@ -154,6 +154,10 @@ public final class UtilsInventory {
         throw new IllegalArgumentException();
     }
 
+    public static List<EquipmentSlot> getPlayerEquipmentSlots() {
+        return List.of(EquipmentSlot.HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND);
+    }
+
     public enum ExcessManage {
         /**
          * drops if front of the player any items that can't be hold by the player
@@ -178,10 +182,6 @@ public final class UtilsInventory {
          * if there aren't enough items to remove, nothing is removed
          */
         CANCEL,
-    }
-
-    public static List<EquipmentSlot> getPlayerEquipmentSlots() {
-        return List.of(EquipmentSlot.HAND, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET, EquipmentSlot.OFF_HAND);
     }
 
 }

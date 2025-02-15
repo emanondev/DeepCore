@@ -10,5 +10,6 @@ public interface PagedButton extends GuiButton {
         return getGui().getPage();
     }
 
-    @NotNull PagedGui getGui();
+    @NotNull
+    PagedGui getGui();
 }

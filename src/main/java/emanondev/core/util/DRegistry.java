@@ -1,6 +1,7 @@
 package emanondev.core.util;
 
 import emanondev.core.CorePlugin;
+import emanondev.core.utility.ConsoleHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +12,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-public class DRegistry<T extends DRegistryElement> implements Iterable<T>, ConsoleLogger {
+public class DRegistry<T extends DRegistryElement> implements Iterable<T>, ConsoleHelper {
 
     private final String name;
     private final LinkedHashMap<String, T> types = new LinkedHashMap<>();
     private final boolean doLog;
     private final CorePlugin plugin;
+
     /**
      * @throws IllegalArgumentException if name doesn't match <code>[a-zA-Z][_a-zA-Z0-9]*</code>
      */

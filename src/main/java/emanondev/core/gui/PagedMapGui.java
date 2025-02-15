@@ -231,8 +231,8 @@ public class PagedMapGui extends ChestGui implements PagedGui {
             updateInventory(); //TODO smarter check the update may be on another page so no need to update
     }
 
-    public void setButtons(@NotNull Map<Integer,GuiButton> map) {
-        map.forEach((slot,button)->{
+    public void setButtons(@NotNull Map<Integer, GuiButton> map) {
+        map.forEach((slot, button) -> {
             if (button == null)
                 buttons.remove(slot);
             else

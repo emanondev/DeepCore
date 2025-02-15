@@ -35,7 +35,8 @@ public interface Gui extends InventoryHolder, FileLogger {
     /**
      * @return plugin responsible for the gui, cannot be null
      */
-    @NotNull CorePlugin getPlugin();
+    @NotNull
+    CorePlugin getPlugin();
 
     default void open(@NotNull HumanEntity p) {
         p.openInventory(getInventory());
@@ -44,7 +45,8 @@ public interface Gui extends InventoryHolder, FileLogger {
     /**
      * @return inventory of this holder, cannot be null
      */
-    @NotNull Inventory getInventory();
+    @NotNull
+    Inventory getInventory();
 
     /**
      * @return parent Gui or null
@@ -59,7 +61,8 @@ public interface Gui extends InventoryHolder, FileLogger {
     /**
      * @return parent Gui or null
      */
-    @Nullable Gui getPreviousGui();
+    @Nullable
+    Gui getPreviousGui();
 
     void onClose(@NotNull InventoryCloseEvent event);
 
@@ -185,7 +188,8 @@ public interface Gui extends InventoryHolder, FileLogger {
      * @return button at slot position or null
      * @throws UnsupportedOperationException if the get operation is not supported by this gui
      */
-    @Nullable GuiButton getButton(int slot);
+    @Nullable
+    GuiButton getButton(int slot);
 
     /**
      * @param slot
@@ -208,7 +212,8 @@ public interface Gui extends InventoryHolder, FileLogger {
     /**
      * @return target player or null
      */
-    @Nullable Player getTargetPlayer();
+    @Nullable
+    Player getTargetPlayer();
 
     default boolean isTimerUpdated() {
         return false;

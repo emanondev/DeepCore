@@ -1,7 +1,7 @@
 package emanondev.core;
 
 import emanondev.core.message.DMessage;
-import emanondev.core.util.GameVersion;
+import emanondev.core.utility.VersionUtility;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
@@ -521,8 +521,10 @@ public class ItemBuilder {
         if (index > 0)
             try {
                 switch (result.getType().name().substring(index)) {
-                    case "_BANNER", "_BED", "_CANDLE", "_CARPET", "_CONCRETE", "_CONCRETE_POWDER", "_DYE", "_GLAZED_TERRACOTTA", "_SHULKER_BOX", "_STAINED_GLASS",
-                            "_STAINED_GLASS_PANE", "_TERRACOTTA", "_WOOL" -> result.setType(Material.getMaterial(color.name() + result.getType().name().substring(index)));
+                    case "_BANNER", "_BED", "_CANDLE", "_CARPET", "_CONCRETE", "_CONCRETE_POWDER", "_DYE",
+                         "_GLAZED_TERRACOTTA", "_SHULKER_BOX", "_STAINED_GLASS",
+                         "_STAINED_GLASS_PANE", "_TERRACOTTA", "_WOOL" ->
+                            result.setType(Material.getMaterial(color.name() + result.getType().name().substring(index)));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -533,11 +535,10 @@ public class ItemBuilder {
 
     @Contract("_ -> this")
     public ItemBuilder glow(@Nullable Boolean value) {
-        if (GameVersion.isNewerEqualsTo(1,20,5))
+        if (VersionUtility.isNewerEquals(1, 20, 5))
             resultMeta.setEnchantmentGlintOverride(value);
-        else
-            if (value!=null)
-                resultMeta.addEnchant(Enchantment.LURE,value?1:0,true);
+        else if (value != null)
+            resultMeta.addEnchant(Enchantment.LURE, value ? 1 : 0, true);
         return this;
     }
 

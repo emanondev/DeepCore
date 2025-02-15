@@ -339,7 +339,7 @@ public class EquipChangeListener implements Listener {
     private void event(PlayerDeathEvent event) {
         if (!isValidUser(event.getEntity()))
             return;
-        for (EquipmentSlot type :UtilsInventory.getPlayerEquipmentSlots()) {
+        for (EquipmentSlot type : UtilsInventory.getPlayerEquipmentSlots()) {
             ItemStack item = event.getEntity().getInventory().getItem(type);
             if (!UtilsInventory.isAirOrNull(item))
                 onEquipChange(event.getEntity(), EquipMethod.DEATH, type, item, null);

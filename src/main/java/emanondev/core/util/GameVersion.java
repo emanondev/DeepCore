@@ -2,6 +2,10 @@ package emanondev.core.util;
 
 import org.bukkit.Bukkit;
 
+/**
+ * @see emanondev.core.utility.VersionUtility
+ */
+@Deprecated
 public final class GameVersion {
 
     public static final String NMS_VERSION = loadNmsver();

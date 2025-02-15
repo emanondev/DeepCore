@@ -23,7 +23,8 @@ public interface CorePluginLinked {
         return new DMessage(getPlugin(), sender).appendLang(path, placeholders);
     }
 
-    @NotNull CorePlugin getPlugin();
+    @NotNull
+    CorePlugin getPlugin();
 
     default <T extends CommandSender> void sendDMessage(@NotNull Collection<T> targets, @NotNull String path, @NotNull Predicate<T> shouldSend, String... placeholders) {
         targets.forEach((t) -> {

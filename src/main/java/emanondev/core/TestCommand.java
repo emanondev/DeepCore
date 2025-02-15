@@ -2,16 +2,11 @@ package emanondev.core;
 
 import emanondev.core.command.CoreCommand;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
 
 public class TestCommand extends CoreCommand {//TODO
 

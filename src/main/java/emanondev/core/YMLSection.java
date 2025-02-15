@@ -6,6 +6,8 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -662,7 +664,17 @@ public interface YMLSection extends ConfigurationSection {
      */
     @Contract("_, !null -> !null")
     default @Nullable Sound loadSound(@NotNull String path, @Nullable Sound def) {
-        return loadEnum(path, def, Sound.class);
+        String soundRaw = loadString(path, def == null ? null : def.getKey().toString());
+        if (soundRaw == null)
+            return null;
+        String[] split = soundRaw.split(":");
+        if (split.length != 2) {
+            new IllegalArgumentException("Sound has wrong namespacedkey at '" + path + ":' on file "
+                    + getFile().getName() + " returning default").printStackTrace();
+            return def;
+        }
+        Sound sound = Registry.SOUNDS.get(new NamespacedKey(split[0], split[1]));
+        return sound == null ? def : sound;
     }
 
     /**
@@ -720,7 +732,17 @@ public interface YMLSection extends ConfigurationSection {
 
     @Contract("_, !null -> !null")
     default @Nullable Sound getSound(@NotNull String path, @Nullable Sound def) {
-        return getEnum(path, def, Sound.class);
+        String soundRaw = getString(path, def == null ? null : def.getKey().toString());
+        if (soundRaw == null)
+            return null;
+        String[] split = soundRaw.split(":");
+        if (split.length != 2) {
+            new IllegalArgumentException("Sound has wrong namespacedkey at '" + path + ":' on file "
+                    + getFile().getName() + " returning default").printStackTrace();
+            return def;
+        }
+        Sound sound = Registry.SOUNDS.get(new NamespacedKey(split[0], split[1]));
+        return sound == null ? def : sound;
     }
 
     @Contract("_, !null, _ -> !null")

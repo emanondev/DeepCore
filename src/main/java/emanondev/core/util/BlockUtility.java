@@ -15,8 +15,9 @@ public class BlockUtility {
         if (index > 0)
             try {
                 switch (block.getType().name().substring(index)) {
-                    case "_BANNER", "_BED", "_CANDLE", "_CARPET", "_CONCRETE", "_CONCRETE_POWDER", "_GLAZED_TERRACOTTA", "_SHULKER_BOX", "_STAINED_GLASS",
-                            "_STAINED_GLASS_PANE", "_TERRACOTTA", "_WOOL" -> {
+                    case "_BANNER", "_BED", "_CANDLE", "_CARPET", "_CONCRETE", "_CONCRETE_POWDER", "_GLAZED_TERRACOTTA",
+                         "_SHULKER_BOX", "_STAINED_GLASS",
+                         "_STAINED_GLASS_PANE", "_TERRACOTTA", "_WOOL" -> {
                         block.setType(Material.getMaterial(color.name() + block.getType().name().substring(index)));
                         return true;
                     }

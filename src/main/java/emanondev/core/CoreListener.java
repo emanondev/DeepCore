@@ -1,12 +1,12 @@
 package emanondev.core;
 
-import emanondev.core.util.ConsoleLogger;
+import emanondev.core.utility.ConsoleHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class CoreListener implements Listener, ConsoleLogger {
+public abstract class CoreListener implements Listener, ConsoleHelper {
 
     private final String id;
     private final CorePlugin plugin;

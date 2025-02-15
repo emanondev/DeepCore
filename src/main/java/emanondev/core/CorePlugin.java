@@ -8,7 +8,7 @@ import emanondev.core.spigot.Metrics;
 import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
-import emanondev.core.util.ConsoleLogger;
+import emanondev.core.utility.ConsoleHelper;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -30,7 +30,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.*;
 
-public abstract class CorePlugin extends JavaPlugin implements ConsoleLogger {
+public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
 
     private final HashMap<String, YMLConfig> languageConfigs = new HashMap<>();
     private final HashMap<String, YMLConfig> configs = new HashMap<>();

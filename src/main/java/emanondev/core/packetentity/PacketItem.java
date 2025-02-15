@@ -84,8 +84,8 @@ public class PacketItem extends PacketEntity {
     }
 
     public EntityType getType() {
-        return GameVersion.isNewerEqualsTo(1,20,5)?
-                EntityType.ITEM:EntityType.valueOf("DROPPED_ITEM");
+        return GameVersion.isNewerEqualsTo(1, 20, 5) ?
+                EntityType.ITEM : EntityType.valueOf("DROPPED_ITEM");
     }
 
     public PacketItem setItemStack(ItemStack item) {

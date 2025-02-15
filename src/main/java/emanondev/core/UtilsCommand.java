@@ -16,8 +16,8 @@ import java.util.function.Predicate;
 
 
 /**
- * @see emanondev.core.util.CompleteUtility
- * @see emanondev.core.util.ReadUtility
+ * @see emanondev.core.utility.CompleteUtility
+ * @see emanondev.core.utility.ReadUtility
  */
 @Deprecated
 public final class UtilsCommand {

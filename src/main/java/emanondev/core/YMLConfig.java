@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,8 +57,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     private YMLConfig(@NotNull JavaPlugin plugin, @NotNull File file, @NotNull String name) {
-        if (file.isDirectory())
+        if (file.isDirectory()) {
             throw new IllegalStateException("file is a directory");
+        }
         this.plugin = plugin;
         this.file = file;
         this.name = name;
@@ -71,21 +73,29 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     /**
      * Fix the given name for a yaml file name
      *
-     * @param name the raw name of the file with or withouth .yml
+     * @param name the raw name of the file with or without <code>.yml</code>
      * @return fixed name
      * @throws NullPointerException     if name is null
      * @throws IllegalArgumentException if name is empty
      */
     public static String fixName(@NotNull String name) {
-        if (name.isEmpty())
+        if (name.isEmpty()) {
             throw new IllegalArgumentException("YAML file must have a name!");
-        if (!name.endsWith(".yml"))
+        }
+        if (!name.endsWith(".yml")) {
             name += ".yml";
+        }
         return name;
     }
 
-    @Deprecated
+    /**
+     * Creates a YMLSection at the specified path, with specified values.
+     * Any value that was previously set at this path will be overwritten.
+     * If the previous value was itself a ConfigurationSection, it will be orphaned.
+     * @see #loadSection(String)
+     */
     @NotNull
+    @ApiStatus.Internal
     public YMLSection createSection(@NotNull String path) {
         if (path.isEmpty())
             throw new IllegalArgumentException("Cannot create section at empty path");
@@ -166,21 +176,26 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                             + "&1] &e✓ &fForce saving file &e" + getFile().getPath() + "&f before reloading"));
             save();
         }
+
         boolean existed = file.exists();
         if (!file.exists()) {
-            if (!file.getParentFile().exists())  // Create parent folders if they don't exist
-                file.getParentFile().mkdirs();
-
-            if (plugin.getResource(name.replace('\\', '/')) != null)
+            if (!file.getParentFile().exists()) {  // Create parent folders if they don't exist
+                if (!file.getParentFile().mkdirs()) {
+                    new Exception("unable to create parent folder").printStackTrace();
+                }
+            }
+            if (plugin.getResource(name.replace('\\', '/')) != null) {
                 plugin.saveResource(name, true); // Save the one from the JAR if possible
-            else
+            } else {
                 try {
-                    file.createNewFile();
+                    if (!file.createNewFile()) {
+                        new Exception("unable to create file").printStackTrace();
+                    }
                 } // Create a blank file if there's not one to copy from the JAR
                 catch (IOException e) {
                     e.printStackTrace();
                 }
-
+            }
         }
         try {
             this.load(file);
@@ -188,22 +203,24 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             e.printStackTrace();
         }
         InputStream resource = plugin.getResource(name.replace('\\', '/'));
-        if (resource != null)
+        if (resource != null) {
             // Set up defaults in case their config is broken.
             this.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8)));
-
+        }
         return existed;
     }
 
     @Override
     public @NotNull Set<String> getKeys(@NotNull String path) {
-        if (path.isEmpty())
+        if (path.isEmpty()) {
             return getKeys(false);
+        }
         ConfigurationSection section = this.getConfigurationSection(path);
-        if (section == null)
+        if (section == null) {
             return new LinkedHashSet<>();
-        else
+        } else {
             return section.getKeys(false);
+        }
     }
 
     public boolean isDirty() {
@@ -410,7 +427,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      *
      * @param path  Path of the Object
      * @param def   Default object
-     * @param color Whether or not translate color codes
+     * @param color Whether translate color codes
      * @param args  holders and replacer
      * @return the value found or default if none
      * @see #loadString(String, String, Player, boolean, String...) loadString(path,
