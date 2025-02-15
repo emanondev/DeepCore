@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.function.generator.Resource;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
@@ -474,8 +475,8 @@ public final class ClipboardContainer implements Clipboard {
     }
 
     @Override
-    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return parent.setTile(x, y, z, tile);
+    public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
+        return parent.tile(x,y,z,tile);
     }
 
     public boolean fullySupports3DBiomes() {
