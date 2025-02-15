@@ -9,6 +9,8 @@ import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
 import emanondev.core.utility.ConsoleHelper;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -30,6 +32,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.*;
 
+@Slf4j
 public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
 
     private final HashMap<String, YMLConfig> languageConfigs = new HashMap<>();
@@ -43,6 +46,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     private final Set<Module> enabledModules = new HashSet<>();
     private LoggerManager loggerManager;
     private boolean useMultiLanguage = true;
+    @Getter
     private String defaultLocale;
     private CooldownAPI cooldownApi = null;
     private CooldownAPI persistentCooldownApi = null;
@@ -63,10 +67,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
         }
         return this.adventure;
-    }
-
-    public String getDefaultLocale() {
-        return defaultLocale;
     }
 
     /**
@@ -94,6 +94,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     /**
      * @return Unmodifiable set of commands registered by this
      */
+    @NotNull
     public Set<Command> getRegisteredCommands() {
         return Collections.unmodifiableSet(registeredCommands);
     }
@@ -109,12 +110,13 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     public final void onReload() {
         long now = System.currentTimeMillis();
 
-        for (YMLConfig conf : configs.values())
+        for (YMLConfig conf : configs.values()) {
             try {
                 if (conf.getFile().exists()) conf.reload();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Unable to reload file {}", conf.getFileName(), e);
             }
+        }
 
         setupLanguageConfig();
         languageConfigs.clear();
@@ -124,7 +126,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         try {
             reload();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unable execute reload()", e);
         }
         for (Command command : registeredCommands) {
             if (command instanceof CoreCommand coreCommand)
@@ -146,7 +148,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
                     this.logDone("Disabled module &e" + module.getID());
                 }
             }
-            if (enabledModules.contains(module)) module.reload();
+            if (enabledModules.contains(module)) {
+                module.reload();
+            }
         }
         logPentaStar(ChatColor.YELLOW, "Reloaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
     }
@@ -158,13 +162,20 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
      * @param sender The target of language
      * @return Config file for sender language
      */
-    public @NotNull YMLConfig getLanguageConfig(@Nullable CommandSender sender) {
+    @NotNull
+    public YMLConfig getLanguageConfig(final @Nullable CommandSender sender) {
         String locale;
-        if (!(sender instanceof Player)) locale = this.defaultLocale;
-        else if (this.useMultiLanguage) locale = ((Player) sender).getLocale().split("_")[0];
-        else locale = this.defaultLocale;
+        if (!(sender instanceof Player)) {
+            locale = this.defaultLocale;
+        } else if (this.useMultiLanguage) {
+            locale = ((Player) sender).getLocale().split("_")[0];
+        } else {
+            locale = this.defaultLocale;
+        }
 
-        if (this.languageConfigs.containsKey(locale)) return languageConfigs.get(locale);
+        if (this.languageConfigs.containsKey(locale)) {
+            return languageConfigs.get(locale);
+        }
         String fileName = "language" + File.separator + locale + ".yml";
         if (locale.equals(this.defaultLocale) || new File(getDataFolder(), fileName).exists()
                 || this.getResource("languages/" + locale + ".yml") != null) {
@@ -172,7 +183,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             languageConfigs.put(locale, conf);
             return conf;
         }
-        if (languageConfigs.containsKey(defaultLocale)) return languageConfigs.get(defaultLocale);
+        if (languageConfigs.containsKey(defaultLocale)) {
+            return languageConfigs.get(defaultLocale);
+        }
         fileName = "language" + File.separator + defaultLocale + ".yml";
         YMLConfig conf = new YMLConfig(this, fileName);
         languageConfigs.put(locale, conf);
@@ -185,7 +198,9 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
 
         if (useMultiLanguage) {
             this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
-        } else this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
+        } else {
+            this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
+        }
     }
 
     /**
@@ -205,10 +220,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         try {
             // TODO bad
             File file = new File(this.getDataFolder(), "permissions.yml");
-            if (file.exists() && !file.delete())
-                new Exception("Unable to delete file permissions.yml").printStackTrace();
+            if (file.exists() && !file.delete()) {
+                Exception e = new Exception();
+                log.warn("Unable to delete file permissions.yml", e);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unexpected error", e);
         }
         load();
         logPentaStar(ChatColor.YELLOW, "Loaded (took &e" + (System.currentTimeMillis() - now) + "&f ms)");
@@ -250,15 +267,16 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
      */
     public final void onDisable() {
         long now = System.currentTimeMillis();
-        for (Player p : Bukkit.getOnlinePlayers())
+        for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getOpenInventory().getTopInventory().getHolder() instanceof Gui && this.equals(((Gui) p.getOpenInventory().getTopInventory().getHolder()).getPlugin())) {
                 p.closeInventory();
                 this.logDone("Safely closing gui for &e" + p.getName() + " &fto prevent dupe glitches");
             }
+        }
         try {
             disable();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unexpected error invoking disable()", e);
         }
         if (persistentCooldownApi != null) {
             persistentCooldownApi.save();
@@ -278,26 +296,30 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             packetManager.clearAll();
             logDone("Removed holograms and Packet entities");
         }
-        for (SQLDatabase conn : new HashSet<>(connections))
+        for (SQLDatabase conn : new HashSet<>(connections)) {
             try {
                 conn.disconnect(false);
                 logDone(conn.getType().name() + " successfully disconnected from &e" + conn.getUrl());
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error("Unexpected error", e);
             }
-        for (YMLConfig conf : configs.values())
+        }
+        for (YMLConfig conf : configs.values()) {
             try {
                 if (conf.getFile().exists()) if (conf.isDirty()) {
                     this.logDone("Force saving file &e" + conf.getFile().getPath() + "&f before turning off");
                     conf.save();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Unexpected error", e);
             }
-        for (String permission : registeredPermissions)
+        }
+        for (String permission : registeredPermissions) {
             Bukkit.getPluginManager().removePermission(permission);
-        if (loggerManager != null) loggerManager.disable();
-
+        }
+        if (loggerManager != null) {
+            loggerManager.disable();
+        }
         if (this.adventure != null) {
             this.adventure.close();
             this.adventure = null;
@@ -456,10 +478,13 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             if (!commandMap.register(this.getName().toLowerCase(Locale.ENGLISH), command))
                 throw new IllegalArgumentException("Unable to register the command '" + command.getName() + "'");
             registeredCommands.add(command);
-            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            logDone("Registered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: "
+                    + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
         } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-            e.printStackTrace();
+            logProblem("Unable to register Command " + ChatColor.YELLOW + "/" + command.getName()
+                    + ChatColor.WHITE + ", aliases: " + ChatColor.YELLOW +
+                    Arrays.toString(command.getAliases().toArray()));
+            log.error("Unexpected error ", e);
             return false;
         }
         return true;
@@ -488,10 +513,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
                 knownCommands.remove(key);
             command.unregister(commandMap);
             registeredCommands.remove(command);
-            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
+            logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for "
+                    + this.getName() + ", aliases: " + ChatColor.YELLOW
+                    + Arrays.toString(command.getAliases().toArray()));
         } catch (Exception e) {
-            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW + Arrays.toString(command.getAliases().toArray()));
-            e.printStackTrace();
+            logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE
+                    + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW
+                    + Arrays.toString(command.getAliases().toArray()));
+            log.error("Unexpected error ", e);
         }
     }
 
@@ -638,7 +667,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         try {
             return new Metrics(this, bStatsId);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unexpected error ", e);
             return null;
         }
     }
@@ -649,7 +678,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             new UpdateChecker(this, spigotResourceId);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Unexpected error ", e);
             return false;
         }
     }

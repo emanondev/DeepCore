@@ -4,6 +4,8 @@ import emanondev.core.CoreMain;
 import emanondev.core.UtilsString;
 import org.bukkit.entity.Player;
 
+import java.util.concurrent.TimeUnit;
+
 public class CooldownAction extends Action {
     public CooldownAction() {
         super("cooldown");
@@ -24,7 +26,7 @@ public class CooldownAction extends Action {
     public void execute(Player player, String text) {
         String[] args = text.split(" ");
         CoreMain.get().getCooldownAPI(args.length < 3 || Boolean.parseBoolean(args[2]))
-                .setCooldown(player, args[0], Integer.parseInt(args[1]));
+                .setCooldown(player, args[0], Integer.parseInt(args[1]), TimeUnit.MILLISECONDS);
     }
 
     @Override
