@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public final class ExpUtility {
 
     private ExpUtility() {
-        throw new AssertionError("Utility class cannot be instantiated.");
+        throw new UnsupportedOperationException();
     }
 
     /**

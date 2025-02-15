@@ -1,9 +1,9 @@
-package emanondev.core;
+package emanondev.core.utility;
 
-@Deprecated
-public final class UtilsMath {
+public final class MathUtility {
 
-    private UtilsMath() {
+    private MathUtility() {
+        throw new UnsupportedOperationException();
     }
 
     /**

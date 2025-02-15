@@ -18,12 +18,7 @@ public abstract class Module implements Listener, ConsoleHelper, FileLogger {
     private final String id;
     private final String description;
 
-    @Deprecated
-    public Module(@NotNull String id, @NotNull CorePlugin plugin) {
-        this(id, plugin, null);
-    }
-
-    public Module(@NotNull String id, @NotNull CorePlugin plugin, String description) {
+    public Module(final @NotNull String id, final @NotNull CorePlugin plugin, final String description) {
         if (!UtilsString.isValidID(id))
             throw new IllegalArgumentException("invalid module id");
         this.id = id;
@@ -46,6 +41,7 @@ public abstract class Module implements Listener, ConsoleHelper, FileLogger {
      *
      * @return module identifier
      */
+    @NotNull
     public final String getID() {
         return this.id;
     }
@@ -55,15 +51,18 @@ public abstract class Module implements Listener, ConsoleHelper, FileLogger {
      *
      * @return module description
      */
+    @Nullable
     public final String getDescription() {
         return this.description;
     }
 
+    @NotNull
     public YMLConfig getConfig() {
         return plugin.getConfig("modules" + File.separator + this.getID() + ".yml");
     }
 
-    public YMLConfig getConfig(String fileName) {
+    @NotNull
+    public YMLConfig getConfig(final String fileName) {
         return plugin.getConfig("modules" + File.separator + this.getID() + this.getID() + "_" + fileName);
     }
 
@@ -88,7 +87,7 @@ public abstract class Module implements Listener, ConsoleHelper, FileLogger {
 
 
     @NotNull
-    public YMLSection getLanguageSection(@Nullable CommandSender who) {
+    public YMLSection getLanguageSection(final @Nullable CommandSender who) {
         return getPlugin().getLanguageConfig(who).loadSection("module." + this.getID());
     }
 }
