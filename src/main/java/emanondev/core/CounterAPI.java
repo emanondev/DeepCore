@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Contract;
@@ -9,18 +10,34 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * API for managing counters with reset periods.
+ */
+@Slf4j
 public class CounterAPI {
 
     private final YMLConfig conf;
     private final ResetTime reset;
     private final HashMap<UUID, HashMap<String, Long>> counters = new HashMap<>();
-    //private int day = Calendar.DAY_OF_YEAR;
     private long id;
 
-    CounterAPI(@NotNull CorePlugin plugin, @NotNull ResetTime reset) {
+    /**
+     * Constructs a CounterAPI instance with persistent storage.
+     *
+     * @param plugin the core plugin instance
+     * @param reset  the reset period for counters
+     */
+    CounterAPI(final @NotNull CorePlugin plugin, final @NotNull ResetTime reset) {
         this(plugin, reset, true);
     }
 
+    /**
+     * Constructs a CounterAPI instance.
+     *
+     * @param plugin     the core plugin instance
+     * @param reset      the reset period for counters
+     * @param persistent whether the counters should be persisted
+     */
     @Contract("null, _, true -> fail")
     CounterAPI(CorePlugin plugin, @NotNull ResetTime reset, boolean persistent) {
         this.reset = reset;
@@ -29,13 +46,15 @@ public class CounterAPI {
         if (conf != null)
             for (String uuid : conf.getKeys(reset.name() + "." + this.id)) {
                 HashMap<String, Long> map = new HashMap<>();
-                for (String counterId : conf.getKeys(reset.name() + "." + this.id + "." + uuid))
+                for (String counterId : conf.getKeys(reset.name() + "." + this.id + "." + uuid)) {
                     try {
-                        long value = conf.getLong(reset.name() + "." + this.id + "." + uuid + "." + counterId, 0L);
+                        long value = conf.getLong(reset.name() + "." + this.id + "."
+                                + uuid + "." + counterId, 0L);
                         map.put(counterId, value);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Unexpected error", e);
                     }
+                }
                 counters.put(UUID.fromString(uuid), map);
             }
     }
@@ -43,110 +62,240 @@ public class CounterAPI {
     void save() {
         if (conf != null) {
             conf.set(reset.name(), null, false);
-            if (id != reset.getId())
+            if (id != reset.getId()) {
                 return;
+            }
             for (UUID player : counters.keySet()) {
                 HashMap<String, Long> values = counters.get(player);
-                for (String id : values.keySet())
-                    if (values.get(id) > 0)
+                for (String id : values.keySet()) {
+                    if (values.get(id) > 0) {
                         conf.set(reset.name() + "." + this.id + "." + player.toString() + "." + id, values.get(id), false);
+                    }
+                }
             }
         }
     }
 
-    public void setCounter(OfflinePlayer player, String counterId, long amount) {
+    /**
+     * Sets a counter for an offline player.
+     *
+     * @param player    the player
+     * @param counterId the counter ID
+     * @param amount    the counter value
+     */
+    public void setCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId, final long amount) {
         setCounter(player.getUniqueId(), counterId, amount);
     }
 
+    /**
+     * Sets a counter for a UUID.
+     *
+     * @param uuid      the UUID
+     * @param counterId the counter ID
+     * @param amount    the counter value
+     */
     public void setCounter(UUID uuid, String counterId, long amount) {
         if (id != reset.getId()) {
             counters.clear();
             id = reset.getId();
         }
-        if (amount <= 0 && counters.containsKey(uuid))
+        if (amount <= 0 && counters.containsKey(uuid)) {
             counters.get(uuid).remove(counterId);
-        else {
+        } else {
             counters.computeIfAbsent(uuid, k -> new HashMap<>());
             counters.get(uuid).put(counterId, amount);
         }
     }
 
-    public void addCounter(OfflinePlayer player, String counterId, long amount) {
+    /**
+     * Increases the counter for the specified player.
+     *
+     * @param player    the player whose counter should be incremented
+     * @param counterId the ID of the counter
+     * @param amount    the amount to add
+     */
+    public void addCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId, final long amount) {
         addCounter(player.getUniqueId(), counterId, amount);
     }
 
-    public void addCounter(UUID uuid, String counterId, long amount) {
+    /**
+     * Increases the counter for the specified UUID.
+     *
+     * @param uuid      the unique identifier of the player
+     * @param counterId the ID of the counter
+     * @param amount    the amount to add
+     * @throws IllegalArgumentException if the amount is negative
+     */
+    public void addCounter(final @NotNull UUID uuid, final @NotNull String counterId, final long amount) {
         if (amount < 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Amount cannot be negative");
         setCounter(uuid, counterId, getCounter(uuid, counterId) + amount);
     }
 
-    public long getCounter(UUID uuid, String counterId) {
+    /**
+     * Retrieves the counter value for the specified UUID.
+     *
+     * @param uuid      the unique identifier of the player
+     * @param counterId the ID of the counter
+     * @return the counter value, or 0 if not set
+     */
+    public long getCounter(final @NotNull UUID uuid, final @NotNull String counterId) {
         if (id != reset.getId()) {
             counters.clear();
             id = reset.getId();
         }
-        return counters.containsKey(uuid)
-                ? (counters.get(uuid).getOrDefault(counterId, 0L))
-                : 0L;
+        return counters.containsKey(uuid) ? counters.get(uuid).getOrDefault(counterId, 0L) : 0L;
     }
 
-    public void reduceCounter(OfflinePlayer player, String counterId, long amount) {
+    /**
+     * Decreases the counter for the specified player.
+     *
+     * @param player    the player whose counter should be reduced
+     * @param counterId the ID of the counter
+     * @param amount    the amount to subtract
+     */
+    public void reduceCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId, final long amount) {
         reduceCounter(player.getUniqueId(), counterId, amount);
     }
 
-    public void reduceCounter(UUID uuid, String counterId, long amount) {
+    /**
+     * Decreases the counter for the specified UUID.
+     *
+     * @param uuid      the unique identifier of the player
+     * @param counterId the ID of the counter
+     * @param amount    the amount to subtract
+     * @throws IllegalArgumentException if the amount is negative
+     */
+    public void reduceCounter(final @NotNull UUID uuid, final @NotNull String counterId, final long amount) {
         if (amount < 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Amount cannot be negative");
         setCounter(uuid, counterId, getCounter(uuid, counterId) - amount);
     }
 
-    public void removeCounter(OfflinePlayer player, String counterId) {
+    /**
+     * Removes the counter for the specified player.
+     *
+     * @param player    the player whose counter should be removed
+     * @param counterId the ID of the counter to remove
+     */
+    public void removeCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId) {
         removeCounter(player.getUniqueId(), counterId);
     }
 
-    public void removeCounter(UUID uuid, String counterId) {
-        if (counters.get(uuid) != null)
+    /**
+     * Removes the counter for the specified UUID.
+     *
+     * @param uuid      the unique identifier of the player
+     * @param counterId the ID of the counter to remove
+     */
+    public void removeCounter(final @NotNull UUID uuid, final @NotNull String counterId) {
+        if (counters.get(uuid) != null) {
             counters.get(uuid).remove(counterId);
+        }
     }
 
-    public boolean hasCounter(OfflinePlayer player, String counterId) {
+    /**
+     * Checks if the specified player has a counter.
+     *
+     * @param player    the player to check
+     * @param counterId the ID of the counter
+     * @return {@code true} if the counter exists and has a nonzero value, {@code false} otherwise
+     */
+    public boolean hasCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId) {
         return hasCounter(player.getUniqueId(), counterId);
-
     }
 
-    public boolean hasCounter(UUID uuid, String counterId) {
+    /**
+     * Checks if the specified UUID has a counter.
+     *
+     * @param uuid      the unique identifier of the player
+     * @param counterId the ID of the counter
+     * @return {@code true} if the counter exists and has a nonzero value, {@code false} otherwise
+     */
+    public boolean hasCounter(final @NotNull UUID uuid, final @NotNull String counterId) {
         return getCounter(uuid, counterId) != 0;
-
     }
 
-    public long getCounter(OfflinePlayer player, String counterId) {
+    /**
+     * Retrieves the counter value for the specified player.
+     *
+     * @param player    the player whose counter should be retrieved
+     * @param counterId the ID of the counter
+     * @return the counter value, or 0 if not set
+     */
+    public long getCounter(final @NotNull OfflinePlayer player, final @NotNull String counterId) {
         return getCounter(player.getUniqueId(), counterId);
     }
 
-    public void setCounter(Block block, String counterId, long amount) {
-        setCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId, amount);
+    /**
+     * Sets the counter for a block.
+     *
+     * @param block     the block to associate with the counter
+     * @param counterId the ID of the counter
+     * @param amount    the amount to set
+     */
+    public void setCounter(final @NotNull Block block, final @NotNull String counterId, final long amount) {
+        setCounter(blockToUUID(block), counterId, amount);
     }
 
-    public void addCounter(Block block, String counterId, long amount) {
-        addCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId, amount);
+    /**
+     * Increases the counter for a block.
+     *
+     * @param block     the block to associate with the counter
+     * @param counterId the ID of the counter
+     * @param amount    the amount to add
+     */
+    public void addCounter(final @NotNull Block block, final @NotNull String counterId, final long amount) {
+        addCounter(blockToUUID(block), counterId, amount);
     }
 
-    public void reduceCounter(Block block, String counterId, long amount) {
-        reduceCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId, amount);
+    /**
+     * Reduces the counter value associated with a block.
+     *
+     * @param block     the block whose counter should be reduced
+     * @param counterId the ID of the counter
+     * @param amount    the amount to subtract from the counter
+     * @throws IllegalArgumentException if the amount is negative
+     */
+    public void reduceCounter(final @NotNull Block block, final @NotNull String counterId, final long amount) {
+        reduceCounter(blockToUUID(block), counterId, amount);
     }
 
-    public void removeCounter(Block block, String counterId) {
-        removeCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId);
+    /**
+     * Removes the counter associated with a block.
+     *
+     * @param block     the block whose counter should be removed
+     * @param counterId the ID of the counter to remove
+     */
+    public void removeCounter(final @NotNull Block block, final @NotNull String counterId) {
+        removeCounter(blockToUUID(block), counterId);
     }
 
-    public boolean hasCounter(Block block, String counterId) {
-        return hasCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId);
-
+    /**
+     * Checks if a block has an associated counter.
+     *
+     * @param block     the block to check
+     * @param counterId the ID of the counter
+     * @return {@code true} if the counter exists and has a nonzero value, {@code false} otherwise
+     */
+    public boolean hasCounter(final @NotNull Block block, final @NotNull String counterId) {
+        return hasCounter(blockToUUID(block), counterId);
     }
 
-    public long getCounter(Block block, String counterId) {
-        return getCounter(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), counterId);
+    /**
+     * Retrieves the counter value associated with a block.
+     *
+     * @param block     the block whose counter should be retrieved
+     * @param counterId the ID of the counter
+     * @return the counter value, or 0 if not set
+     */
+    public long getCounter(final @NotNull Block block, final @NotNull String counterId) {
+        return getCounter(blockToUUID(block), counterId);
+    }
+
+    private UUID blockToUUID(Block block) {
+        return new UUID((((long) block.getX()) << 32) + block.getZ(),
+                (((long) block.getWorld().getName().hashCode()) << 8) + block.getY());
     }
 
     public enum ResetTime {

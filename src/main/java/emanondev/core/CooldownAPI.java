@@ -42,7 +42,7 @@ public class CooldownAPI {
             for (String id : conf.getKeys("users")) {
                 HashMap<String, Long> map = new HashMap<>();
                 cooldowns.put(UUID.fromString(id), map);
-                for (String cooldownId : conf.getKeys("users." + id))
+                for (String cooldownId : conf.getKeys("users." + id)) {
                     try {
                         long value = conf.getLong("users." + id + "." + cooldownId, 0L);
                         if (value > now) {
@@ -51,6 +51,7 @@ public class CooldownAPI {
                     } catch (Exception e) {
                         log.error("Unexpected error", e);
                     }
+                }
             }
         }
     }
@@ -61,9 +62,11 @@ public class CooldownAPI {
             conf.set("users", null, false);
             for (UUID uuid : cooldowns.keySet()) {
                 Map<String, Long> values = cooldowns.get(uuid);
-                for (String id : values.keySet())
-                    if (values.get(id) > now)
+                for (String id : values.keySet()) {
+                    if (values.get(id) > now) {
                         conf.set("users." + uuid.toString() + "." + id, values.get(id), false);
+                    }
+                }
             }
             conf.save();
         }
@@ -82,9 +85,7 @@ public class CooldownAPI {
                             final @NotNull String cooldownId,
                             final @Range(from = 0, to = Long.MAX_VALUE) long duration,
                             final @NotNull TimeUnit timeUnit) {
-        setCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId, duration, timeUnit);
+        setCooldown(blockToUUID(block), cooldownId, duration, timeUnit);
     }
 
     /**
@@ -100,9 +101,7 @@ public class CooldownAPI {
                             final @NotNull String cooldownId,
                             final @Range(from = 0, to = Long.MAX_VALUE) long duration,
                             final @NotNull TimeUnit timeUnit) {
-        addCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId, duration, timeUnit);
+        addCooldown(blockToUUID(block), cooldownId, duration, timeUnit);
     }
 
     /**
@@ -118,9 +117,7 @@ public class CooldownAPI {
                                final @NotNull String cooldownId,
                                final @Range(from = 0, to = Long.MAX_VALUE) long duration,
                                final @NotNull TimeUnit timeUnit) {
-        reduceCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId, duration, timeUnit);
+        reduceCooldown(blockToUUID(block), cooldownId, duration, timeUnit);
     }
 
     /**
@@ -131,9 +128,7 @@ public class CooldownAPI {
      */
     public void removeCooldown(final @NotNull Block block,
                                final @NotNull String cooldownId) {
-        removeCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId);
+        removeCooldown(blockToUUID(block), cooldownId);
     }
 
     /**
@@ -145,9 +140,7 @@ public class CooldownAPI {
      */
     public boolean hasCooldown(final @NotNull Block block,
                                final @NotNull String cooldownId) {
-        return hasCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId);
+        return hasCooldown(blockToUUID(block), cooldownId);
     }
 
     /**
@@ -162,9 +155,7 @@ public class CooldownAPI {
     public long getCooldown(final @NotNull Block block,
                             final @NotNull String cooldownId,
                             final @NotNull TimeUnit timeUnit) {
-        return getCooldown(new UUID(((long) block.getX() << 32) | (long) block.getY(),
-                        ((long) block.getZ() << 32) | (long) block.getWorld().getName().hashCode()),
-                cooldownId, timeUnit);
+        return getCooldown(blockToUUID(block), cooldownId, timeUnit);
     }
 
     /**
@@ -498,7 +489,7 @@ public class CooldownAPI {
      */
     @Deprecated
     public void setCooldown(Block block, String cooldownId, long duration) {
-        setCooldown(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        setCooldown(blockToUUID(block), cooldownId, duration);
     }
 
     /**
@@ -506,7 +497,7 @@ public class CooldownAPI {
      */
     @Deprecated
     public void addCooldown(Block block, String cooldownId, long duration) {
-        addCooldown(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        addCooldown(blockToUUID(block), cooldownId, duration);
     }
 
     /**
@@ -514,41 +505,46 @@ public class CooldownAPI {
      */
     @Deprecated
     public void reduceCooldown(Block block, String cooldownId, long duration) {
-        reduceCooldown(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        reduceCooldown(blockToUUID(block), cooldownId, duration);
     }
 
     @Deprecated
     public void setCooldownSeconds(Block block, String cooldownId, long duration) {
-        setCooldownSeconds(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        setCooldownSeconds(blockToUUID(block), cooldownId, duration);
     }
 
     @Deprecated
     public void addCooldownSeconds(Block block, String cooldownId, long duration) {
-        addCooldownSeconds(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        addCooldownSeconds(blockToUUID(block), cooldownId, duration);
     }
 
     @Deprecated
     public void reduceCooldownSeconds(Block block, String cooldownId, long duration) {
-        reduceCooldownSeconds(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId, duration);
+        reduceCooldownSeconds(blockToUUID(block), cooldownId, duration);
     }
 
     @Deprecated
     public long getCooldownMillis(Block block, String cooldownId) {
-        return getCooldownMillis(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId);
+        return getCooldownMillis(blockToUUID(block), cooldownId);
     }
 
     @Deprecated
     public long getCooldownSeconds(Block block, String cooldownId) {
-        return getCooldownSeconds(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId);
+        return getCooldownSeconds(blockToUUID(block), cooldownId);
     }
 
     @Deprecated
     public long getCooldownMinutes(Block block, String cooldownId) {
-        return getCooldownMinutes(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId);
+        return getCooldownMinutes(blockToUUID(block), cooldownId);
     }
 
     @Deprecated
     public long getCooldownHours(Block block, String cooldownId) {
-        return getCooldownHours(new UUID((((long) block.getX()) << 32) + block.getZ(), (((long) block.getWorld().getName().hashCode()) << 8) + block.getY()), cooldownId);
+        return getCooldownHours(blockToUUID(block), cooldownId);
+    }
+
+    private UUID blockToUUID(Block block) {
+        return new UUID((((long) block.getX()) << 32) + block.getZ(),
+                (((long) block.getWorld().getName().hashCode()) << 8) + block.getY());
     }
 }
