@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.Pair;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import emanondev.core.util.GameVersion;
+import emanondev.core.utility.VersionUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,7 +30,7 @@ public class PacketManager {
         if (plugin == null)
             throw new NullPointerException();
         this.plugin = plugin;
-        if (!GameVersion.isNewerEqualsTo(1, 19, 3))
+        if (!VersionUtility.isNewerEquals(1, 19, 3))
             throw new IllegalStateException("unsupported version");
     }
 

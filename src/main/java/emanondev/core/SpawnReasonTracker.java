@@ -1,5 +1,7 @@
 package emanondev.core;
 
+import emanondev.core.utility.ReflectionUtility;
+import emanondev.core.utility.VersionUtility;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,6 +32,8 @@ public class SpawnReasonTracker implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     private static void handler(CreatureSpawnEvent event) {
+        if (VersionUtility.hasPaperAPI())
+            return;
         event.getEntity().setMetadata(metaName, fixedMetas.get(event.getSpawnReason()));
     }
 
@@ -39,6 +43,9 @@ public class SpawnReasonTracker implements Listener {
      * spawning reason {@code SpawnReason.DEFAULT} is returned
      */
     public static SpawnReason getSpawnReason(Entity entity) {
+        if (VersionUtility.hasPaperAPI()) {
+            return (SpawnReason) ReflectionUtility.invokeMethod(entity, "getEntitySpawnReason");
+        }
         try {
             if (!entity.hasMetadata(metaName))
                 throw new NullPointerException();

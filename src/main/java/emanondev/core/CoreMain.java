@@ -8,6 +8,7 @@ import emanondev.core.events.EquipChangeListener;
 import emanondev.core.gui.GuiHandler;
 import emanondev.core.util.FAWECleaner;
 import emanondev.core.util.ItemUtility;
+import emanondev.core.utility.VersionUtility;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,8 @@ public final class CoreMain extends CorePlugin {
         this.logDone("Enabled &aMerchantCraftEvent");
         this.registerListener(new GuiHandler());
         this.logDone("Enabled &aDeepCore Guis");
-        this.registerListener(new SpawnReasonTracker());
+        if (!VersionUtility.hasPaperAPI())
+            this.registerListener(new SpawnReasonTracker());
         this.logDone("Enabled &aSpawnReasonTracker");
         this.registerListener(new EquipChangeListener());
         this.logDone("Enabled &aEquipmentChangeEvent");

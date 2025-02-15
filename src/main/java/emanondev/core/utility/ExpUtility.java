@@ -1,15 +1,15 @@
-package emanondev.core;
+package emanondev.core.utility;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @see emanondev.core.utility.ExpUtility
+ * Utility class for handling experience (EXP) operations in Minecraft.
+ * Provides methods to modify, calculate, and check player experience.
  */
-@Deprecated
-public final class UtilsExp {
+public final class ExpUtility {
 
-    private UtilsExp() {
+    private ExpUtility() {
         throw new AssertionError("Utility class cannot be instantiated.");
     }
 

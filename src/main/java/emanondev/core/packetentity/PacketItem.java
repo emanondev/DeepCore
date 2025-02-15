@@ -1,7 +1,7 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import emanondev.core.util.GameVersion;
+import emanondev.core.utility.VersionUtility;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -84,7 +84,7 @@ public class PacketItem extends PacketEntity {
     }
 
     public EntityType getType() {
-        return GameVersion.isNewerEqualsTo(1, 20, 5) ?
+        return VersionUtility.isNewerEquals(1, 20, 5) ?
                 EntityType.ITEM : EntityType.valueOf("DROPPED_ITEM");
     }
 

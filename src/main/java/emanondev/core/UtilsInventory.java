@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import emanondev.core.utility.InventoryUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -14,6 +15,10 @@ import org.jetbrains.annotations.Range;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @see InventoryUtility
+ */
+@Deprecated
 public final class UtilsInventory {
 
     private UtilsInventory() {

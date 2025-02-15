@@ -26,11 +26,11 @@ public class ItemBuilder {
     private final ItemStack result;
     private ItemMeta resultMeta;
 
-    public ItemBuilder(@NotNull Material result) {
+    public ItemBuilder(final @NotNull Material result) {
         this(new ItemStack(result));
     }
 
-    public ItemBuilder(@NotNull ItemStack result) {
+    public ItemBuilder(final @NotNull ItemStack result) {
         this.result = new ItemStack(result);
         this.resultMeta = this.result.getItemMeta();
     }
@@ -85,7 +85,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_ -> this")
-    public ItemBuilder addFlag(ItemFlag flag) {
+    public ItemBuilder addFlag(@NotNull ItemFlag flag) {
         this.resultMeta.addItemFlags(flag);
         return this;
     }
@@ -95,7 +95,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_ -> this")
-    public ItemBuilder setDisplayName(String displayName) {
+    public ItemBuilder setDisplayName(@NotNull String displayName) {
 
         this.resultMeta.setDisplayName(displayName);
         return this;
@@ -108,7 +108,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_ -> this")
-    public ItemBuilder addLore(String line) {
+    public ItemBuilder addLore(final String line) {
         if (line == null)
             return this;
         List<String> lore = this.resultMeta.hasLore() ? new ArrayList<>(this.resultMeta.getLore()) : new ArrayList<>();
@@ -124,7 +124,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_ -> this")
-    public ItemBuilder setLore(@Nullable List<String> lore) {
+    public ItemBuilder setLore(final @Nullable List<String> lore) {
         this.resultMeta.setLore(lore);
         return this;
     }
@@ -137,7 +137,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_, _ -> this")
-    public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
+    public ItemBuilder addEnchantment(final @NotNull Enchantment enchantment, final int level) {
         if (level == 0)
             this.resultMeta.removeEnchant(enchantment);
         else
@@ -154,7 +154,7 @@ public class ItemBuilder {
      *                               PotionMeta
      */
     @Contract("_ -> this")
-    public ItemBuilder setColor(Color color) {
+    public ItemBuilder setColor(final Color color) {
         if (resultMeta instanceof LeatherArmorMeta) {
             ((LeatherArmorMeta) this.resultMeta).setColor(color);
             return this;
@@ -174,7 +174,7 @@ public class ItemBuilder {
      * @throws IllegalStateException if this meta is not BookMeta
      */
     @Contract("_ -> this")
-    public ItemBuilder setAuthor(String name) {
+    public ItemBuilder setAuthor(final String name) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setAuthor(name);
         else
@@ -190,7 +190,7 @@ public class ItemBuilder {
      * @throws IllegalStateException if this meta is not BookMeta
      */
     @Contract("_ -> this")
-    public ItemBuilder setTitle(String title) {
+    public ItemBuilder setTitle(final String title) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setTitle(title);
         else
@@ -207,7 +207,7 @@ public class ItemBuilder {
      * @throws IllegalStateException if this meta is not BookMeta
      */
     @Contract("_, _ -> this")
-    public ItemBuilder setPage(int page, String text) {
+    public ItemBuilder setPage(final int page, final String text) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).setPage(page, text);
         else
@@ -223,7 +223,7 @@ public class ItemBuilder {
      * @throws IllegalStateException if this meta is not PotionMeta
      */
     @Contract("_ -> this")
-    public ItemBuilder addPotionEffect(PotionEffect effect) {
+    public ItemBuilder addPotionEffect(final @NotNull PotionEffect effect) {
         if (this.resultMeta instanceof PotionMeta)
             ((PotionMeta) this.resultMeta).addCustomEffect(effect, true);
         else
@@ -233,7 +233,7 @@ public class ItemBuilder {
 
     @SuppressWarnings("deprecation")
     @Contract("_ -> this")
-    public ItemBuilder setSkullOwner(String name) {
+    public ItemBuilder setSkullOwner(final String name) {
         if (this.resultMeta instanceof SkullMeta)
             ((SkullMeta) this.resultMeta).setOwner(name);
         else
@@ -242,7 +242,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setSkullOwner(OfflinePlayer player) {
+    public ItemBuilder setSkullOwner(final OfflinePlayer player) {
         if (this.resultMeta instanceof SkullMeta)
             ((SkullMeta) this.resultMeta).setOwningPlayer(player);
         else
@@ -251,7 +251,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setDamage(int dmg) {
+    public ItemBuilder setDamage(final int dmg) {
         if (this.resultMeta instanceof Damageable)
             ((Damageable) this.resultMeta).setDamage(dmg);
         else if (dmg != 0)
@@ -260,13 +260,13 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setCustomModelData(Integer data) {
+    public ItemBuilder setCustomModelData(final Integer data) {
         this.resultMeta.setCustomModelData(data);
         return this;
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setAmount(int amount) {
+    public ItemBuilder setAmount(final int amount) {
         if (amount > 0)
             this.result.setAmount(amount);
         else
@@ -282,7 +282,7 @@ public class ItemBuilder {
     }
 
     @Contract("_, _ -> this")
-    public ItemBuilder addPattern(DyeColor color, PatternType patternType) {
+    public ItemBuilder addPattern(final @NotNull DyeColor color, final @NotNull PatternType patternType) {
         if (this.resultMeta instanceof BannerMeta)
             ((BannerMeta) this.resultMeta).addPattern(new Pattern(color, patternType));
         else
@@ -299,7 +299,7 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_, _ -> this")
-    public ItemBuilder setDescription(List<String> description, String... holders) {
+    public ItemBuilder setDescription(final List<String> description, final String... holders) {
         return setDescription(description, true, null, holders);
     }
 
@@ -314,7 +314,10 @@ public class ItemBuilder {
      * @return this for chaining.
      */
     @Contract("_, _, _, _ -> this")
-    public ItemBuilder setDescription(List<String> description, boolean color, Player player, String... holders) {
+    public ItemBuilder setDescription(final List<String> description,
+                                      final boolean color,
+                                      final Player player,
+                                      final String... holders) {
         List<String> list = UtilsString.fix(description, player, color, holders);
         if (list == null || list.isEmpty()) {
             this.resultMeta.setDisplayName(null);
@@ -345,19 +348,24 @@ public class ItemBuilder {
      */
     @Contract("_, _, _ -> this")
     @Deprecated
-    public ItemBuilder setDescription(List<String> description, boolean color, String... holders) {
+    public ItemBuilder setDescription(final List<String> description,
+                                      final boolean color,
+                                      final String... holders) {
         return setDescription(description, color, null, holders);
     }
 
     @Contract("_, _ -> this")
     @Deprecated
-    public ItemBuilder setMiniDescription(List<String> description, String... holders) {
+    public ItemBuilder setMiniDescription(final List<String> description,
+                                          final String... holders) {
         return setMiniDescription(description, null, holders);
     }
 
     @Contract("_, _, _ -> this")
     @Deprecated
-    public ItemBuilder setMiniDescription(List<String> description, Player player, String... holders) {
+    public ItemBuilder setMiniDescription(final List<String> description,
+                                          final Player player,
+                                          final String... holders) {
         List<String> list = UtilsString.fix(description, player, false, holders);
         if (list == null || list.isEmpty()) {
             this.resultMeta.setDisplayName("");
@@ -408,7 +416,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder addDescription(@NotNull DMessage message) {
+    public ItemBuilder addDescription(final @NotNull DMessage message) {
         List<String> list = message.toJsonMulti();
         if (list == null || list.isEmpty())
             return this;
@@ -422,7 +430,7 @@ public class ItemBuilder {
     }
 
     @Contract("_, _ -> this")
-    public ItemBuilder setPage(int page, @NotNull DMessage message) {
+    public ItemBuilder setPage(final int page, final @NotNull DMessage message) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).spigot().setPage(page, message.toBaseComponent());
         else
@@ -431,7 +439,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setPages(DMessage... messages) {
+    public ItemBuilder setPages(final DMessage... messages) {
         if (this.resultMeta instanceof BookMeta)
             for (DMessage message : messages)
                 addPage(message);
@@ -441,7 +449,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder addPage(@NotNull DMessage message) {
+    public ItemBuilder addPage(final @NotNull DMessage message) {
         if (this.resultMeta instanceof BookMeta)
             ((BookMeta) this.resultMeta).spigot().addPage(message.toBaseComponent());
         else
@@ -450,13 +458,15 @@ public class ItemBuilder {
     }
 
     @Contract("_, _, _ -> this")
-    public ItemBuilder applyPlaceholders(@NotNull CorePlugin plugin, @Nullable Player target, String... placeholders) {
+    public ItemBuilder applyPlaceholders(final @NotNull CorePlugin plugin,
+                                         final @Nullable Player target,
+                                         final String... placeholders) {
         DMessage msg = getDescription(plugin);
         msg.applyHolders(target, placeholders);
         return setDescription(msg);
     }
 
-    public DMessage getDescription(@NotNull CorePlugin plugin) {
+    public DMessage getDescription(final @NotNull CorePlugin plugin) {
         DMessage msg = new DMessage(plugin, null);
         Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
         if (map.containsKey("display-name"))
@@ -469,7 +479,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setDescription(@NotNull DMessage message) {
+    public ItemBuilder setDescription(final @NotNull DMessage message) {
         List<String> list = message.toJsonMulti();
         if (list == null || list.isEmpty()) {
             this.resultMeta.setDisplayName("");
@@ -494,7 +504,9 @@ public class ItemBuilder {
     }
 
     @Contract("_, _, _ -> this")
-    public <T, Z> ItemBuilder addNamespacedKey(@NotNull NamespacedKey key, @NotNull PersistentDataType<T, Z> type, Z value) {
+    public <T, Z> ItemBuilder addNamespacedKey(final @NotNull NamespacedKey key,
+                                               final @NotNull PersistentDataType<T, Z> type,
+                                               final Z value) {
         resultMeta.getPersistentDataContainer().set(key, type, value);
         return this;
     }
@@ -507,7 +519,7 @@ public class ItemBuilder {
     }
 
     @Contract("_ -> this")
-    public ItemBuilder setColor(@Nullable DyeColor color) {
+    public ItemBuilder setColor(final @Nullable DyeColor color) {
         if (color == null)
             return this;
         if (resultMeta instanceof LeatherArmorMeta meta) {
@@ -534,7 +546,7 @@ public class ItemBuilder {
 
 
     @Contract("_ -> this")
-    public ItemBuilder glow(@Nullable Boolean value) {
+    public ItemBuilder glow(final @Nullable Boolean value) {
         if (VersionUtility.isNewerEquals(1, 20, 5))
             resultMeta.setEnchantmentGlintOverride(value);
         else if (value != null)
