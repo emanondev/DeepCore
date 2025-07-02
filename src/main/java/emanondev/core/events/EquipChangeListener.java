@@ -91,7 +91,7 @@ public class EquipChangeListener implements Listener {
                 case LEGS -> 7;
                 case FEET -> 8;
                 case OFF_HAND -> 45;
-                case BODY -> throw new IllegalStateException();
+                case BODY,SADDLE -> throw new IllegalStateException();
             };
         if (slot == EquipmentSlot.HAND)
             return p.getInventory().getHeldItemSlot() + view.getTopInventory().getSize() + 27;

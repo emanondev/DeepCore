@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -14,9 +15,9 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -32,12 +33,24 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class YMLConfig extends YamlConfiguration implements YMLSection {
+    /**
+     * Return the plugin associated with this Config.
+     */
+    @Getter
     private final JavaPlugin plugin;
     private final File file;
     private final String name;
     private boolean saveIfDirtyOnReload = true;
     private BukkitTask delayedSave = null;
+    @Getter
     private boolean dirty = false;
+
+    public void setAutosaveOnSet(boolean autosaveOnSet) {
+        if (file != null) {
+            this.autosaveOnSet = autosaveOnSet;
+        }
+    }
+
     private boolean autosaveOnSet = true;
 
     /**
@@ -70,6 +83,14 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         this(plugin, file, file.getName());
     }
 
+    public YMLConfig(@NotNull String fromText) throws InvalidConfigurationException {
+        this.file = null;
+        this.plugin = null;
+        this.name = null;
+        this.autosaveOnSet = false;
+        this.loadFromString(fromText);
+    }
+
     /**
      * Fix the given name for a yaml file name
      *
@@ -92,6 +113,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * Creates a YMLSection at the specified path, with specified values.
      * Any value that was previously set at this path will be overwritten.
      * If the previous value was itself a ConfigurationSection, it will be orphaned.
+     *
      * @see #loadSection(String)
      */
     @NotNull
@@ -157,19 +179,15 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return (YMLSection) super.getParent();
     }
 
-    /**
-     * Returns the file path of this config.
-     *
-     * @return the file path starting by
-     * {@link #getPlugin()}.{@link JavaPlugin#getDataFolder()
-     * getDataFolder()}.
-     */
     public String getFileName() {
         return name;
     }
 
     @Override
     public boolean reload() {
+        if (file == null) {
+            return false;
+        }
         if (dirty && saveIfDirtyOnReload) {
             Bukkit.getConsoleSender()
                     .sendMessage(ChatColor.translateAlternateColorCodes('&', "&1[&f" + getPlugin().getName()
@@ -223,10 +241,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         }
     }
 
-    public boolean isDirty() {
-        return dirty;
-    }
-
     public void saveAsync() {
         if (!dirty || delayedSave != null)
             return;
@@ -245,10 +259,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             e.printStackTrace();
             save();
         }
-    }
-
-    public @Nullable ItemStack loadItemStack(@NotNull String path, @Nullable ItemStack def) {
-        return load(path, def, ItemStack.class);
     }
 
     @Override
@@ -273,15 +283,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         super.set(path, value);
     }
 
-    /**
-     * Return the plugin associated with this Config.
-     *
-     * @return the plugin associated with this Config
-     */
-    public JavaPlugin getPlugin() {
-        return plugin;
-    }
-
     public YMLConfig setSaveIfDirtyOnReload(boolean value) {
         saveIfDirtyOnReload = value;
         return this;
@@ -289,15 +290,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
 
     public boolean getAutosaveOnSet() {
         return autosaveOnSet;
-    }
-
-    /**
-     * Should autosave when set method id used?
-     *
-     * @param value the value to set
-     */
-    public void setAutosaveOnSet(boolean value) {
-        autosaveOnSet = value;
     }
 
     void setDirty() {
@@ -446,7 +438,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @param path   Path of the Object
      * @param def    Default object
      * @param target Player target for PlaceHolderAPI holders
-     * @param color  Whether or not translate color codes
+     * @param color  Whether translate color codes
      * @param args   holders and replacer
      * @return the value found or default if none
      * @see #loadString(String, String, Player, boolean, String...) loadString(path,
@@ -484,7 +476,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      *
      * @param path  Path of the Object
      * @param def   Default object
-     * @param color Whether or not translate color codes
+     * @param color Whether translate color codes
      * @param args  holders and replacer
      * @return the value found or default if none
      * @see #getString(String, String, Player, boolean, String...) getString(path,
@@ -504,7 +496,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @param path   Path of the Object
      * @param def    Default object
      * @param target Player target for PlaceHolderAPI holders
-     * @param color  Whether or not translate color codes
+     * @param color  Whether translate color codes
      * @param args   holders and replacer
      * @return the value found or default if none
      * @see #get(String, Object, Class)
@@ -529,7 +521,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      *
      * @param path  Path of the Object
      * @param def   Default object
-     * @param color Whether or not translate color codes
+     * @param color Whether translate color codes
      * @return the value found or default if none
      * @deprecated use
      * {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
@@ -544,7 +536,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @param path   Path of the Object
      * @param def    Default object
      * @param target Player target for PlaceHolderAPI holders
-     * @param color  Whether or not translate color codes
+     * @param color  Whether translate color codes
      * @param args   holders and replacer
      * @return the value found or default if none
      * @deprecated use
@@ -574,7 +566,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      *
      * @param path  Path of the Object
      * @param def   Default object
-     * @param color Whether or not translate color codes
+     * @param color Whether translate color codes
      * @return the value found or default if none
      * @deprecated use
      * {@link YMLSection#loadMultiMessage(String, List, boolean, CommandSender, String...)}
@@ -589,7 +581,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @param path   Path of the Object
      * @param def    Default object
      * @param target Player target for PlaceHolderAPI holders
-     * @param color  Whether or not translate color codes
+     * @param color  Whether translate color codes
      * @param args   holders and replacer
      * @return the value found or default if none
      * @deprecated use
@@ -610,6 +602,9 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             return UtilsString.fix(get(path, def, List.class), target, color, args);
         } catch (Exception e) {
             e.printStackTrace();
+            if (def==null){
+                return List.of();
+            }
             return UtilsString.fix(def, target, color, args);
         }
     }
@@ -622,7 +617,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
      * @param defHover        Default hover message
      * @param defClickSuggest Default click suggestion
      * @param target          Player target for PlaceHolderAPI holders
-     * @param color           Whether or not translate color codes
+     * @param color           Whether translate color codes
      * @param holders         Additional placeholders to replace in the format
      *                        "holder1", "value1", "holder2", "value2"...
      * @return result component
@@ -640,10 +635,10 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         if (message == null || message.isEmpty())
             return null;
         if (holders.length > 0) {
-            String HOLDERS = "";
+            StringBuilder HOLDERS = new StringBuilder();
             for (int i = 0; i < holders.length; i += 2)
-                HOLDERS = HOLDERS + holders[i] + " ";
-            loadString(path + ".USABLE_HOLDERS", HOLDERS, false);
+                HOLDERS.append(holders[i]).append(" ");
+            loadString(path + ".USABLE_HOLDERS", HOLDERS.toString(), false);
         }
         String hover = loadString(path + ".hover", defHover == null ? "" : defHover, p, color, holders);
         String suggest = loadString(path + ".suggest", defClickSuggest == null ? "" : defClickSuggest, p, color,
@@ -695,6 +690,4 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                 section.set(key, value);
         }
     }
-
-
 }
