@@ -9,6 +9,7 @@ import emanondev.core.spigot.UpdateChecker;
 import emanondev.core.sql.SQLDatabase;
 import emanondev.core.sql.SQLType;
 import emanondev.core.utility.ConsoleHelper;
+import emanondev.core.utility.ReflectionUtility;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -54,12 +55,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     private BukkitAudiences adventure;
 
     @SuppressWarnings("unchecked")
-    private static HashMap<String, Command> getKnownCommands(Object object) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field objectField = SimpleCommandMap.class.getDeclaredField("knownCommands");
+    private static Map<String, Command> getKnownCommands(Object object) throws Exception {
+        Field objectField = ReflectionUtility.getDeclaredField(SimpleCommandMap.class,"knownCommands");
         objectField.setAccessible(true);
         Object result = objectField.get(object);
-        objectField.setAccessible(false);
-        return (HashMap<String, Command>) result;
+        ReflectionUtility.getFieldValue(object,"knownCommands");
+        return (Map<String, Command>) result;
     }
 
     public @NonNull BukkitAudiences adventure() {
@@ -505,18 +506,22 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
             bukkitCommandMap.setAccessible(true);
             CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
-            HashMap<String, Command> knownCommands = getKnownCommands(commandMap);
+            Map<String, Command> knownCommands = getKnownCommands(commandMap);
             List<String> keys = new ArrayList<>();
-            for (String key : knownCommands.keySet())
-                if (knownCommands.get(key).equals(command)) keys.add(key);
-            for (String key : keys)
+            for (String key : knownCommands.keySet()) {
+                if (knownCommands.get(key).equals(command)) {
+                    keys.add(key);
+                }
+            }
+            for (String key : keys) {
                 knownCommands.remove(key);
+            }
             command.unregister(commandMap);
             registeredCommands.remove(command);
             logDone("Unregistered command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE + " for "
                     + this.getName() + ", aliases: " + ChatColor.YELLOW
                     + Arrays.toString(command.getAliases().toArray()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logProblem("Unable to unregister command " + ChatColor.YELLOW + "/" + command.getName() + ChatColor.WHITE
                     + " for " + this.getName() + ", aliases: " + ChatColor.YELLOW
                     + Arrays.toString(command.getAliases().toArray()));
