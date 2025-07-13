@@ -5,12 +5,15 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
+
+import java.util.Random;
 
 public class ParticleUtility {
 
@@ -196,4 +199,24 @@ public class ParticleUtility {
         }
         return true;
     }
+
+    public static void generateParticleInRandomPointInSphere(@NotNull Particle particle, @NotNull Location location, @NotNull World world, double speed, int amount, double radius, boolean shouldStayOnBorders, @Nullable Object data) {
+        if(amount == 0) {
+            return;
+        }
+        Random random = new Random();
+        for(int i = 0; i < amount; i++) {
+            double x = random.nextDouble() * ((Math.random() < 0.5) ? -1 : 1);
+            double y = random.nextDouble() * ((Math.random() < 0.5) ? -1 : 1);
+            double z = random.nextDouble() * ((Math.random() < 0.5) ? -1 : 1);
+            Vector v = new Vector(x, y, z);
+            if(shouldStayOnBorders) {
+                v.normalize();
+            }
+            Vector offset = v.multiply(radius);
+            world.spawnParticle(particle, location.clone().add(offset), 0, 0, 0, 0, speed, data, true);
+        }
+    }
+
+
 }

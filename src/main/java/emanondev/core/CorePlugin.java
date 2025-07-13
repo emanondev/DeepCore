@@ -56,11 +56,12 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Command> getKnownCommands(Object object) throws Exception {
-        Field objectField = ReflectionUtility.getDeclaredField(SimpleCommandMap.class,"knownCommands");
-        objectField.setAccessible(true);
-        Object result = objectField.get(object);
-        ReflectionUtility.getFieldValue(object,"knownCommands");
-        return (Map<String, Command>) result;
+        SimpleCommandMap commandMap = (SimpleCommandMap) object;
+
+        Field field = ReflectionUtility.getDeclaredField(SimpleCommandMap.class, "knownCommands");
+        field.setAccessible(true);
+
+        return (Map<String, Command>) field.get(commandMap);
     }
 
     public @NonNull BukkitAudiences adventure() {
@@ -509,12 +510,14 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
             Map<String, Command> knownCommands = getKnownCommands(commandMap);
             List<String> keys = new ArrayList<>();
             for (String key : knownCommands.keySet()) {
-                if (knownCommands.get(key).equals(command)) {
+                if(knownCommands.get(key) == command) {
                     keys.add(key);
                 }
             }
             for (String key : keys) {
                 knownCommands.remove(key);
+                List<String> removedKeys = new ArrayList<>();
+                removedKeys.add(key);
             }
             command.unregister(commandMap);
             registeredCommands.remove(command);

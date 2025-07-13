@@ -274,6 +274,15 @@ public class ItemBuilder {
         return this;
     }
 
+    @Contract("_ -> this")
+    public ItemBuilder setMaxStackSize(final int amount) {
+        if (amount > 0 && amount<127)
+            this.resultMeta.setMaxStackSize(amount);
+        else
+            new IllegalStateException("invalid stack size (" + amount + ")").printStackTrace();
+        return this;
+    }
+
     @Contract(" -> new")
     public ItemBuilder clone() {
         ItemBuilder copy = new ItemBuilder(this.result);
