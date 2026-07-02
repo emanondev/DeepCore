@@ -2,6 +2,7 @@ package emanondev.core.gui;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +29,7 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
     private final T maxChangeAmount;
     private final T minChangeAmount;
     private final ItemStack base;
+    @Getter
     private T changeAmount;
     private Function<T, List<String>> baseDescription = null;
     private BiFunction<T, T, List<String>> fullDescription = null;
@@ -298,10 +300,6 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
 
     public void changeRequest(T value) {
         changeRequest.accept(value);
-    }
-
-    public T getChangeAmount() {
-        return changeAmount;
     }
 
     public void setChangeAmount(T changeAmount) {

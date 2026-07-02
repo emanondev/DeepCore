@@ -3,6 +3,8 @@ package emanondev.core.gui;
 import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
 import emanondev.core.message.DMessage;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +21,8 @@ public class StringEditorFButton extends AGuiButton {
     private final Consumer<String> setValue;
     private final Supplier<ItemStack> baseItem;
     private final boolean addInstructions;
+    @Setter
+    @Getter
     private String title = "&9Text editor";
 
     /**
@@ -70,14 +74,6 @@ public class StringEditorFButton extends AGuiButton {
     public DMessage getInstructionsDescription() {
         return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("textEditor.Instructions");
         //, List.of("&7[&fClick&7] &9Any &7> &9Change Text"))
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String value) {
-        title = value;
     }
 
     public String getValue() {

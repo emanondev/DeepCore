@@ -1,5 +1,6 @@
 package emanondev.core.sql;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +12,7 @@ import java.sql.Statement;
 
 public class SQLDatabase {
     // private final CorePlugin plugin;
+    @Getter
     private final SQLType type;
     private final String host;
     private final String user;
@@ -98,10 +100,6 @@ public class SQLDatabase {
 
     public String getUrl() {
         return type.getUrl(host, port, database);
-    }
-
-    public SQLType getType() {
-        return type;
     }
 
     public boolean update(String command) throws ClassNotFoundException, SQLException {

@@ -1,5 +1,6 @@
 package emanondev.core.events;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
@@ -10,9 +11,12 @@ import org.jetbrains.annotations.NotNull;
 public class EquipmentChangeEvent extends PlayerEvent {
 
     private static final HandlerList HANDLERS_LIST = new HandlerList();
+    @Getter
     private final ItemStack from;
+    @Getter
     private final ItemStack to;
     private final EquipmentSlot slot;
+    @Getter
     private final EquipMethod method;
 
     public EquipmentChangeEvent(Player who, EquipMethod method, EquipmentSlot slot, ItemStack from, ItemStack to) {
@@ -32,23 +36,9 @@ public class EquipmentChangeEvent extends PlayerEvent {
         return HANDLERS_LIST;
     }
 
-    public ItemStack getFrom() {
-        return from;
-    }
-
-
-    public ItemStack getTo() {
-        return to;
-    }
-
 
     public EquipmentSlot getSlotType() {
         return slot;
-    }
-
-
-    public EquipMethod getMethod() {
-        return method;
     }
 
 

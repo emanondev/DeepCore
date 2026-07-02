@@ -2,6 +2,8 @@ package emanondev.core.gui;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,6 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
+@Getter
 public abstract class TextEditorButton extends AGuiButton {
 
     private ItemStack baseItem = new ItemBuilder(Material.PAPER).setGuiProperty().build();
@@ -44,14 +48,6 @@ public abstract class TextEditorButton extends AGuiButton {
         return new ItemBuilder(baseItem).setDescription(getDescription(), true).build();
     }
 
-    public ItemStack getBaseItem() {
-        return baseItem;
-    }
-
-    public void setBaseItem(ItemStack item) {
-        baseItem = item;
-    }
-
     public List<String> getDescription() {
         List<String> desc = new ArrayList<>();
         desc.addAll(getBaseDescription());
@@ -76,14 +72,6 @@ public abstract class TextEditorButton extends AGuiButton {
 
     public List<String> getInstructionsDescription() {
         return List.of("&7[&fClick&7] &9Left &7> &9Change Text");
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String value) {
-        title = value;
     }
 
     public abstract String getValue();

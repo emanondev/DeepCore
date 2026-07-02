@@ -1,6 +1,7 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,10 +14,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public class PacketItemFrame extends PacketEntity {
+    @Getter
     private ItemStack item;
 
     private BlockFace facing;
 
+    @Getter
     private int frameRotation;
 
     public PacketItemFrame(Location location, PacketManager manager) {
@@ -74,10 +77,6 @@ public class PacketItemFrame extends PacketEntity {
         return 0.0F;
     }
 
-    public ItemStack getItem() {
-        return this.item;
-    }
-
     public PacketItemFrame setItem(ItemStack item) {
         this.item = item.clone();
         return this;
@@ -90,10 +89,6 @@ public class PacketItemFrame extends PacketEntity {
     public PacketItemFrame setFacingDirection(BlockFace facing) {
         this.facing = facing;
         return this;
-    }
-
-    public int getFrameRotation() {
-        return this.frameRotation;
     }
 
     public PacketItemFrame setFrameRotation(int rotation) {

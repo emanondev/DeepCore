@@ -1,5 +1,6 @@
 package emanondev.core.events;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -7,6 +8,7 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.inventory.ItemStack;
 
+@Getter
 abstract class CraftEvent extends InventoryEvent implements Cancellable {
     private final InventoryClickEvent clickEvent;
 
@@ -23,10 +25,6 @@ abstract class CraftEvent extends InventoryEvent implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         clickEvent.setCancelled(cancelled);
-    }
-
-    public InventoryClickEvent getClickEvent() {
-        return clickEvent;
     }
 
     public int getExpectedRecipeUses() {

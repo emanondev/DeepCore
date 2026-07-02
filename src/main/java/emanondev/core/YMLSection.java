@@ -1195,7 +1195,7 @@ public interface YMLSection extends ConfigurationSection {
         ItemMeta meta = def == null ? null : def.getItemMeta();
         return new ItemBuilder(section.getMaterial("material", def == null ? Material.STONE : def.getType()))
                 .hideAllFlags().addEnchantment(Enchantment.LURE, section.getBoolean("glow",
-                        def != null && def.getEnchantments().size() > 0) ? 1 : 0)
+                        def != null && !def.getEnchantments().isEmpty()) ? 1 : 0)
                 .setAmount(section.getInteger("amount", def == null ? 1 : def.getAmount()))
                 .setUnbreakable(section.getBoolean("unbreakable", def != null && meta.isUnbreakable()))
                 .setCustomModelData(section.getInteger("customModelData",

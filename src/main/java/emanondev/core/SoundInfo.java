@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -18,6 +19,7 @@ public class SoundInfo implements ConfigurationSerializable {
     private Sound sound;
     private float volume;
     private float pitch;
+    @Setter
     private boolean selfSound;
 
     /**
@@ -100,10 +102,6 @@ public class SoundInfo implements ConfigurationSerializable {
 
     public boolean getSelfSound() {
         return selfSound;
-    }
-
-    public void setSelfSound(boolean selfSound) {
-        this.selfSound = selfSound;
     }
 
     @Override

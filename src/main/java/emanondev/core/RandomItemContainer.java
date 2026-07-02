@@ -1,5 +1,6 @@
 package emanondev.core;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class RandomItemContainer<T> {
 
     private final List<T> items = new ArrayList<>();
     private final List<Integer> weights = new ArrayList<>();
+    @Getter
     private long fullWeight = 0;
 
     /**
@@ -102,10 +104,6 @@ public class RandomItemContainer<T> {
     @NotNull
     public List<Integer> getWeights() {
         return Collections.unmodifiableList(weights);
-    }
-
-    public long getFullWeight() {
-        return fullWeight;
     }
 
 }

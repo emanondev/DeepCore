@@ -117,7 +117,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     }
 
     public InventoryView getView() {
-        if (this.getInventory().getViewers().size() == 0)
+        if (this.getInventory().getViewers().isEmpty())
             return null;
         HumanEntity viewer = this.getInventory().getViewers().get(0);
         if (!(viewer instanceof Player))
@@ -136,7 +136,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         nextPageSlot = slot;
         if (nextPageSlot >= 0 && nextPageSlot < 9)
             controlButtons[nextPageSlot] = nextB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -162,7 +162,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         previousPageSlot = slot;
         if (previousPageSlot >= 0 && previousPageSlot < 9)
             controlButtons[previousPageSlot] = prevB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -177,7 +177,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         backGuiSlot = slot;
         if (backGuiSlot >= 0 && backGuiSlot < 9)
             controlButtons[backGuiSlot] = backB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -228,7 +228,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                 if (show.test(button.getValue()) && button.match(getRenameText()))
                     activeButtons.add(button);
 
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             reloadInventory();
         controlButtons[nextPageSlot] = nextB;
         controlButtons[previousPageSlot] = prevB;
@@ -328,7 +328,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         buttons.add(container);
         if (show == null || show.test(value)) {
             activeButtons.add(container);
-            if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+            if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
                 reloadInventory();
         }
     }
@@ -340,7 +340,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     public void clearElements() {
         buttons.clear();
         activeButtons.clear();
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             reloadInventory();
     }
 
@@ -354,7 +354,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                 added = true;
             }
         }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -368,7 +368,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                 added = true;
             }
         }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -383,7 +383,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                     added = true;
                 }
             }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -398,7 +398,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
                     added = true;
                 }
             }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 

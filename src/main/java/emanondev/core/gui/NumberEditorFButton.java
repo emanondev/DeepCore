@@ -4,6 +4,7 @@ import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
 import emanondev.core.message.DMessage;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,6 +27,7 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
     private final Supplier<ItemStack> baseItem;
     //private final Supplier<List<String>> baseDescription;
     //private final Supplier<List<String>> instructionsDescription;
+    @Getter
     private T changeAmount;
 
 
@@ -325,10 +327,6 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
 
     public void setValue(T value) {
         setValue.accept(value);
-    }
-
-    public T getChangeAmount() {
-        return changeAmount;
     }
 
     public void setChangeAmount(T changeAmount) {

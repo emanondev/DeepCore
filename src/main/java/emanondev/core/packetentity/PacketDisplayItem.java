@@ -1,6 +1,7 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.EntityType;
@@ -16,10 +17,13 @@ import java.util.Collection;
 public class PacketDisplayItem extends PacketEntity {
 
     private boolean hasShadow = false;
+    @Getter
     private float shadowStrength = 1;
+    @Getter
     private float shadowRadius = 0;
 
 
+    @Getter
     private float viewRangeBlocks = 32;
     private Display.Billboard billboard = Display.Billboard.FIXED;
     private ItemDisplay.ItemDisplayTransform displayTransform = ItemDisplay.ItemDisplayTransform.NONE;
@@ -47,18 +51,6 @@ public class PacketDisplayItem extends PacketEntity {
 
     public boolean hasShadow() {
         return this.hasShadow;
-    }
-
-    public float getShadowStrength() {
-        return this.shadowStrength;
-    }
-
-    public float getShadowRadius() {
-        return this.shadowRadius;
-    }
-
-    public float getViewRangeBlocks() {
-        return this.viewRangeBlocks;
     }
 
     @Contract("_->this")

@@ -3,6 +3,7 @@ package emanondev.core.gui;
 import emanondev.core.CorePlugin;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,6 +18,7 @@ import java.util.List;
 public abstract class TextEditorGui extends AnvilGui {
 
     private final BackButton back = new BackButton(this);
+    @Getter
     private String original;
     private String storedText = "";
     private String lastText;
@@ -180,10 +182,6 @@ public abstract class TextEditorGui extends AnvilGui {
     }
 
     public abstract void onTextConfirmed(String line);
-
-    public String getOriginal() {
-        return original;
-    }
 
     public void setOriginal(String value) {
         if (value == null)

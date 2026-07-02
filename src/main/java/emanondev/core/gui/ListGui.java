@@ -82,7 +82,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         nextPageSlot = slot;
         if (nextPageSlot >= 0 && nextPageSlot < 9)
             controlButtons[nextPageSlot] = nextB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -102,7 +102,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         previousPageSlot = slot;
         if (previousPageSlot >= 0 && previousPageSlot < 9)
             controlButtons[previousPageSlot] = prevB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -114,7 +114,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         backGuiSlot = slot;
         if (backGuiSlot >= 0 && backGuiSlot < 9)
             controlButtons[backGuiSlot] = backB;
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             updateControlButtons();
     }
 
@@ -196,7 +196,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
             for (int i = 0; i < buttons.size(); i++)
                 if (show.test(buttons.get(i).getValue()))
                     activeButtons.add(buttons.get(i));
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             reloadInventory();
     }
 
@@ -242,7 +242,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         buttons.add(container);
         if (show == null || show.test(value)) {
             activeButtons.add(container);
-            if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+            if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
                 reloadInventory();
         }
     }
@@ -254,7 +254,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     public void clearElements() {
         buttons.clear();
         activeButtons.clear();
-        if (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0)
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             reloadInventory();
     }
 
@@ -268,7 +268,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                 added = true;
             }
         }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -282,7 +282,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                 added = true;
             }
         }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -297,7 +297,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                     added = true;
                 }
             }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 
@@ -312,7 +312,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                     added = true;
                 }
             }
-        if (added && (!this.isUpdateOnOpen() || getInventory().getViewers().size() > 0))
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
     }
 

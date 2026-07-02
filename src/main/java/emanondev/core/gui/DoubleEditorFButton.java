@@ -4,6 +4,7 @@ import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
 import emanondev.core.message.DMessage;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +22,7 @@ public class DoubleEditorFButton extends AGuiButton {
     private final Consumer<Double> setValue;
     private final Supplier<ItemStack> baseItem;
     private final boolean addInstructions;
+    @Getter
     private double changeAmount;
 
     /**
@@ -140,10 +142,6 @@ public class DoubleEditorFButton extends AGuiButton {
 
     public void setValue(double value) {
         setValue.accept(value);
-    }
-
-    public double getChangeAmount() {
-        return changeAmount;
     }
 
     public void setChangeAmount(double changeAmount) {

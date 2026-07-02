@@ -3,6 +3,7 @@ package emanondev.core.packetentity;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import emanondev.core.message.DMessage;
+import lombok.Getter;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.Display;
@@ -17,9 +18,12 @@ import java.util.Objects;
 
 public class PacketHologram extends PacketEntity {
 
+    @Getter
     private boolean isSeeThrough = false;
     private boolean hasShadow = false;
+    @Getter
     private float shadowStrength = 1;
+    @Getter
     private float shadowRadius = 0;
     private DMessage text = null;
 
@@ -47,20 +51,8 @@ public class PacketHologram extends PacketEntity {
         getManager().updateHologram(players, this);
     }
 
-    public boolean isSeeThrough() {
-        return this.isSeeThrough;
-    }
-
     public boolean hasShadow() {
         return this.hasShadow;
-    }
-
-    public float getShadowStrength() {
-        return this.shadowStrength;
-    }
-
-    public float getShadowRadius() {
-        return this.shadowRadius;
     }
 
     public float getViewRangeBlocks() {

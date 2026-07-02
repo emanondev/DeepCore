@@ -9,7 +9,6 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -52,14 +51,6 @@ public final class ClipboardContainer implements Clipboard {
     public ClipboardContainer(Clipboard contained) {
         this.parent = contained;
         track();
-    }
-
-
-    private void track() {
-        if (parent instanceof ClipboardContainer)
-            return;
-        if (Hooks.isFAWEEnabled())
-            FAWECleaner.track(parent);
     }
 
     @Override
@@ -386,22 +377,6 @@ public final class ClipboardContainer implements Clipboard {
         return parent.apply(positions, filter);
     }
 
-    @Override
-    protected void finalize() {
-        try {
-            clean();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    private void clean() {
-        if (parent instanceof ClipboardContainer container)
-            container.clean();
-        else if (Hooks.isFAWEEnabled())
-            FAWECleaner.clean(parent);
-    }
-
     public BlockState getBlock(BlockVector3 position) {
         return parent.getBlock(position);
     }
@@ -476,7 +451,7 @@ public final class ClipboardContainer implements Clipboard {
 
     @Override
     public boolean tile(int x, int y, int z, FaweCompoundTag tile) throws WorldEditException {
-        return parent.tile(x,y,z,tile);
+        return parent.tile(x, y, z, tile);
     }
 
     public boolean fullySupports3DBiomes() {
@@ -521,6 +496,29 @@ public final class ClipboardContainer implements Clipboard {
 
     public Spliterator<BlockVector3> spliterator() {
         return parent.spliterator();
+    }
+
+    @Override
+    protected void finalize() {
+        try {
+            clean();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private void track() {
+        if (parent instanceof ClipboardContainer)
+            return;
+        if (Hooks.isFAWEEnabled())
+            FAWECleaner.track(parent);
+    }
+
+    private void clean() {
+        if (parent instanceof ClipboardContainer container)
+            container.clean();
+        else if (Hooks.isFAWEEnabled())
+            FAWECleaner.clean(parent);
     }
 
 }

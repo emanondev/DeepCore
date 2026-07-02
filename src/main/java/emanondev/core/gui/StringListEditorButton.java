@@ -3,6 +3,8 @@ package emanondev.core.gui;
 import emanondev.core.CoreMain;
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +21,8 @@ public abstract class StringListEditorButton extends AGuiButton {
     private Action action = Action.ADD_LINE;
     private int line;
     private String subTitle = "&9Line editor";
+    @Setter
+    @Getter
     private ItemStack baseItem = new ItemBuilder(Material.PAPER).setGuiProperty().build();
 
     public StringListEditorButton(Gui parent) {
@@ -152,14 +156,6 @@ public abstract class StringListEditorButton extends AGuiButton {
         if (item == null)
             return null;
         return new ItemBuilder(item).setDescription(getDescription()).build();
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem;
-    }
-
-    public void setBaseItem(ItemStack item) {
-        baseItem = item;
     }
 
     public List<String> getDescription() {

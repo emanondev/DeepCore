@@ -131,10 +131,6 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
     }
 
     @Override
-    public void onDrag(@NotNull InventoryDragEvent event) {
-    }
-
-    @Override
     public void updateInventory() {
         for (int i = 0; i < this.getInventory().getSize() - 9; i++) {
             GuiButton b = getButton(i);

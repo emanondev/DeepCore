@@ -1,6 +1,7 @@
 package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -22,7 +23,9 @@ public abstract class PacketEntity {
     protected Collection<Player> active = new HashSet<>();
     protected boolean shouldUpdateMeta = false;
     private Location location;
+    @Getter
     private boolean isSilent;
+    @Getter
     private boolean isVisible = true;
     private boolean shouldUpdatePosition = false;
 
@@ -36,10 +39,6 @@ public abstract class PacketEntity {
     }
 
     public abstract EntityType getType();
-
-    public boolean isVisible() {
-        return this.isVisible;
-    }
 
     @Contract("_->this")
     public PacketEntity setVisible(boolean visible) {
@@ -83,10 +82,6 @@ public abstract class PacketEntity {
         this.location = location.clone();
         shouldUpdatePosition = !active.isEmpty();
         return this;
-    }
-
-    public boolean isSilent() {
-        return isSilent;
     }
 
 

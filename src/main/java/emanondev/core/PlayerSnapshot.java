@@ -1,5 +1,7 @@
 package emanondev.core;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -30,28 +32,69 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
     private List<ItemStack> armor;
     private List<ItemStack> inventory;
     private List<ItemStack> enderChest;
+    @Setter
+    @Getter
     private Integer level;
+    @Setter
+    @Getter
     private Float experience;
     private Collection<PotionEffect> effects;
+    @Setter
+    @Getter
     private Integer foodLevel;
+    @Setter
+    @Getter
     private Float exhaustion;
+    @Setter
+    @Getter
     private Float saturation;
+    @Setter
+    @Getter
     private Double health;
+    @Setter
+    @Getter
     private Double absorbition;
+    @Setter
+    @Getter
     private Boolean allowFlight;
+    @Setter
+    @Getter
     private Boolean god;
+    @Setter
+    @Getter
     private Boolean collidable;
+    @Setter
+    @Getter
     private Boolean canPickupItems;
+    @Setter
+    @Getter
     private GameMode gameMode;
+    @Setter
+    @Getter
     private Float flySpeed;
+    @Setter
+    @Getter
     private Integer fireTicks;
+    @Setter
+    @Getter
     private Integer remainingAir;
+    @Setter
+    @Getter
     private Float walkSpeed;
+    @Setter
+    @Getter
     private Boolean flying;
     private List<ItemStack> extraContents;
+    //check on number validity
     //private Boolean invisible;
+    @Setter
+    @Getter
     private Integer heldItemSlot;
+    @Setter
+    @Getter
     private Integer freezeTicks;
+    @Setter
+    @Getter
     private Boolean glowing;
 
     public PlayerSnapshot() {
@@ -451,30 +494,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
 
     }
 
-    public Double getAbsorbition() {
-        return this.absorbition;
-    }
-
-    public void setAbsorbition(Double value) {
-        this.absorbition = value;
-    }
-
-    public Integer getRemainingAir() {
-        return this.remainingAir;
-    }
-
-    public void setRemainingAir(Integer value) {
-        this.remainingAir = value;
-    }
-
-    public Boolean getAllowFlight() {
-        return this.allowFlight;
-    }
-
-    public void setAllowFlight(Boolean value) {
-        this.allowFlight = value;
-    }
-
     public List<ItemStack> getArmor() {
         if (this.armor == null)
             return null;
@@ -521,78 +540,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         this.enderChest = value == null ? null : new ArrayList<>(value);
     }
 
-    public Float getExhaustion() {
-        return this.exhaustion;
-    }
-
-    public void setExhaustion(Float value) {
-        this.exhaustion = value;
-    }
-
-    public Float getExperience() {
-        return this.experience;
-    }
-
-    public void setExperience(Float value) {
-        this.experience = value;
-    }
-
-    public Integer getFireTicks() {
-        return this.fireTicks;
-    }
-
-    public void setFireTicks(Integer value) {
-        this.fireTicks = value;
-    }
-
-    public Boolean getFlying() {
-        return this.flying;
-    }
-
-    public void setFlying(Boolean value) {
-        this.flying = value;
-    }
-
-    public Float getFlySpeed() {
-        return this.flySpeed;
-    }
-
-    public void setFlySpeed(Float value) {
-        this.flySpeed = value;
-    }
-
-    public Integer getFoodLevel() {
-        return this.foodLevel;
-    }
-
-    public void setFoodLevel(Integer value) {
-        this.foodLevel = value;
-    }
-
-    public GameMode getGameMode() {
-        return this.gameMode;
-    }
-
-    public void setGameMode(GameMode value) {
-        this.gameMode = value;
-    }
-
-    public Boolean getGod() {
-        return this.god;
-    }
-
-    public void setGod(Boolean value) {
-        this.god = value;
-    }
-
-    public Double getHealth() {
-        return this.health;
-    }
-
-    public void setHealth(Double value) {
-        this.health = value;
-    }
-
     public List<ItemStack> getInventory() {
         if (this.inventory == null)
             return null;
@@ -603,14 +550,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         if (value != null && value.size() != 4 * 9)
             throw new IllegalArgumentException();
         this.inventory = value == null ? null : new ArrayList<>(value);
-    }
-
-    public Integer getLevel() {
-        return this.level;
-    }
-
-    public void setLevel(Integer value) {
-        this.level = value;
     }
 
     public Location getLocation() {
@@ -635,62 +574,6 @@ public class PlayerSnapshot implements ConfigurationSerializable, Cloneable {
         this.locationZ = isNull ? null : value.getZ();
         this.locationYaw = isNull ? null : value.getYaw();
         this.locationPitch = isNull ? null : value.getPitch();
-    }
-
-    public Float getSaturation() {
-        return this.saturation;
-    }
-
-    public void setSaturation(Float value) {
-        this.saturation = value;
-    }
-
-    public Float getWalkSpeed() {
-        return this.walkSpeed;
-    }
-
-    public void setWalkSpeed(Float value) {
-        this.walkSpeed = value;
-    }
-
-    public Integer getHeldItemSlot() {
-        return heldItemSlot;
-    }
-
-    public void setHeldItemSlot(Integer value) { //check on number validity
-        this.heldItemSlot = value;
-    }
-
-    public Integer getFreezeTicks() {
-        return this.freezeTicks;
-    }
-
-    public void setFreezeTicks(Integer value) {
-        this.freezeTicks = value;
-    }
-
-    public Boolean getGlowing() {
-        return this.glowing;
-    }
-
-    public void setGlowing(Boolean value) {
-        this.glowing = value;
-    }
-
-    public Boolean getCollidable() {
-        return this.collidable;
-    }
-
-    public void setCollidable(Boolean value) {
-        this.collidable = value;
-    }
-
-    public Boolean getCanPickupItems() {
-        return this.canPickupItems;
-    }
-
-    public void setCanPickupItems(Boolean value) {
-        this.canPickupItems = value;
     }
 
     @SuppressWarnings("unchecked")

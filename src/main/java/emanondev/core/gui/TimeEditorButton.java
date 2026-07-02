@@ -2,6 +2,7 @@ package emanondev.core.gui;
 
 import emanondev.core.ItemBuilder;
 import emanondev.core.UtilsString;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -22,6 +23,7 @@ public abstract class TimeEditorButton extends AGuiButton {
     private final Long minChangeAmount;
     private final long[] ranges = new long[]{1L, 10L, 60L, 600L, 3600L, 6 * 3600L, 24 * 3600L, 7 * 24 * 3600L,
             4 * 7 * 24 * 3600L, 54 * 7 * 24 * 3600L};
+    @Getter
     private Long changeAmount;
     private ItemStack base;
 
@@ -161,10 +163,6 @@ public abstract class TimeEditorButton extends AGuiButton {
     public abstract Long getValue();
 
     public abstract void onValueChange(Long value);
-
-    public Long getChangeAmount() {
-        return changeAmount;
-    }
 
     public void setChangeAmount(Long changeAmount) {
         if (changeAmount.doubleValue() < 0)

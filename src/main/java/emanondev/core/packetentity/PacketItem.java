@@ -2,6 +2,7 @@ package emanondev.core.packetentity;
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import emanondev.core.utility.VersionUtility;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
@@ -20,14 +21,19 @@ public class PacketItem extends PacketEntity {
 
     private boolean hasGravity;
 
+    @Getter
     private boolean isGlowing;
 
+    @Getter
     private int pickupDelay;
 
+    @Getter
     private BaseComponent customName;
 
+    @Getter
     private boolean customNameVisible;
 
+    @Getter
     private Vector velocity;
 
     PacketItem(Location location, PacketManager manager) {
@@ -51,10 +57,6 @@ public class PacketItem extends PacketEntity {
         getManager().updateItem(players, this);
     }
 
-    public BaseComponent getCustomName() {
-        return this.customName;
-    }
-
     public PacketItem setCustomName(String customName) {
         this.customName = new TextComponent(customName);
         return this;
@@ -65,17 +67,9 @@ public class PacketItem extends PacketEntity {
         return this;
     }
 
-    public boolean isGlowing() {
-        return this.isGlowing;
-    }
-
     public PacketItem setGlowing(boolean bool) {
         this.isGlowing = bool;
         return this;
-    }
-
-    public boolean isCustomNameVisible() {
-        return this.customNameVisible;
     }
 
     public PacketItem setCustomNameVisible(boolean bool) {
@@ -110,17 +104,9 @@ public class PacketItem extends PacketEntity {
         return this.hasGravity;
     }
 
-    public Vector getVelocity() {
-        return this.velocity;
-    }
-
     public PacketItem setVelocity(Vector vector) {
         this.velocity = vector.clone();
         return this;
-    }
-
-    public int getPickupDelay() {
-        return this.pickupDelay;
     }
 
     public PacketItem setPickupDelay(int pickupDelay) {

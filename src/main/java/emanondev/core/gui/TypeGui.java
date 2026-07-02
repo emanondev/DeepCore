@@ -2,6 +2,8 @@ package emanondev.core.gui;
 
 import emanondev.core.CorePlugin;
 import emanondev.core.UtilsString;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +21,18 @@ public class TypeGui implements Gui {
     private final InventoryType type;
     private final CorePlugin plugin;
     private final GuiButton[] buttons;
+    /**
+     * -- GETTER --
+     *
+     *
+     * -- SETTER --
+     *  Sets whenever the inventory should be updated when a player open it
+     *
+     @return true if the inventory is updated when a player open it
+      * @param value
+     */
+    @Setter
+    @Getter
     private boolean updateOnOpen = true;
 
     /**
@@ -82,22 +96,6 @@ public class TypeGui implements Gui {
         if (event.getRawSlot() >= 0 && event.getRawSlot() < getInventory().getSize())
             if (buttons[event.getRawSlot()] != null && buttons[event.getRawSlot()].onClick(event))
                 updateInventory();
-    }
-
-    /**
-     * @return true if the inventory is updated when a player open it
-     */
-    public boolean isUpdateOnOpen() {
-        return this.updateOnOpen;
-    }
-
-    /**
-     * Sets whenever the inventory should be updated when a player open it
-     *
-     * @param value
-     */
-    public void setUpdateOnOpen(boolean value) {
-        this.updateOnOpen = value;
     }
 
     @Override

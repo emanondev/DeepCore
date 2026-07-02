@@ -4,6 +4,7 @@ import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import emanondev.core.UtilsInventory;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -26,14 +27,19 @@ public class PacketArmorStand extends PacketEntity {
     private final EnumMap<EquipmentSlot, ItemStack> equip = new EnumMap<>(EquipmentSlot.class);
     private boolean hasArms;
     private boolean hasBasePlate;
+    @Getter
     private boolean isMarker;
     private boolean hasGravity;
+    @Getter
     private boolean isSmall;
+    @Getter
     private boolean isInvulnerable;
     private EulerAngle rightArmPose;
     private EulerAngle headPose;
+    @Getter
     private BaseComponent customName;
 
+    @Getter
     private boolean customNameVisible;
 
     private Vector velocity;
@@ -96,10 +102,6 @@ public class PacketArmorStand extends PacketEntity {
         getManager().updateArmorStand(players, this);
     }
 
-    public BaseComponent getCustomName() {
-        return this.customName;
-    }
-
     @Contract("_->this")
     public PacketArmorStand setCustomName(@NotNull String customName) {
         this.customName = new TextComponent(customName);
@@ -110,10 +112,6 @@ public class PacketArmorStand extends PacketEntity {
     public PacketArmorStand setCustomName(@Nullable BaseComponent customName) {
         this.customName = customName;
         return this;
-    }
-
-    public boolean isCustomNameVisible() {
-        return this.customNameVisible;
     }
 
     @Contract("_->this")
@@ -151,10 +149,6 @@ public class PacketArmorStand extends PacketEntity {
         return this.hasBasePlate;
     }
 
-    public boolean isMarker() {
-        return this.isMarker;
-    }
-
     @Contract("_->this")
     public PacketArmorStand setMarker(boolean bool) {
         if (this.isMarker != bool) {
@@ -169,10 +163,6 @@ public class PacketArmorStand extends PacketEntity {
         return this.hasGravity;
     }
 
-    public boolean isSmall() {
-        return this.isSmall;
-    }
-
     @Contract("_->this")
     public PacketArmorStand setSmall(boolean bool) {
         if (this.isSmall != bool) {
@@ -180,10 +170,6 @@ public class PacketArmorStand extends PacketEntity {
             this.isSmall = bool;
         }
         return this;
-    }
-
-    public boolean isInvulnerable() {
-        return this.isInvulnerable;
     }
 
     @Contract("_->this")
