@@ -231,7 +231,7 @@ public final class WorldEditUtility {
             return null;
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
+        return new BoundingBox(min.x(), min.y(), min.z(), max.x(), max.y(), max.z());
     }
 
     /**
@@ -246,7 +246,7 @@ public final class WorldEditUtility {
             return null;
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        return new BoundingBox(min.getX(), min.getY(), min.getZ(), max.getX() + 1, max.getY() + 1, max.getZ() + 1);
+        return new BoundingBox(min.x(), min.y(), min.z(), max.x() + 1, max.y() + 1, max.z() + 1);
     }
 
 
