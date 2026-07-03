@@ -50,7 +50,7 @@ public class SpawnReasonTracker implements Listener {
             if (!entity.hasMetadata(metaName))
                 throw new NullPointerException();
             List<MetadataValue> list = entity.getMetadata(metaName);
-            return SpawnReason.valueOf(list.get(0).asString());
+            return SpawnReason.valueOf(list.getFirst().asString());
         } catch (Exception e) {
             return SpawnReason.DEFAULT;
         }

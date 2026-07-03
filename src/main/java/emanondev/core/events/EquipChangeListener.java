@@ -329,7 +329,7 @@ public class EquipChangeListener implements Listener {
         if (slots.isEmpty())
             throw new IllegalStateException();
         if (slots.size() == 1) {
-            onEquipChange(e.getPlayer(), EquipMethod.BROKE, slots.get(0), e.getBrokenItem(), null);
+            onEquipChange(e.getPlayer(), EquipMethod.BROKE, slots.getFirst(), e.getBrokenItem(), null);
             return;
         }
         new SlotCheck(e.getPlayer(), EquipMethod.BROKE, slots).runTaskLater(plugin, 1L);
@@ -358,7 +358,7 @@ public class EquipChangeListener implements Listener {
         if (event.getItem().equals(event.getPlayer().getInventory().getItem(EquipmentSlot.OFF_HAND)))
             slots.add(EquipmentSlot.OFF_HAND);
         if (slots.size() == 1)
-            onEquipChange(event.getPlayer(), EquipMethod.CONSUME, slots.get(0), event.getItem(),
+            onEquipChange(event.getPlayer(), EquipMethod.CONSUME, slots.getFirst(), event.getItem(),
                     event.getItem().getType() == Material.MILK_BUCKET ? new ItemStack(Material.BUCKET) : null);
         else if (slots.size() > 1)
             new SlotCheck(event.getPlayer(), EquipMethod.CONSUME, slots).runTaskLater(plugin, 1L);

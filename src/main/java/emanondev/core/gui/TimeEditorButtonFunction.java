@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -81,14 +82,8 @@ public class TimeEditorButtonFunction extends AGuiButton {
         this.grabValue = grabValue;
         this.base = base == null ? new ItemBuilder(Material.REPEATER).setGuiProperty().build() : new ItemBuilder(base).setGuiProperty().build();
         this.changeAmount = changeAmountBase == null ? 60L : changeAmountBase;
-        if (maxChangeValue == null) {
-            this.maxChangeAmount = Long.MAX_VALUE;
-        } else
-            this.maxChangeAmount = maxChangeValue;
-        if (minChangeValue == null) {
-            this.minChangeAmount = 1L;
-        } else
-            this.minChangeAmount = minChangeValue;
+        this.maxChangeAmount = Objects.requireNonNullElse(maxChangeValue, Long.MAX_VALUE);
+        this.minChangeAmount = Objects.requireNonNullElse(minChangeValue, 1L);
         checkBounds();
     }
 
@@ -200,9 +195,11 @@ public class TimeEditorButtonFunction extends AGuiButton {
     }
 
     private Long multiply() {
-        for (int i = 0; i < ranges.length; i++)
-            if (ranges[i] > this.changeAmount)
-                return bound(ranges[i]);
+        for (long range : ranges) {
+            if (range > this.changeAmount) {
+                return bound(range);
+            }
+        }
         return bound(ranges[ranges.length - 1]);
     }
 

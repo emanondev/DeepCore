@@ -25,7 +25,7 @@ import org.bukkit.potion.PotionEffectType;
 @Deprecated
 public class PlayerBuyMerchantRecipeEvent extends PlayerEvent implements Cancellable {
     private static final HandlerList HANDLERS_LIST = new HandlerList();
-    private InventoryClickEvent clickEvent;
+    private final InventoryClickEvent clickEvent;
 
     public PlayerBuyMerchantRecipeEvent(InventoryClickEvent event) {
         super((Player) event.getWhoClicked());

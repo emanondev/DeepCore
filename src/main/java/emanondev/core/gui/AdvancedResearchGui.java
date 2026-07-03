@@ -119,7 +119,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     public InventoryView getView() {
         if (this.getInventory().getViewers().isEmpty())
             return null;
-        HumanEntity viewer = this.getInventory().getViewers().get(0);
+        HumanEntity viewer = this.getInventory().getViewers().getFirst();
         if (!(viewer instanceof Player))
             return null;
         return viewer.getOpenInventory();
@@ -191,7 +191,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
      */
     @Override
     public boolean setPage(int pag) {
-        pag = Math.min(Math.max(1, pag), getMaxPage());
+        pag = Math.clamp(pag, 1, getMaxPage());
         if (pag == page)
             return false;
         page = pag;

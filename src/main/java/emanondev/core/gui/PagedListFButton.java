@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class PagedListFButton<T extends Object> extends AGuiButton {
+public class PagedListFButton<T> extends AGuiButton {
 
     private final PagedListFGui<T> pagedListFGui;
     private final Supplier<ItemStack> getItem;
@@ -22,7 +22,7 @@ public class PagedListFButton<T extends Object> extends AGuiButton {
                             @Nullable BiFunction<InventoryClickEvent, T, Boolean> onClickItem, @NotNull Function<T, ItemStack> getElementItem) {
         super(gui);
         this.getItem = getItem;
-        pagedListFGui = new PagedListFGui<T>(title, rows, getGui().getTargetPlayer(), getGui(),
+        pagedListFGui = new PagedListFGui<>(title, rows, getGui().getTargetPlayer(), getGui(),
                 getGui().getPlugin(), timerUpdate,
                 onClickItem, getElementItem);
     }

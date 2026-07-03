@@ -27,7 +27,7 @@ public class SoundAction extends Action {
             if (Float.parseFloat(args[2]) <= 0)
                 throw new IllegalStateException();
         }
-        if (args.length >= 4) {
+        if (args.length == 4) {
             switch (args[3].toLowerCase(Locale.ENGLISH)) {
                 case "true":
                 case "false":

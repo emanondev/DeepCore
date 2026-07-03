@@ -20,7 +20,7 @@ public abstract class PacketEntity {
     private final UUID uuid;
     private final PacketManager manager;
     protected WrappedDataWatcher dataWatcher;
-    protected Collection<Player> active = new HashSet<>();
+    protected final Collection<Player> active = new HashSet<>();
     protected boolean shouldUpdateMeta = false;
     private Location location;
     @Getter

@@ -42,8 +42,7 @@ public class CustomEventListener implements Listener {
 
     private static void checkResult(InventoryClickEvent event) {
         switch (event.getClick()) {
-            case LEFT:
-            case RIGHT: {
+            case LEFT, RIGHT -> {
                 if (event.getCursor() != null && !event.getCursor().getType().isAir()) {
                     if (!event.getCurrentItem().isSimilar(event.getCursor()))
                         return;
@@ -52,10 +51,8 @@ public class CustomEventListener implements Listener {
                         return;
                 }
                 craftResultEvent(event);
-                return;
             }
-            case SHIFT_LEFT:
-            case SHIFT_RIGHT: {
+            case SHIFT_LEFT, SHIFT_RIGHT -> {
                 if (event.getView().getBottomInventory().firstEmpty() == -1) {
                     for (ItemStack item : event.getView().getBottomInventory().getStorageContents()) {
                         if (event.getCurrentItem().isSimilar(item) && item.getAmount() != item.getMaxStackSize()) {
@@ -65,25 +62,20 @@ public class CustomEventListener implements Listener {
                     }
                 } else
                     craftResultEvent(event);
-                return;
             }
-            case NUMBER_KEY: {
+            case NUMBER_KEY -> {
                 ItemStack barItem = event.getView().getBottomInventory().getItem(event.getHotbarButton());
                 if (barItem != null && !barItem.getType().isAir())
                     return;
                 craftResultEvent(event);
-                return;
             }
-            case DROP: {
+            case DROP-> {
                 if (event.getCursor() != null && !event.getCursor().getType().isAir())
                     return;
                 // if (event.getCurrentItem()==null || event.getCursor().getType().isAir())
                 // return;
                 craftResultEvent(event);
-                return;
             }
-            default:
-                return;
         }
     }
 

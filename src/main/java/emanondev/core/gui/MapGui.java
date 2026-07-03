@@ -17,7 +17,7 @@ public class MapGui extends ChestGui {
      * will replace with array GuiButton[rows*9]
      */
     @Deprecated
-    protected HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
+    protected final HashMap<Integer, GuiButton> buttonsMap = new HashMap<>();
 
     /**
      * @param title

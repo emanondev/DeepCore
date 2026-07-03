@@ -323,14 +323,14 @@ public class ItemBuilder {
             this.resultMeta.setDisplayName(null);
             this.resultMeta.setLore(null);
         } else if (list.size() == 1) {
-            this.resultMeta.setDisplayName(list.get(0));
+            this.resultMeta.setDisplayName(list.getFirst());
             this.resultMeta.setLore(null);
         } else {
             try {
-                this.resultMeta.setDisplayName(list.remove(0));
+                this.resultMeta.setDisplayName(list.removeFirst());
             } catch (UnsupportedOperationException e) {
                 list = new ArrayList<>(list);
-                this.resultMeta.setDisplayName(list.remove(0));
+                this.resultMeta.setDisplayName(list.removeFirst());
             }
             this.resultMeta.setLore(list);
         }
@@ -373,16 +373,16 @@ public class ItemBuilder {
         } else if (list.size() == 1) {
             this.resultMeta.setLore(null);
             Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
-            map.put("display-name", format(list.get(0)));
+            map.put("display-name", format(list.getFirst()));
             map.put("==", "ItemMeta");
             this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
         } else {
             Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
             try {
-                map.put("display-name", format(list.remove(0)));
+                map.put("display-name", format(list.removeFirst()));
             } catch (UnsupportedOperationException e) {
                 list = new ArrayList<>(list);
-                map.put("display-name", format(list.remove(0)));
+                map.put("display-name", format(list.removeFirst()));
             }
             for (int i = 0; i < list.size(); i++)
                 list.set(i, format(list.get(i)));
@@ -489,14 +489,14 @@ public class ItemBuilder {
         if (list.size() == 1) {
             this.resultMeta.setLore(null);
             Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
-            map.put("display-name", list.get(0));
+            map.put("display-name", list.getFirst());
             map.put("==", "ItemMeta");
             this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);
             return this;
         }
         list = new ArrayList<>(list);
         Map<String, Object> map = new LinkedHashMap<>(resultMeta.serialize());
-        map.put("display-name", list.remove(0));
+        map.put("display-name", list.removeFirst());
         map.put("lore", list);
         map.put("==", "ItemMeta");
         this.resultMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(map);

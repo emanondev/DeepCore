@@ -34,9 +34,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import emanondev.core.Hooks;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -106,7 +106,7 @@ public final class ClipboardContainer implements Clipboard {
         return parent.iterator(order);
     }
 
-    @Nonnull
+    @NotNull
     public Iterator<BlockVector3> iterator() {
         return parent.iterator();
     }

@@ -3,12 +3,12 @@ main: ${groupId}.CoreMain
 version: ${project.version}
 author: emanon
 api-version: 1.13
-softdepend: [ SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny,ItemEdit,MythicMobs,DracarysGui,FastAsyncWorldEdit ]
+softdepend: [ SuperVanish,PremiumVanish,PlaceholderAPI,VirginBlock,Vault,ProtocolLib,CMI,Towny,ItemEdit,MythicMobs,FastAsyncWorldEdit ]
 
 
 libraries:
-  - net.kyori:adventure-api:4.16.0
-  - net.kyori:adventure-platform-bukkit:4.3.2
-  - net.kyori:adventure-text-minimessage:4.16.0
-  - net.kyori:adventure-text-serializer-gson:4.16.0
-  - net.kyori:adventure-text-serializer-legacy:4.16.0
+  - net.kyori:adventure-api:5.1.1
+  - net.kyori:adventure-platform-bukkit:4.4.1
+  - net.kyori:adventure-text-minimessage:5.1.1
+  - net.kyori:adventure-text-serializer-gson:5.1.1
+  - net.kyori:adventure-text-serializer-legacy:5.1.1

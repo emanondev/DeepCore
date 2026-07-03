@@ -92,7 +92,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     }
 
     /**
-     * Fix the given name for a yaml file name
+     * Fix the given name for a YAML file name
      *
      * @param name the raw name of the file with or without <code>.yml</code>
      * @return fixed name

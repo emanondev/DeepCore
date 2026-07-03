@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -43,18 +42,6 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
         updateInventory();
     }
 
-    protected abstract void addStartButtons();
-
-    /**
-     * override to change position (default 2) last line slot 0 to 8 or anything
-     * else if you won't show, warning this method is called in the constructor
-     *
-     * @return position
-     */
-    protected int loadPreviousPageButtonPosition() {
-        return 2;
-    }
-
     /**
      * control buttons are the last line buttons
      *
@@ -69,30 +56,10 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
     }
 
     /**
-     * override to change position (default 6) last line slot 0 to 8 or anything
-     * else if you won't show, warning this method is called in the constructor
-     *
-     * @return position
-     */
-    protected int loadNextPageButtonPosition() {
-        return 6;
-    }
-
-    /**
-     * override to change position (default 8) last line slot 0 to 8 or anything
-     * else if you won't show, warning this method is called in the constructor
-     *
-     * @return position
-     */
-    protected int loadBackButtonPosition() {
-        return 8;
-    }
-
-    /**
      * returns true if the page changed
      */
     public boolean setPage(int pag) {
-        pag = Math.min(Math.max(1, pag), getMaxPage());
+        pag = Math.clamp(pag, 1, getMaxPage());
         if (pag == page)
             return false;
         page = pag;
@@ -111,13 +78,6 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
      */
     public int getMaxPage() {
         return (buttons.size() - 1) / (getInventory().getSize() - 9) + 1;
-    }
-
-    protected void reloadInventory() {
-        updateInventory();
-        for (int i = 0; i < 9; i++)
-            if (controlGuiButtons[i] != null)
-                getInventory().setItem(getInventory().getSize() - 9 + i, controlGuiButtons[i].getItem());
     }
 
     @Override
@@ -162,6 +122,45 @@ public abstract class PagedChestGui extends ChestGui implements PagedGui {
     @Override
     public void addButton(@NotNull GuiButton button) {
         buttons.add(button);
+    }
+
+    protected abstract void addStartButtons();
+
+    /**
+     * override to change position (default 2) last line slot 0 to 8 or anything
+     * else if you won't show, warning this method is called in the constructor
+     *
+     * @return position
+     */
+    protected int loadPreviousPageButtonPosition() {
+        return 2;
+    }
+
+    /**
+     * override to change position (default 6) last line slot 0 to 8 or anything
+     * else if you won't show, warning this method is called in the constructor
+     *
+     * @return position
+     */
+    protected int loadNextPageButtonPosition() {
+        return 6;
+    }
+
+    /**
+     * override to change position (default 8) last line slot 0 to 8 or anything
+     * else if you won't show, warning this method is called in the constructor
+     *
+     * @return position
+     */
+    protected int loadBackButtonPosition() {
+        return 8;
+    }
+
+    protected void reloadInventory() {
+        updateInventory();
+        for (int i = 0; i < 9; i++)
+            if (controlGuiButtons[i] != null)
+                getInventory().setItem(getInventory().getSize() - 9 + i, controlGuiButtons[i].getItem());
     }
 
 }

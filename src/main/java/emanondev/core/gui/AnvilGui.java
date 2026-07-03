@@ -21,7 +21,7 @@ public abstract class AnvilGui implements TextGui {
     private boolean timerUpdated = false;
 
     /**
-     * Create a anvil-type gui
+     * Create an anvil-type gui
      *
      * @param title          the raw title
      * @param p              target player
@@ -37,7 +37,7 @@ public abstract class AnvilGui implements TextGui {
 
 
     /**
-     * Create a anvil-type gui
+     * Create an anvil-type gui
      *
      * @param title          the raw title
      * @param p              target player
@@ -49,7 +49,7 @@ public abstract class AnvilGui implements TextGui {
     }
 
     /**
-     * Create a anvil-type gui
+     * Create an anvil-type gui
      *
      * @param title          the raw title
      * @param p              target player

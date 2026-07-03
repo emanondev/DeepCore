@@ -568,7 +568,7 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
      * on {@link #onReload()} method use {@link YMLConfig} constructor.<br>
      * Auto-append ".yml" to file name if not present.
      *
-     * @param fileName might contains folder separator for file inside folders
+     * @param fileName might contain folder separator for file inside folders
      * @return config file at specified path inside plugin folder.
      */
     public @NotNull YMLConfig getConfig(@NotNull String fileName) {

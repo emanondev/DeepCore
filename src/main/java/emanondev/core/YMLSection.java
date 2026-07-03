@@ -1358,7 +1358,7 @@ public interface YMLSection extends ConfigurationSection {
 
     /**
      * Returns target object or default.<br>
-     * This method works like {@link #getDouble(String)} (String)} but also keep tracks of null objects:
+     * This method works like {@link #getDouble(String)} but also keep tracks of null objects:
      * notify console and leave track on a file if object is null.
      * This method helps the developer to find and fix not generated default configurations, without hardcoding defaults.
      * WARNINGS: do not use this method for objects which may be null nor for objects not supposed to be on default configurations.

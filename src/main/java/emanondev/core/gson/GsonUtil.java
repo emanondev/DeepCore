@@ -33,43 +33,51 @@ public class GsonUtil {
     private static Object fix(Object o) {
         if (o == null)
             return null;
-        if (o instanceof Integer || o instanceof Short || o instanceof Long)
-            return Collections.singletonMap(SERIALIZED_INT_KEY, o);
-        if (o instanceof Float)
-            return Collections.singletonMap(SERIALIZED_FLOAT_KEY, o);
-        if (o instanceof ConfigurationSerializable s) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(s.getClass()));
-            map.putAll((Map<String, Object>) fix(s.serialize()));
-            return map;
-        }
-        if (o instanceof Map subMap) {
-            boolean hasWeirdValues = false;
-            for (Object v : subMap.values())
-                if (isWeird(v)) {
-                    hasWeirdValues = true;
-                    break;
+        return switch (o) {
+            case Integer i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
+            case Short i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
+            case Long i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
+            case Float aFloat ->
+                 Collections.singletonMap(SERIALIZED_FLOAT_KEY, o);
+
+            case ConfigurationSerializable s -> {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(s.getClass()));
+                map.putAll((Map<String, Object>) fix(s.serialize()));
+                yield map;
+            }
+            case Map subMap -> {
+                boolean hasWeirdValues = false;
+                for (Object v : subMap.values()) {
+                    if (isWeird(v)) {
+                        hasWeirdValues = true;
+                        break;
+                    }
                 }
-            if (!hasWeirdValues)
-                return o;
-            Map map = new LinkedHashMap();
-            subMap.forEach((k, v) -> map.put(k, fix(v)));
-            return map;
-        }
-        if (o instanceof Collection collection) {
-            boolean hasWeirdValues = false;
-            for (Object v : collection)
-                if (isWeird(v)) {
-                    hasWeirdValues = true;
-                    break;
+                if (!hasWeirdValues) {
+                    yield o;
                 }
-            if (!hasWeirdValues)
-                return o;
-            List list = new ArrayList();
-            collection.forEach((v) -> list.add(fix(v)));
-            return list;
-        }
-        return o; //hopefully a double or a string
+                Map map = new LinkedHashMap();
+                subMap.forEach((k, v) -> map.put(k, fix(v)));
+                yield map;
+            }
+            case Collection collection -> {
+                boolean hasWeirdValues = false;
+                for (Object v : collection) {
+                    if (isWeird(v)) {
+                        hasWeirdValues = true;
+                        break;
+                    }
+                }
+                if (!hasWeirdValues) {
+                    yield o;
+                }
+                List list = new ArrayList();
+                collection.forEach((v) -> list.add(fix(v)));
+                yield list;
+            }
+            default -> o;//hopefully a double or a string
+        };
     }
 
     private static boolean isWeird(Object o) {

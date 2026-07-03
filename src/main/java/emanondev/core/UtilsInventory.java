@@ -91,22 +91,22 @@ public final class UtilsInventory {
         if (remains == 0)
             return amount;
 
-        switch (mode) {
-            case DELETE_EXCESS:
-                return amount - remains;
-            case DROP_EXCESS:
+        return switch (mode) {
+            case DELETE_EXCESS -> amount - remains;
+            case DROP_EXCESS -> {
                 while (remains > 0) {
                     int drop = Math.min(remains, 64);
                     item.setAmount(drop);
                     player.getWorld().dropItem(player.getEyeLocation(), item);
                     remains -= drop;
                 }
-                return amount;
-            case CANCEL:
+                yield amount;
+            }
+            case CANCEL -> {
                 removeAmount(player, item, amount - remains, LackManage.REMOVE_MAX_POSSIBLE);
-                return 0;
-        }
-        throw new IllegalArgumentException();
+                yield 0;
+            }
+        };
     }
 
     /**

@@ -35,13 +35,6 @@ public class Translations {
         return "<tr:" + path + ">";
     }
 
-    /*
-
-     public static String get(@NotNull Translatable tr) {
-     return getTranslation(tr.getTranslationKey());
-     }
-     */
-
     private static @NotNull String format(@NotNull Keyed keyed) {
         return keyed.getKey().getNamespace() + "." + keyed.getKey().getKey();
     }

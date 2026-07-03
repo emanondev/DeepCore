@@ -48,7 +48,7 @@ public class ResearchFButton<T> extends AGuiButton {
     /**
      * @param parent
      * @param getItem             create the item for this button
-     * @param shouldOverrideClick true if should override override click
+     * @param shouldOverrideClick if true should override click
      * @param overrideClick       if override click handle click
      * @param match               select which string match which elements
      * @param elementClick        what happens when clicked

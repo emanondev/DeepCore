@@ -18,10 +18,6 @@ import java.util.function.Supplier;
 
 
 @Deprecated
-/**
- *
- * @see StringEditorFButton
- */
 public class TextEditorFButton extends AGuiButton {
 
     private final Supplier<String> getValue;

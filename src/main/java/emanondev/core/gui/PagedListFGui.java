@@ -107,7 +107,7 @@ public class PagedListFGui<T> extends ChestGui implements PagedGui {
      * returns true if the page changed
      */
     public boolean setPage(int pag) {
-        pag = Math.min(Math.max(1, pag), getMaxPage());
+        pag = Math.clamp(pag, 1, getMaxPage());
         if (pag == page)
             return false;
         page = pag;
@@ -130,21 +130,6 @@ public class PagedListFGui<T> extends ChestGui implements PagedGui {
     public void setShowPredicate(Predicate<T> showP) {
         this.show = showP;
         recalculateButtons();
-    }
-
-    private void recalculateButtons() {
-        activeButtons.clear();
-        if (show == null)
-            activeButtons.addAll(buttons);
-        else
-            for (int i = 0; i < buttons.size(); i++)
-                if (show.test(buttons.get(i).getValue()))
-                    activeButtons.add(buttons.get(i));
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            reloadInventory();
-        controlButtons[nextPageSlot] = nextB;
-        controlButtons[previousPageSlot] = prevB;
-        controlButtons[backGuiSlot] = backB;
     }
 
     public void sort(@NotNull Comparator<T> comparator) {
@@ -305,6 +290,24 @@ public class PagedListFGui<T> extends ChestGui implements PagedGui {
             }
         if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
+    }
+
+    private void recalculateButtons() {
+        activeButtons.clear();
+        if (show == null) {
+            activeButtons.addAll(buttons);
+        } else {
+            for (ContainerButton button : buttons) {
+                if (show.test(button.getValue())) {
+                    activeButtons.add(button);
+                }
+            }
+        }
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            reloadInventory();
+        controlButtons[nextPageSlot] = nextB;
+        controlButtons[previousPageSlot] = prevB;
+        controlButtons[backGuiSlot] = backB;
     }
 
     private class ContainerButton implements GuiButton {

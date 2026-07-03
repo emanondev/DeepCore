@@ -35,26 +35,29 @@ public abstract class StringListEditorButton extends AGuiButton {
 
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
-        switch (event.getClick()) {
-            case LEFT:
+        return switch (event.getClick()) {
+            case LEFT -> {
                 setLine(getLine() - 1);
-                return true;
-            case RIGHT:
+                yield true;
+            }
+            case RIGHT -> {
                 setLine(getLine() + 1);
-                return true;
-            case MIDDLE:
+                yield true;
+            }
+            case MIDDLE -> {
                 applyAction();
-                return true;
-            case SHIFT_LEFT:
+                yield true;
+            }
+            case SHIFT_LEFT -> {
                 action = Action.values()[(action.ordinal() - 1 + Action.values().length) % Action.values().length];
-                return true;
-            case SHIFT_RIGHT:
+                yield true;
+            }
+            case SHIFT_RIGHT -> {
                 action = Action.values()[(action.ordinal() + 1 + Action.values().length) % Action.values().length];
-                return true;
-            default:
-                break;
-        }
-        return false;
+                yield true;
+            }
+            default -> false;
+        };
     }
 
     private int getLine() {
@@ -63,7 +66,7 @@ public abstract class StringListEditorButton extends AGuiButton {
             action = Action.ADD_LINE;
             return 0;
         }
-        int r = Math.min(value.size(), Math.max(0, line));
+        int r = Math.clamp(line, 0, value.size());
         if (r == value.size())
             action = Action.ADD_LINE;
         if (r == 0 && action == Action.MOVE_UP)

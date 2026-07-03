@@ -247,7 +247,7 @@ public class PacketArmorStand extends PacketEntity {
         bitmask = !this.isVisible() ? (byte) (bitmask | 0x20) : bitmask;
         dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, WatchableCollection.byteSerializer), bitmask);
 
-        if (this.getCustomName() != null && !this.getCustomName().toPlainText().equals(""))
+        if (this.getCustomName() != null && !this.getCustomName().toPlainText().isEmpty())
             dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, WatchableCollection.optChatSerializer), Optional.of(WrappedChatComponent.fromJson(ComponentSerializer.toString(this.getCustomName())).getHandle()));
         else
             dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, WatchableCollection.optChatSerializer), Optional.empty());

@@ -148,7 +148,7 @@ public class PagedMapGui extends ChestGui implements PagedGui {
      * returns true if the page changed
      */
     public boolean setPage(int pag) {
-        pag = Math.min(Math.max(1, pag), getMaxPage());
+        pag = Math.clamp(pag, 1, getMaxPage());
         if (pag == page)
             return false;
         page = pag;

@@ -52,11 +52,12 @@ public class Metrics {
             config
                     .options()
                     .header(
-                            "bStats (https://bStats.org) collects some basic information for plugin authors, like how\n"
-                                    + "many people use their plugin and their total player count. It's recommended to keep bStats\n"
-                                    + "enabled, but if you're not comfortable with this, you can turn this setting off. There is no\n"
-                                    + "performance penalty associated with having metrics enabled, and data sent to bStats is fully\n"
-                                    + "anonymous.")
+                            """
+                                    bStats (https://bStats.org) collects some basic information for plugin authors, like how
+                                    many people use their plugin and their total player count. It's recommended to keep bStats
+                                    enabled, but if you're not comfortable with this, you can turn this setting off. There is no
+                                    performance penalty associated with having metrics enabled, and data sent to bStats is fully
+                                    anonymous.""")
                     .copyDefaults(true);
             try {
                 config.save(configFile);
@@ -178,14 +179,14 @@ public class Metrics {
          * @param appendServiceDataConsumer   A consumer that receives a {@code JsonObjectBuilder} and
          *                                    appends all service-specific data.
          * @param submitTaskConsumer          A consumer that takes a runnable with the submit task. This can be
-         *                                    used to delegate the data collection to a another thread to prevent errors caused by
+         *                                    used to delegate the data collection to another thread to prevent errors caused by
          *                                    concurrency. Can be {@code null}.
          * @param checkServiceEnabledSupplier A supplier to check if the service is still enabled.
          * @param errorLogger                 A consumer that accepts log message and an error.
          * @param infoLogger                  A consumer that accepts info log messages.
-         * @param logErrors                   Whether or not errors should be logged.
-         * @param logSentData                 Whether or not the sent data should be logged.
-         * @param logResponseStatusText       Whether or not the response status text should be logged.
+         * @param logErrors                   Whether errors should be logged.
+         * @param logSentData                 Whether the send data should be logged.
+         * @param logResponseStatusText       Whether the response status text should be logged.
          */
         public MetricsBase(
                 String platform,

@@ -113,12 +113,12 @@ public final class UtilsWorld {
 
     private static Location getFallbackLocation(Location l, World w) {
         if (l == null)
-            return Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
-                    : Bukkit.getWorlds().get(0).getSpawnLocation();
+            return Bukkit.getWorlds().getFirst().equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
+                    : Bukkit.getWorlds().getFirst().getSpawnLocation();
 
         if (l.getWorld().equals(w) || !l.isWorldLoaded()) {
-            l = Bukkit.getWorlds().get(0).equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
-                    : Bukkit.getWorlds().get(0).getSpawnLocation();
+            l = Bukkit.getWorlds().getFirst().equals(w) ? Bukkit.getWorlds().get(1).getSpawnLocation()
+                    : Bukkit.getWorlds().getFirst().getSpawnLocation();
             new IllegalArgumentException("invalid input location correcting it with " + l).printStackTrace();
         }
         return l;

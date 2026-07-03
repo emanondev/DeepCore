@@ -89,7 +89,7 @@ public class StringListEditorFButton extends AGuiButton {
             action = Action.ADD_LINE;
             return 0;
         }
-        int r = Math.min(value.size(), Math.max(0, line));
+        int r = Math.clamp(line, 0, value.size());
         if (r == value.size())
             action = Action.ADD_LINE;
         if (r == 0 && action == Action.MOVE_UP)

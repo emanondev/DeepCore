@@ -81,37 +81,27 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
         this.base = base == null ? new ItemBuilder(Material.REPEATER).setGuiProperty().build() : base;
         this.changeAmount = changeAmountBase;
         if (maxChangeValue == null) {
-            if (changeAmount instanceof BigDecimal)
-                this.maxChangeAmount = (T) BigDecimal.valueOf(Double.MAX_VALUE);
-            else if (changeAmount instanceof Double)
-                this.maxChangeAmount = (T) (Double) Double.MAX_VALUE;
-            else if (changeAmount instanceof Float)
-                this.maxChangeAmount = (T) (Float) Float.MAX_VALUE;
-            else if (changeAmount instanceof Integer)
-                this.maxChangeAmount = (T) (Integer) Integer.MAX_VALUE;
-            else if (changeAmount instanceof Long)
-                this.maxChangeAmount = (T) (Long) Long.MAX_VALUE;
-            else if (changeAmount instanceof Short)
-                this.maxChangeAmount = (T) (Short) Short.MAX_VALUE;
-            else
-                throw new UnsupportedOperationException();
+            switch (changeAmount) {
+                case BigDecimal bigDecimal -> this.maxChangeAmount = (T) BigDecimal.valueOf(Double.MAX_VALUE);
+                case Double v -> this.maxChangeAmount = (T) (Double) Double.MAX_VALUE;
+                case Float v -> this.maxChangeAmount = (T) (Float) Float.MAX_VALUE;
+                case Integer i -> this.maxChangeAmount = (T) (Integer) Integer.MAX_VALUE;
+                case Long l -> this.maxChangeAmount = (T) (Long) Long.MAX_VALUE;
+                case Short i -> this.maxChangeAmount = (T) (Short) Short.MAX_VALUE;
+                default -> throw new UnsupportedOperationException();
+            }
         } else
             this.maxChangeAmount = maxChangeValue;
         if (minChangeValue == null) {
-            if (changeAmount instanceof BigDecimal)
-                this.minChangeAmount = (T) BigDecimal.valueOf(Math.pow(10, -10));
-            else if (changeAmount instanceof Double)
-                this.minChangeAmount = (T) (Double) Math.pow(10, -10);
-            else if (changeAmount instanceof Float)
-                this.minChangeAmount = (T) (Float) (float) Math.pow(10, -10);
-            else if (changeAmount instanceof Integer)
-                this.minChangeAmount = (T) (Integer) 1;
-            else if (changeAmount instanceof Long)
-                this.minChangeAmount = (T) (Long) 1L;
-            else if (changeAmount instanceof Short)
-                this.minChangeAmount = (T) (Short) ((short) 1);
-            else
-                throw new UnsupportedOperationException();
+            switch (changeAmount) {
+                case BigDecimal bigDecimal -> this.minChangeAmount = (T) BigDecimal.valueOf(Math.pow(10, -10));
+                case Double v -> this.minChangeAmount = (T) (Double) Math.pow(10, -10);
+                case Float v -> this.minChangeAmount = (T) (Float) (float) Math.pow(10, -10);
+                case Integer i -> this.minChangeAmount = (T) (Integer) 1;
+                case Long l -> this.minChangeAmount = (T) (Long) 1L;
+                case Short i -> this.minChangeAmount = (T) (Short) ((short) 1);
+                case null, default -> throw new UnsupportedOperationException();
+            }
         } else
             this.minChangeAmount = minChangeValue;
         checkBounds();

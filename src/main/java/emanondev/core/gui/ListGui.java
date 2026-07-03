@@ -127,7 +127,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
      * returns true if the page changed
      */
     public boolean setPage(int pag) {
-        pag = Math.min(Math.max(1, pag), getMaxPage());
+        pag = Math.clamp(pag, 1, getMaxPage());
         if (pag == page)
             return false;
         page = pag;
@@ -190,12 +190,15 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
 
     public void recalculateButtons() {
         activeButtons.clear();
-        if (show == null)
+        if (show == null) {
             activeButtons.addAll(buttons);
-        else
-            for (int i = 0; i < buttons.size(); i++)
-                if (show.test(buttons.get(i).getValue()))
-                    activeButtons.add(buttons.get(i));
+        }        else {
+            for (ContainerButton button : buttons) {
+                if (show.test(button.getValue())) {
+                    activeButtons.add(button);
+                }
+            }
+        }
         if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
             reloadInventory();
     }

@@ -93,7 +93,7 @@ public class RandomItemContainer<T> {
                 return items.get(i);
         }
         new IllegalStateException("Invalid state").printStackTrace();
-        return items.get(items.size() - 1);
+        return items.getLast();
     }
 
     @NotNull
