@@ -192,7 +192,7 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
         activeButtons.clear();
         if (show == null) {
             activeButtons.addAll(buttons);
-        }        else {
+        } else {
             for (ContainerButton button : buttons) {
                 if (show.test(button.getValue())) {
                     activeButtons.add(button);
@@ -248,10 +248,6 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
             if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
                 reloadInventory();
         }
-    }
-
-    private ContainerButton getContainer(T value) {
-        return new ContainerButton(value);
     }
 
     public void clearElements() {
@@ -322,6 +318,10 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     public abstract boolean onElementClick(InventoryClickEvent event, T value);
 
     public abstract ItemStack getElementItem(T value);
+
+    private ContainerButton getContainer(T value) {
+        return new ContainerButton(value);
+    }
 
     private class ContainerButton implements GuiButton {
 

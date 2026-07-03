@@ -16,11 +16,11 @@ import java.util.UUID;
 
 public abstract class PacketEntity {
 
+    protected final Collection<Player> active = new HashSet<>();
     private final int id;
     private final UUID uuid;
     private final PacketManager manager;
     protected WrappedDataWatcher dataWatcher;
-    protected final Collection<Player> active = new HashSet<>();
     protected boolean shouldUpdateMeta = false;
     private Location location;
     @Getter
@@ -121,10 +121,6 @@ public abstract class PacketEntity {
         return this;
     }
 
-    protected void handleRemovePackets(@NotNull Collection<Player> players) {
-        getManager().entityDestroyPacket(players, this);
-    }
-
     @Contract("_->this")
     public PacketEntity spawn(@NotNull Collection<Player> players) {
         active.addAll(players);
@@ -136,8 +132,6 @@ public abstract class PacketEntity {
     public PacketEntity spawn(@NotNull Player player) {
         return spawn(List.of(player));
     }
-
-    protected abstract void handleSpawnPackets(@NotNull Collection<Player> players);
 
     @Contract("->this")
     public PacketEntity update() {
@@ -153,7 +147,13 @@ public abstract class PacketEntity {
         return this;
     }
 
-    protected abstract void handleUpdatePackets(@NotNull Collection<Player> players);
-
     public abstract WrappedDataWatcher getWrappedDataWatcher();
+
+    protected void handleRemovePackets(@NotNull Collection<Player> players) {
+        getManager().entityDestroyPacket(players, this);
+    }
+
+    protected abstract void handleSpawnPackets(@NotNull Collection<Player> players);
+
+    protected abstract void handleUpdatePackets(@NotNull Collection<Player> players);
 }

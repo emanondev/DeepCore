@@ -393,28 +393,6 @@ public class ItemBuilder {
         return this;
     }
 
-    private String format(String text) {
-        if (text == null)
-            return null;
-        text = UtilsString.fix(text, null, false);
-        text = text.replace('§', '&');
-        for (ChatColor color : ChatColor.values())
-            text = text.replace("&" + color.toString().charAt(1),
-                    (color.getColor() == null ? "" : "<reset>") +
-                            "<" + color.getName()
-                            .toLowerCase(Locale.ENGLISH) + ">");
-        try {
-            int from = 0;
-            while (text.indexOf("&#", from) >= 0) {
-                from = text.indexOf("&#", from) + 1;
-                text = text.replace(text.substring(from - 1, from + 7),
-                        "<reset><#" + text.substring(from, from + 7) + ">");
-            }
-        } catch (Throwable ignored) {
-        }
-        return GsonComponentSerializer.gson().serialize(MiniMessage.miniMessage().deserialize(text));
-    }
-
     @Contract("_ -> this")
     public ItemBuilder addDescription(final @NotNull DMessage message) {
         List<String> list = message.toJsonMulti();
@@ -544,7 +522,6 @@ public class ItemBuilder {
         return this;
     }
 
-
     @Contract("_ -> this")
     public ItemBuilder glow(final @Nullable Boolean value) {
         if (VersionUtility.isNewerEquals(1, 20, 5))
@@ -552,6 +529,28 @@ public class ItemBuilder {
         else if (value != null)
             resultMeta.addEnchant(Enchantment.LURE, value ? 1 : 0, true);
         return this;
+    }
+
+    private String format(String text) {
+        if (text == null)
+            return null;
+        text = UtilsString.fix(text, null, false);
+        text = text.replace('§', '&');
+        for (ChatColor color : ChatColor.values())
+            text = text.replace("&" + color.toString().charAt(1),
+                    (color.getColor() == null ? "" : "<reset>") +
+                            "<" + color.getName()
+                            .toLowerCase(Locale.ENGLISH) + ">");
+        try {
+            int from = 0;
+            while (text.indexOf("&#", from) >= 0) {
+                from = text.indexOf("&#", from) + 1;
+                text = text.replace(text.substring(from - 1, from + 7),
+                        "<reset><#" + text.substring(from, from + 7) + ">");
+            }
+        } catch (Throwable ignored) {
+        }
+        return GsonComponentSerializer.gson().serialize(MiniMessage.miniMessage().deserialize(text));
     }
 
 }

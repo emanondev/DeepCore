@@ -167,6 +167,92 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         //this.instructionsDescription = instructionsDescription;
     }
 
+    @Override
+    public boolean onClick(@NotNull InventoryClickEvent event) {
+        switch (event.getClick()) {
+            case LEFT: {
+                T old = getValue();
+                setValue(subtractNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case RIGHT: {
+                T old = getValue();
+                setValue(addNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case SHIFT_RIGHT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(10D));
+                return !old.equals(getChangeAmount());
+            }
+            case SHIFT_LEFT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(0.1D));
+                return !old.equals(getChangeAmount());
+            }
+            case MIDDLE:
+            default:
+                return false;
+        }
+    }
+
+    public T getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(T value) {
+        setValue.accept(value);
+    }
+
+    public void setChangeAmount(T changeAmount) {
+        if (changeAmount.doubleValue() < 0)
+            throw new IllegalArgumentException();
+        this.changeAmount = changeAmount;
+    }
+
+    @Override
+    public ItemStack getItem() {
+        return baseItem.get();
+        /*
+        ItemStack base = getBaseItem();
+        return base == null ? null
+                : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
+                UtilsString.formatOptional10Digit(getValue()), "%amount%",
+                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
+                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
+                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();*/
+    }
+
+    @Deprecated
+    public ItemStack getBaseItem() {
+        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
+                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
+    }
+
+    @Deprecated
+    public List<String> getDescription() {
+        List<String> desc = new ArrayList<>();
+        List<String> tmp = getBaseDescription();
+        if (tmp != null)
+            desc.addAll(getBaseDescription());
+        tmp = getInstructionsDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        return desc;
+    }
+
+    @Deprecated
+    public List<String> getBaseDescription() {
+        return CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.base");
+    }
+
+    @Deprecated
+    public List<String> getInstructionsDescription() {
+        return CoreMain.get().getLanguageConfig(getTargetPlayer())
+                .getStringList("gui_button.number_editor.instructions");
+    }
+
     @SuppressWarnings("unchecked")
     private static <T extends Number> T subtractNumbers(T a, T b) {
         if (a instanceof BigDecimal && b instanceof BigDecimal)
@@ -272,49 +358,6 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         }
     }
 
-    @Override
-    public boolean onClick(@NotNull InventoryClickEvent event) {
-        switch (event.getClick()) {
-            case LEFT: {
-                T old = getValue();
-                setValue(subtractNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case RIGHT: {
-                T old = getValue();
-                setValue(addNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case SHIFT_RIGHT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(10D));
-                return !old.equals(getChangeAmount());
-            }
-            case SHIFT_LEFT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(0.1D));
-                return !old.equals(getChangeAmount());
-            }
-            case MIDDLE:
-            default:
-                return false;
-        }
-    }
-
-    public T getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(T value) {
-        setValue.accept(value);
-    }
-
-    public void setChangeAmount(T changeAmount) {
-        if (changeAmount.doubleValue() < 0)
-            throw new IllegalArgumentException();
-        this.changeAmount = changeAmount;
-    }
-
     @SuppressWarnings("unchecked")
     private T multiplyEditor(double b) {
         if (this.changeAmount instanceof BigDecimal)
@@ -382,50 +425,6 @@ public class NumberEditorFButton<T extends Number> extends AGuiButton {
         }
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public ItemStack getItem() {
-        return baseItem.get();
-        /*
-        ItemStack base = getBaseItem();
-        return base == null ? null
-                : new ItemBuilder(base).setDescription(getDescription(), true, this.getTargetPlayer(), "%value%",
-                UtilsString.formatOptional10Digit(getValue()), "%amount%",
-                UtilsString.formatOptional10Digit(changeAmount), "%amount_inc%",
-                UtilsString.formatOptional10Digit(multiplyEditor(10)), "%amount_dec%",
-                UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();*/
-    }
-
-    @Deprecated
-    public ItemStack getBaseItem() {
-        return baseItem == null ? CoreMain.get().getConfig("guiConfig.yml")
-                .loadGuiItem("number_editor", Material.REPEATER).build() : baseItem.get();
-    }
-
-    @Deprecated
-    public List<String> getDescription() {
-        List<String> desc = new ArrayList<>();
-        List<String> tmp = getBaseDescription();
-        if (tmp != null)
-            desc.addAll(getBaseDescription());
-        tmp = getInstructionsDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        return desc;
-    }
-
-    @Deprecated
-    public List<String> getBaseDescription() {
-        return CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.base");
-    }
-
-    @Deprecated
-    public List<String> getInstructionsDescription() {
-        return CoreMain.get().getLanguageConfig(getTargetPlayer())
-                .getStringList("gui_button.number_editor.instructions");
-    }
-
 
     private DMessage getDefaultDescription(Player player, Supplier<List<String>> base, Supplier<List<String>> instructions) {
         DMessage msg = new DMessage(CoreMain.get());

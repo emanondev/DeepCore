@@ -69,7 +69,7 @@ public class CustomEventListener implements Listener {
                     return;
                 craftResultEvent(event);
             }
-            case DROP-> {
+            case DROP -> {
                 if (event.getCursor() != null && !event.getCursor().getType().isAir())
                     return;
                 // if (event.getCurrentItem()==null || event.getCursor().getType().isAir())

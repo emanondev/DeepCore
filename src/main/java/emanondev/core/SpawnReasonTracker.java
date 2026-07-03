@@ -16,26 +16,12 @@ import java.util.List;
 
 /**
  * This class keeps tracks of mob spawning reasons
+ *
  * @author emanon
  */
 public class SpawnReasonTracker implements Listener {
     private static final String metaName = "SpawnReason";
     private static final EnumMap<SpawnReason, FixedMetadataValue> fixedMetas = loadMetas();
-
-    private static EnumMap<SpawnReason, FixedMetadataValue> loadMetas() {
-        EnumMap<SpawnReason, FixedMetadataValue> map = new EnumMap<>(SpawnReason.class);
-        for (SpawnReason reason : SpawnReason.values()) {
-            map.put(reason, new FixedMetadataValue(CoreMain.get(), reason.toString()));
-        }
-        return map;
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    private static void handler(CreatureSpawnEvent event) {
-        if (VersionUtility.hasPaperAPI())
-            return;
-        event.getEntity().setMetadata(metaName, fixedMetas.get(event.getSpawnReason()));
-    }
 
     /**
      * @param entity - target entity
@@ -54,6 +40,21 @@ public class SpawnReasonTracker implements Listener {
         } catch (Exception e) {
             return SpawnReason.DEFAULT;
         }
+    }
+
+    private static EnumMap<SpawnReason, FixedMetadataValue> loadMetas() {
+        EnumMap<SpawnReason, FixedMetadataValue> map = new EnumMap<>(SpawnReason.class);
+        for (SpawnReason reason : SpawnReason.values()) {
+            map.put(reason, new FixedMetadataValue(CoreMain.get(), reason.toString()));
+        }
+        return map;
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    private static void handler(CreatureSpawnEvent event) {
+        if (VersionUtility.hasPaperAPI())
+            return;
+        event.getEntity().setMetadata(metaName, fixedMetas.get(event.getSpawnReason()));
     }
 
 }

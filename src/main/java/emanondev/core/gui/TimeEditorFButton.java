@@ -92,25 +92,6 @@ public class TimeEditorFButton extends AGuiButton {
                 changeAmountBase, null, null);
     }
 
-    private static Long addNumbers(Long a, Long b) {
-        return a + b;
-    }
-
-    private static Long subtractNumbers(Long a, Long b) {
-        return a - b;
-    }
-
-    private void checkBounds() {
-        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
-            throw new IllegalArgumentException();
-        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-    }
-
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
@@ -185,6 +166,47 @@ public class TimeEditorFButton extends AGuiButton {
         checkBounds();
     }
 
+    /**
+     * holder %value% for current value
+     *
+     * @param baseDescription
+     * @return this
+     */
+    public TimeEditorFButton setBaseDescription(Supplier<List<String>> baseDescription) {
+        this.baseDescription = baseDescription;
+        return this;
+    }
+
+    /**
+     * holder %value% for current value, %amount% for amount editor, %amount_inc%, %amount_dec%
+     *
+     * @param fullDescription
+     * @return this
+     */
+    public TimeEditorFButton setFullDescription(Supplier<List<String>> fullDescription) {
+        this.fullDescription = fullDescription;
+        return this;
+    }
+
+    private static Long addNumbers(Long a, Long b) {
+        return a + b;
+    }
+
+    private static Long subtractNumbers(Long a, Long b) {
+        return a - b;
+    }
+
+    private void checkBounds() {
+        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
+            throw new IllegalArgumentException();
+        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+    }
+
     private Long multiply() {
         for (long range : ranges)
             if (range > this.changeAmount)
@@ -206,28 +228,6 @@ public class TimeEditorFButton extends AGuiButton {
             num = minChangeAmount;
         return num;
 
-    }
-
-    /**
-     * holder %value% for current value
-     *
-     * @param baseDescription
-     * @return this
-     */
-    public TimeEditorFButton setBaseDescription(Supplier<List<String>> baseDescription) {
-        this.baseDescription = baseDescription;
-        return this;
-    }
-
-    /**
-     * holder %value% for current value, %amount% for amount editor, %amount_inc%, %amount_dec%
-     *
-     * @param fullDescription
-     * @return this
-     */
-    public TimeEditorFButton setFullDescription(Supplier<List<String>> fullDescription) {
-        this.fullDescription = fullDescription;
-        return this;
     }
 
 }

@@ -153,19 +153,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     }
 
     /**
-     * Notify sender the lack of permission as specified at
-     * 'generic.lack_permission' path of language file
-     *
-     * @param sender target to notify
-     * @param perm   lacking permission
-     */
-    protected void permissionLackNotify(final @NotNull CommandSender sender,
-                                        final @NotNull Permission perm) {
-        new DMessage(CoreMain.get(), sender).appendLang("command.lack_permission",
-                "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
-    }
-
-    /**
      * Execute the command.
      *
      * @param sender Source object which is executing this command
@@ -259,6 +246,79 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         return onComplete(sender, alias, args, null);
     }
 
+    @Override
+    public void log(final String log) {
+        Bukkit.getConsoleSender()
+                .sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + getPlugin().getName() + ChatColor.DARK_BLUE + "|Command "
+                                + ChatColor.WHITE + getID() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
+    }
+
+    /**
+     * Returns the ID of the Command.
+     *
+     * @return Command ID.
+     */
+    public final @NotNull String getID() {
+        return id;
+    }
+
+    public final @NotNull String getLanguagePath(final @NotNull String subPath) {
+        return "command." + this.getID() + "." + subPath;
+    }
+
+    /**
+     * Returns language section for the command sender<br>
+     * (load language config and go to sub pattern 'command.[command id]')
+     *
+     * @param who target user
+     * @return language section for the command sender
+     */
+    public final @NotNull YMLSection getLanguageSection(final @Nullable CommandSender who) {
+        return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
+    }
+
+    public void reload() {
+    }
+
+    /**
+     * Returns language section for this command.
+     *
+     * @param sender language target
+     * @return language section for this command.
+     * @see #getLanguageSection(CommandSender)
+     */
+    @Deprecated
+    public YMLSection getCommandLang(final @Nullable CommandSender sender) {
+        return getPlugin().getLanguageConfig(sender).loadSection(getPathLang());
+    }
+
+    /**
+     * Returns language section for selected sub command.
+     *
+     * @param sender language target
+     * @param subId  sub command id
+     * @return language section for selected sub command.
+     */
+    @Deprecated
+    public YMLSection getSubCommandLang(final @Nullable CommandSender sender,
+                                        final @NotNull String subId) {
+        return getCommandLang(sender).loadSection(getPathSubCommandLang(subId));
+    }
+
+    /**
+     * Notify sender the lack of permission as specified at
+     * 'generic.lack_permission' path of language file
+     *
+     * @param sender target to notify
+     * @param perm   lacking permission
+     */
+    protected void permissionLackNotify(final @NotNull CommandSender sender,
+                                        final @NotNull Permission perm) {
+        new DMessage(CoreMain.get(), sender).appendLang("command.lack_permission",
+                "%permission%", perm.getName(), "%plugin%", getPlugin().getName()).send();
+    }
+
     /**
      * @param sender     the sender
      * @param permission the permission
@@ -283,23 +343,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
         return permission == null || sender.hasPermission(permission);
     }
 
-    @Override
-    public void log(final String log) {
-        Bukkit.getConsoleSender()
-                .sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        ChatColor.DARK_BLUE + "[" + ChatColor.WHITE + getPlugin().getName() + ChatColor.DARK_BLUE + "|Command "
-                                + ChatColor.WHITE + getID() + ChatColor.DARK_BLUE + "] " + ChatColor.WHITE + log));
-    }
-
-    /**
-     * Returns the ID of the Command.
-     *
-     * @return Command ID.
-     */
-    public final @NotNull String getID() {
-        return id;
-    }
-
     /**
      * Notify sender the command may be used by players only
      *
@@ -308,10 +351,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     protected void playerOnlyNotify(final CommandSender sender) {
         new DMessage(CoreMain.get(), sender).appendLang("command.players_only",
                 "%plugin%", getPlugin().getName()).send();
-    }
-
-    public final @NotNull String getLanguagePath(final @NotNull String subPath) {
-        return "command." + this.getID() + "." + subPath;
     }
 
     /**
@@ -393,17 +432,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
     }
 
     /**
-     * Returns language section for the command sender<br>
-     * (load language config and go to sub pattern 'command.[command id]')
-     *
-     * @param who target user
-     * @return language section for the command sender
-     */
-    public final @NotNull YMLSection getLanguageSection(final @Nullable CommandSender who) {
-        return getPlugin().getLanguageConfig(who).loadSection("command." + this.getID());
-    }
-
-    /**
      * Sends a message to receiver
      *
      * @param receiver message target
@@ -469,35 +497,6 @@ public abstract class CoreCommand extends Command implements PluginIdentifiableC
                                             final @Nullable CommandSender target,
                                             final String... holders) {
         sendMessageFeedback(receiver, path, def, true, target, holders);
-    }
-
-    public void reload() {
-    }
-
-    /**
-     * Returns language section for this command.
-     *
-     * @param sender language target
-     * @return language section for this command.
-     * @see #getLanguageSection(CommandSender)
-     */
-    @Deprecated
-    public YMLSection getCommandLang(final @Nullable CommandSender sender) {
-        return getPlugin().getLanguageConfig(sender).loadSection(getPathLang());
-    }
-
-
-    /**
-     * Returns language section for selected sub command.
-     *
-     * @param sender language target
-     * @param subId  sub command id
-     * @return language section for selected sub command.
-     */
-    @Deprecated
-    public YMLSection getSubCommandLang(final @Nullable CommandSender sender,
-                                        final @NotNull String subId) {
-        return getCommandLang(sender).loadSection(getPathSubCommandLang(subId));
     }
 
     protected @NotNull String getPathErrorLang() {

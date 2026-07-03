@@ -185,12 +185,6 @@ public class PermissionBuilder {
         return new PermissionBuilder(plugin.getName() + "." + subName);
     }
 
-    private void setName(final @NotNull String name) {
-        if (name.isEmpty() || name.contains(" ") || name.startsWith(".") || name.endsWith("."))
-            throw new IllegalArgumentException(name + " is invalid permission name");
-        this.name = name.toLowerCase(Locale.ENGLISH);
-    }
-
     /**
      * Sets the description for the permission.
      * <p>
@@ -298,5 +292,11 @@ public class PermissionBuilder {
         Permission perm = build();
         plugin.registerPermission(perm, silent);
         return perm;
+    }
+
+    private void setName(final @NotNull String name) {
+        if (name.isEmpty() || name.contains(" ") || name.startsWith(".") || name.endsWith("."))
+            throw new IllegalArgumentException(name + " is invalid permission name");
+        this.name = name.toLowerCase(Locale.ENGLISH);
     }
 }

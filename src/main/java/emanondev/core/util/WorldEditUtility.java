@@ -136,38 +136,6 @@ public final class WorldEditUtility {
         return future;
     }
 
-    private static Actor getActor(boolean persistent) {
-        if (persistent)
-            return BukkitAdapter.adapt(Bukkit.getConsoleSender());
-        return new BukkitCommandSender((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), Bukkit.getConsoleSender()) {
-
-            @Override
-            public SessionKey getSessionKey() {
-                return new SessionKey() {
-                    @Override
-                    public @NotNull String getName() {
-                        return Bukkit.getConsoleSender().getName();
-                    }
-
-                    @Override
-                    public boolean isActive() {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean isPersistent() {
-                        return false;
-                    }
-
-                    @Override
-                    public UUID getUniqueId() {
-                        return DEFAULT_ID;
-                    }
-                };
-            }
-        };
-    }
-
     public static boolean save(File dest, Clipboard clip) {
         dest.getParentFile().mkdirs();
         try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(dest))) {
@@ -249,7 +217,6 @@ public final class WorldEditUtility {
         return new BoundingBox(min.x(), min.y(), min.z(), max.x() + 1, max.y() + 1, max.z() + 1);
     }
 
-
     public static void clearSelection(@NotNull Player player) {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(BukkitAdapter.adapt(player));
         com.sk89q.worldedit.world.World world = BukkitAdapter.adapt(player.getWorld());
@@ -257,7 +224,6 @@ public final class WorldEditUtility {
             return;
         session.getRegionSelector(world).clear();
     }
-
 
     public static CompletableFuture<EditSession> pasteAir(BoundingBox box, World world, boolean async, CorePlugin plugin) {
         CompletableFuture<EditSession> future = new CompletableFuture<>();
@@ -428,6 +394,38 @@ public final class WorldEditUtility {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static Actor getActor(boolean persistent) {
+        if (persistent)
+            return BukkitAdapter.adapt(Bukkit.getConsoleSender());
+        return new BukkitCommandSender((WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit"), Bukkit.getConsoleSender()) {
+
+            @Override
+            public SessionKey getSessionKey() {
+                return new SessionKey() {
+                    @Override
+                    public @NotNull String getName() {
+                        return Bukkit.getConsoleSender().getName();
+                    }
+
+                    @Override
+                    public boolean isActive() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean isPersistent() {
+                        return false;
+                    }
+
+                    @Override
+                    public UUID getUniqueId() {
+                        return DEFAULT_ID;
+                    }
+                };
+            }
+        };
     }
 
 }

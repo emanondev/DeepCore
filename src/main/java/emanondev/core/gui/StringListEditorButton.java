@@ -60,22 +60,58 @@ public abstract class StringListEditorButton extends AGuiButton {
         };
     }
 
-    private int getLine() {
-        List<String> value = getValue();
-        if (value == null) {
-            action = Action.ADD_LINE;
-            return 0;
-        }
-        int r = Math.clamp(line, 0, value.size());
-        if (r == value.size())
-            action = Action.ADD_LINE;
-        if (r == 0 && action == Action.MOVE_UP)
-            action = Action.MOVE_DOWN;
-        return r;
+    public abstract List<String> getValue();
+
+    public abstract void onChange(List<String> list);
+
+    @Override
+    public ItemStack getItem() {
+        ItemStack item = getBaseItem();
+        if (item == null)
+            return null;
+        return new ItemBuilder(item).setDescription(getDescription()).build();
     }
 
-    private void setLine(int value) {
-        line = value;
+    public List<String> getDescription() {
+        List<String> desc = new ArrayList<>();
+        List<String> tmp = getBaseDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        tmp = getValueDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        tmp = getInstructionsDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        return UtilsString.fix(desc, null, true, "%action_symbol%", action.getSymbol(getTargetPlayer()), "%action_description%",
+                action.getDescription(getTargetPlayer()), "%action_line%", actionLine());
+    }
+
+    public List<String> getBaseDescription() {
+        return List.of("&6&lText:");
+    }
+
+    public List<String> getValueDescription() {
+        List<String> val = getValue();
+        if (val == null)
+            val = new ArrayList<>();
+        else
+            val = new ArrayList<>(val);
+        val.add("");
+        int line = getLine();
+        for (int i = 0; i < val.size(); i++) {
+            if (i != line)
+                val.set(i, "   &f" + val.get(i));
+            else
+                val.set(i, "%action_symbol% &f" + val.get(i));
+        }
+        return val;
+    }
+
+    public List<String> getInstructionsDescription() {
+        return Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9Change line",
+                "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9Change action",
+                "&7[&fClick&7] &9Middle &7> %action_symbol% &9%action_description%", "%action_line%");
     }
 
     void applyAction() {
@@ -149,58 +185,22 @@ public abstract class StringListEditorButton extends AGuiButton {
 
     }
 
-    public abstract List<String> getValue();
-
-    public abstract void onChange(List<String> list);
-
-    @Override
-    public ItemStack getItem() {
-        ItemStack item = getBaseItem();
-        if (item == null)
-            return null;
-        return new ItemBuilder(item).setDescription(getDescription()).build();
-    }
-
-    public List<String> getDescription() {
-        List<String> desc = new ArrayList<>();
-        List<String> tmp = getBaseDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        tmp = getValueDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        tmp = getInstructionsDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        return UtilsString.fix(desc, null, true, "%action_symbol%", action.getSymbol(getTargetPlayer()), "%action_description%",
-                action.getDescription(getTargetPlayer()), "%action_line%", actionLine());
-    }
-
-    public List<String> getBaseDescription() {
-        return List.of("&6&lText:");
-    }
-
-    public List<String> getValueDescription() {
-        List<String> val = getValue();
-        if (val == null)
-            val = new ArrayList<>();
-        else
-            val = new ArrayList<>(val);
-        val.add("");
-        int line = getLine();
-        for (int i = 0; i < val.size(); i++) {
-            if (i != line)
-                val.set(i, "   &f" + val.get(i));
-            else
-                val.set(i, "%action_symbol% &f" + val.get(i));
+    private int getLine() {
+        List<String> value = getValue();
+        if (value == null) {
+            action = Action.ADD_LINE;
+            return 0;
         }
-        return val;
+        int r = Math.clamp(line, 0, value.size());
+        if (r == value.size())
+            action = Action.ADD_LINE;
+        if (r == 0 && action == Action.MOVE_UP)
+            action = Action.MOVE_DOWN;
+        return r;
     }
 
-    public List<String> getInstructionsDescription() {
-        return Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9Change line",
-                "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9Change action",
-                "&7[&fClick&7] &9Middle &7> %action_symbol% &9%action_description%", "%action_line%");
+    private void setLine(int value) {
+        line = value;
     }
 
     private String actionLine() {

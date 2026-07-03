@@ -17,11 +17,6 @@ public final class GameVersion {
         throw new AssertionError();
     }
 
-    private static String loadNmsver() {
-        String txt = Bukkit.getServer().getClass().getPackage().getName();
-        return txt.substring(txt.lastIndexOf(".") + 1);
-    }
-
     public static boolean hasSpigot() {
         try {
             Class.forName("org.spigotmc.SpigotConfig");
@@ -56,5 +51,10 @@ public final class GameVersion {
         if (GAME_SUB_VERSION > subVersion)
             return false;
         return GAME_SUB_VERSION < subVersion;
+    }
+
+    private static String loadNmsver() {
+        String txt = Bukkit.getServer().getClass().getPackage().getName();
+        return txt.substring(txt.lastIndexOf(".") + 1);
     }
 }

@@ -73,40 +73,9 @@ public class DMessage {
 
     @Contract("_ -> this")
     @NotNull
-    private DMessage appendDirectly(@Nullable String text) {
-        if (text != null)
-            raw.append(text);
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull ChatColor color) {
-        raw.append(color.name()); //for formats
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull java.awt.Color color) {
-        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
-                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
-                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
     public DMessage append(@Nullable org.bukkit.ChatColor color) {
         if (color != null)
             appendDirectly("<").appendDirectly(color).appendDirectly(">");
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull org.bukkit.ChatColor color) {
-        raw.append(color.name());
         return this;
     }
 
@@ -123,15 +92,6 @@ public class DMessage {
     public DMessage append(@Nullable Color color) {
         if (color != null)
             appendDirectly("<").appendDirectly(color).appendDirectly(">");
-        return this;
-    }
-
-    @Contract("_ -> this")
-    @NotNull
-    private DMessage appendDirectly(@NotNull Color color) {
-        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
-                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
-                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
         return this;
     }
 
@@ -177,27 +137,6 @@ public class DMessage {
         if (text != null)
             raw.append(format(text, holders));
         return this;
-    }
-
-    @NotNull
-    private String format(@NotNull String text, String... holders) {
-        text = UtilsString.fix(text, papiTarget, false, holders);
-        text = text.replace('§', '&');
-        for (ChatColor color : ChatColor.values()) //formats
-            text = text.replace("&" + color.toString().charAt(1),
-                    (color.getColor() == null ? "" : "<reset>") +
-                            "<" + color.getName()
-                            .toLowerCase(Locale.ENGLISH) + ">");
-        try {
-            int from = 0;
-            while (text.indexOf("&#", from) >= 0) {
-                from = text.indexOf("&#", from) + 1;
-                text = text.replace(text.substring(from - 1, from + 7),
-                        "<reset><#" + text.substring(from, from + 7) + ">");
-            }
-        } catch (Throwable ignored) {
-        }
-        return text;
     }
 
     @Contract("_, _, _ -> this")
@@ -686,6 +625,67 @@ public class DMessage {
         raw.delete(0, raw.length());
         raw.append(str);
         return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@Nullable String text) {
+        if (text != null)
+            raw.append(text);
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull ChatColor color) {
+        raw.append(color.name()); //for formats
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull java.awt.Color color) {
+        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
+                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
+                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull org.bukkit.ChatColor color) {
+        raw.append(color.name());
+        return this;
+    }
+
+    @Contract("_ -> this")
+    @NotNull
+    private DMessage appendDirectly(@NotNull Color color) {
+        raw.append(color.getRed() < 16 ? "#0" : "#").append(Integer.toHexString(color.getRed()))
+                .append(color.getGreen() < 16 ? "0" : "").append(Integer.toHexString(color.getGreen()))
+                .append(color.getBlue() < 16 ? "0" : "").append(Integer.toHexString(color.getBlue()));
+        return this;
+    }
+
+    @NotNull
+    private String format(@NotNull String text, String... holders) {
+        text = UtilsString.fix(text, papiTarget, false, holders);
+        text = text.replace('§', '&');
+        for (ChatColor color : ChatColor.values()) //formats
+            text = text.replace("&" + color.toString().charAt(1),
+                    (color.getColor() == null ? "" : "<reset>") +
+                            "<" + color.getName()
+                            .toLowerCase(Locale.ENGLISH) + ">");
+        try {
+            int from = 0;
+            while (text.indexOf("&#", from) >= 0) {
+                from = text.indexOf("&#", from) + 1;
+                text = text.replace(text.substring(from - 1, from + 7),
+                        "<reset><#" + text.substring(from, from + 7) + ">");
+            }
+        } catch (Throwable ignored) {
+        }
+        return text;
     }
 
 }

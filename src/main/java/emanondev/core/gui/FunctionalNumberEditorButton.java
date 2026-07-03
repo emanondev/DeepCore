@@ -120,6 +120,95 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
                 changeAmountBase);
     }
 
+    @Override
+    public boolean onClick(@NotNull InventoryClickEvent event) {
+        switch (event.getClick()) {
+            case LEFT: {
+                T old = getValue();
+                changeRequest(addNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case RIGHT: {
+                T old = getValue();
+                changeRequest(subtractNumbers(old, getChangeAmount()));
+                return !old.equals(getValue());
+            }
+            case SHIFT_LEFT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(10D));
+                return !old.equals(getChangeAmount());
+            }
+            case SHIFT_RIGHT: {
+                T old = getChangeAmount();
+                setChangeAmount(multiplyEditor(0.1D));
+                return !old.equals(getChangeAmount());
+            }
+            case MIDDLE:
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public ItemStack getItem() {
+        if (fullDescription != null)
+            return new ItemBuilder(base).setDescription(fullDescription.apply(getValue(), changeAmount), true,
+                    this.getTargetPlayer(), "%value%", String.valueOf(grabValue.get()), "%amount%", String.valueOf(changeAmount), "%amountx10%",
+                    String.valueOf(multiplyEditor(10D)), "%amount/10%", String.valueOf(multiplyEditor(0.1))).build();
+        if (baseDescription != null) {
+            List<String> info = baseDescription.apply(getValue());
+            if (info != null)
+                info = new ArrayList<>(info);
+            else
+                info = new ArrayList<>();
+            info.addAll(this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditorInstructions",
+                    Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
+                            "&7[&fClick&7] &9Shift Left&b/&9Right &7> &e%amount% &9-> &e%amountx10%&b/&e%amount/10%")));
+            return new ItemBuilder(base).setDescription(new ArrayList<>(info), true, this.getTargetPlayer(),
+                    "%amount%", UtilsString.formatOptional10Digit(changeAmount),
+                    "%amountx10%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
+                    "%amount/10%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
+        }
+        List<String> info = new ArrayList<>(this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditorFull",
+                Arrays.asList("&6&lAmount: &e%value%", "", "&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
+                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9+&b/&9- &e%amount% &9-> &9+&b/&9- &e%amountx10%&b/&e%amount/10%")));
+        return new ItemBuilder(base).setDescription(new ArrayList<>(info), true, this.getTargetPlayer(),
+                "%value%", UtilsString.formatOptional10Digit(grabValue.get()),
+                "%amount%", UtilsString.formatOptional10Digit(changeAmount),
+                "%amountx10%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
+                "%amount/10%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
+    }
+
+    public T getValue() {
+        return grabValue.get();
+    }
+
+    public void changeRequest(T value) {
+        changeRequest.accept(value);
+    }
+
+    public void setChangeAmount(T changeAmount) {
+        if (changeAmount.doubleValue() < 0)
+            throw new IllegalArgumentException();
+        this.changeAmount = changeAmount;
+    }
+
+    /**
+     * holder %amount% for current value
+     *
+     * @param baseDescription
+     * @return
+     */
+    public FunctionalNumberEditorButton<T> setBaseDescription(Function<T, List<String>> baseDescription) {
+        this.baseDescription = baseDescription;
+        return this;
+    }
+
+    public FunctionalNumberEditorButton<T> setFullDescription(BiFunction<T, T, List<String>> fullDescription) {
+        this.fullDescription = fullDescription;
+        return this;
+    }
+
     @SuppressWarnings("unchecked")
     private static <T extends Number> T addNumbers(T a, T b) {
         if (a instanceof BigDecimal && b instanceof BigDecimal)
@@ -225,79 +314,6 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
         }
     }
 
-    @Override
-    public boolean onClick(@NotNull InventoryClickEvent event) {
-        switch (event.getClick()) {
-            case LEFT: {
-                T old = getValue();
-                changeRequest(addNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case RIGHT: {
-                T old = getValue();
-                changeRequest(subtractNumbers(old, getChangeAmount()));
-                return !old.equals(getValue());
-            }
-            case SHIFT_LEFT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(10D));
-                return !old.equals(getChangeAmount());
-            }
-            case SHIFT_RIGHT: {
-                T old = getChangeAmount();
-                setChangeAmount(multiplyEditor(0.1D));
-                return !old.equals(getChangeAmount());
-            }
-            case MIDDLE:
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public ItemStack getItem() {
-        if (fullDescription != null)
-            return new ItemBuilder(base).setDescription(fullDescription.apply(getValue(), changeAmount), true,
-                    this.getTargetPlayer(), "%value%", String.valueOf(grabValue.get()), "%amount%", String.valueOf(changeAmount), "%amountx10%",
-                    String.valueOf(multiplyEditor(10D)), "%amount/10%", String.valueOf(multiplyEditor(0.1))).build();
-        if (baseDescription != null) {
-            List<String> info = baseDescription.apply(getValue());
-            if (info != null)
-                info = new ArrayList<>(info);
-            else
-                info = new ArrayList<>();
-            info.addAll(this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditorInstructions",
-                    Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
-                            "&7[&fClick&7] &9Shift Left&b/&9Right &7> &e%amount% &9-> &e%amountx10%&b/&e%amount/10%")));
-            return new ItemBuilder(base).setDescription(new ArrayList<>(info), true, this.getTargetPlayer(),
-                    "%amount%", UtilsString.formatOptional10Digit(changeAmount),
-                    "%amountx10%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
-                    "%amount/10%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
-        }
-        List<String> info = new ArrayList<>(this.getLanguageSection(getTargetPlayer()).loadStringList("numberEditorFull",
-                Arrays.asList("&6&lAmount: &e%value%", "", "&7[&fClick&7] &9Left&b/&9Right &7> &9+&b/&9- &e%amount%",
-                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9+&b/&9- &e%amount% &9-> &9+&b/&9- &e%amountx10%&b/&e%amount/10%")));
-        return new ItemBuilder(base).setDescription(new ArrayList<>(info), true, this.getTargetPlayer(),
-                "%value%", UtilsString.formatOptional10Digit(grabValue.get()),
-                "%amount%", UtilsString.formatOptional10Digit(changeAmount),
-                "%amountx10%", UtilsString.formatOptional10Digit(multiplyEditor(10)),
-                "%amount/10%", UtilsString.formatOptional10Digit(multiplyEditor(0.1))).build();
-    }
-
-    public T getValue() {
-        return grabValue.get();
-    }
-
-    public void changeRequest(T value) {
-        changeRequest.accept(value);
-    }
-
-    public void setChangeAmount(T changeAmount) {
-        if (changeAmount.doubleValue() < 0)
-            throw new IllegalArgumentException();
-        this.changeAmount = changeAmount;
-    }
-
     @SuppressWarnings("unchecked")
     private T multiplyEditor(double b) {
         if (this.changeAmount instanceof BigDecimal)
@@ -364,22 +380,6 @@ public class FunctionalNumberEditorButton<T extends Number> extends AGuiButton {
             return num;
         }
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * holder %amount% for current value
-     *
-     * @param baseDescription
-     * @return
-     */
-    public FunctionalNumberEditorButton<T> setBaseDescription(Function<T, List<String>> baseDescription) {
-        this.baseDescription = baseDescription;
-        return this;
-    }
-
-    public FunctionalNumberEditorButton<T> setFullDescription(BiFunction<T, T, List<String>> fullDescription) {
-        this.fullDescription = fullDescription;
-        return this;
     }
 
 }

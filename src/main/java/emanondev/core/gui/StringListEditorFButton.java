@@ -83,6 +83,73 @@ public class StringListEditorFButton extends AGuiButton {
         return false;
     }
 
+    public List<String> getValue() {
+        return getValue.get();
+    }
+
+    public void setValue(List<String> list) {
+        setValue.accept(list);
+    }
+
+    @Override
+    public ItemStack getItem() {
+        ItemStack item = getBaseItem();
+        if (item == null)
+            return null;
+        return new ItemBuilder(item).setDescription(getDescription()).build();
+    }
+
+    public ItemStack getBaseItem() {
+        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
+    }
+
+    public List<String> getDescription() {
+        List<String> desc = new ArrayList<>();
+        List<String> tmp = getBaseDescription();
+        if (tmp != null)
+            desc.addAll(getBaseDescription());
+        tmp = getValueDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        tmp = getInstructionsDescription();
+        if (tmp != null)
+            desc.addAll(tmp);
+        return UtilsString.fix(desc, null, true, "%action_symbol%", action.getSymbol(getTargetPlayer()), "%action_description%", action.getDescription(getTargetPlayer()),
+                "%action_line%", actionLine());
+    }
+
+    public List<String> getBaseDescription() {
+        return baseDescription == null ? List.of("&6&lText:") : baseDescription.get();
+    }
+
+    public List<String> getValueDescription() {
+        if (valueDescription != null)
+            return valueDescription.get();
+        List<String> val = getValue();
+        if (val == null)
+            val = new ArrayList<>();
+        else
+            val = new ArrayList<>(val);
+        val.add("");
+        int line = getLine();
+        for (int i = 0; i < val.size(); i++) {
+            if (i != line)
+                val.set(i, "   &f" + val.get(i));
+            else
+                val.set(i, "%action_symbol% &f" + val.get(i));
+        }
+        return val;
+    }
+
+    public List<String> getInstructionsDescription() {
+        return instructionsDescription == null
+                ? this.getLanguageSection(getTargetPlayer()).loadStringList("stringListEditor.Instructions",
+                Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9Change line",
+                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9Change action",
+                        "&7[&fClick&7] &9Middle &7> %action_symbol% &9%action_description%", "%action_line%"))
+                : instructionsDescription.get();
+    }
+
     private int getLine() {
         List<String> value = getValue();
         if (value == null) {
@@ -169,73 +236,6 @@ public class StringListEditorFButton extends AGuiButton {
             default -> throw new IllegalStateException();
         }
 
-    }
-
-    public List<String> getValue() {
-        return getValue.get();
-    }
-
-    public void setValue(List<String> list) {
-        setValue.accept(list);
-    }
-
-    @Override
-    public ItemStack getItem() {
-        ItemStack item = getBaseItem();
-        if (item == null)
-            return null;
-        return new ItemBuilder(item).setDescription(getDescription()).build();
-    }
-
-    public ItemStack getBaseItem() {
-        return baseItem == null ? new ItemBuilder(Material.PAPER).setGuiProperty().build() : baseItem.get();
-    }
-
-    public List<String> getDescription() {
-        List<String> desc = new ArrayList<>();
-        List<String> tmp = getBaseDescription();
-        if (tmp != null)
-            desc.addAll(getBaseDescription());
-        tmp = getValueDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        tmp = getInstructionsDescription();
-        if (tmp != null)
-            desc.addAll(tmp);
-        return UtilsString.fix(desc, null, true, "%action_symbol%", action.getSymbol(getTargetPlayer()), "%action_description%", action.getDescription(getTargetPlayer()),
-                "%action_line%", actionLine());
-    }
-
-    public List<String> getBaseDescription() {
-        return baseDescription == null ? List.of("&6&lText:") : baseDescription.get();
-    }
-
-    public List<String> getValueDescription() {
-        if (valueDescription != null)
-            return valueDescription.get();
-        List<String> val = getValue();
-        if (val == null)
-            val = new ArrayList<>();
-        else
-            val = new ArrayList<>(val);
-        val.add("");
-        int line = getLine();
-        for (int i = 0; i < val.size(); i++) {
-            if (i != line)
-                val.set(i, "   &f" + val.get(i));
-            else
-                val.set(i, "%action_symbol% &f" + val.get(i));
-        }
-        return val;
-    }
-
-    public List<String> getInstructionsDescription() {
-        return instructionsDescription == null
-                ? this.getLanguageSection(getTargetPlayer()).loadStringList("stringListEditor.Instructions",
-                Arrays.asList("&7[&fClick&7] &9Left&b/&9Right &7> &9Change line",
-                        "&7[&fClick&7] &9Shift Left&b/&9Right &7> &9Change action",
-                        "&7[&fClick&7] &9Middle &7> %action_symbol% &9%action_description%", "%action_line%"))
-                : instructionsDescription.get();
     }
 
     private String actionLine() {

@@ -59,23 +59,6 @@ public class CounterAPI {
             }
     }
 
-    void save() {
-        if (conf != null) {
-            conf.set(reset.name(), null, false);
-            if (id != reset.getId()) {
-                return;
-            }
-            for (UUID player : counters.keySet()) {
-                HashMap<String, Long> values = counters.get(player);
-                for (String id : values.keySet()) {
-                    if (values.get(id) > 0) {
-                        conf.set(reset.name() + "." + this.id + "." + player.toString() + "." + id, values.get(id), false);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Sets a counter for an offline player.
      *
@@ -291,6 +274,23 @@ public class CounterAPI {
      */
     public long getCounter(final @NotNull Block block, final @NotNull String counterId) {
         return getCounter(blockToUUID(block), counterId);
+    }
+
+    void save() {
+        if (conf != null) {
+            conf.set(reset.name(), null, false);
+            if (id != reset.getId()) {
+                return;
+            }
+            for (UUID player : counters.keySet()) {
+                HashMap<String, Long> values = counters.get(player);
+                for (String id : values.keySet()) {
+                    if (values.get(id) > 0) {
+                        conf.set(reset.name() + "." + this.id + "." + player.toString() + "." + id, values.get(id), false);
+                    }
+                }
+            }
+        }
     }
 
     private UUID blockToUUID(Block block) {

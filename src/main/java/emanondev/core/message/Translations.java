@@ -35,10 +35,6 @@ public class Translations {
         return "<tr:" + path + ">";
     }
 
-    private static @NotNull String format(@NotNull Keyed keyed) {
-        return keyed.getKey().getNamespace() + "." + keyed.getKey().getKey();
-    }
-
     public static @NotNull String get(@NotNull ItemStack stack) {
         return get(stack.getType());
     }
@@ -115,5 +111,9 @@ public class Translations {
 
     public static @NotNull String getItemDurability(int value, int max) {
         return "<tr:item.durability:'" + value + "':'" + max + "'>";
+    }
+
+    private static @NotNull String format(@NotNull Keyed keyed) {
+        return keyed.getKey().getNamespace() + "." + keyed.getKey().getKey();
     }
 }

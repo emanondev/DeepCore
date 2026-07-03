@@ -23,13 +23,13 @@ public class TypeGui implements Gui {
     private final GuiButton[] buttons;
     /**
      * -- GETTER --
-     *
-     *
+     * <p>
+     * <p>
      * -- SETTER --
-     *  Sets whenever the inventory should be updated when a player open it
+     * Sets whenever the inventory should be updated when a player open it
      *
-     @return true if the inventory is updated when a player open it
-      * @param value
+     * @return true if the inventory is updated when a player open it
+     * @param value
      */
     @Setter
     @Getter

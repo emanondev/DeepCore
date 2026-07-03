@@ -76,27 +76,6 @@ public abstract class TimeEditorButton extends AGuiButton {
         this(gui, null, changeAmountBase, null, null);
     }
 
-    private static Long addNumbers(Long a, Long b) {
-        return a + b;
-    }
-
-    private static Long subtractNumbers(Long a, Long b) {
-        return a - b;
-    }
-
-    private void checkBounds() {
-
-        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
-            throw new IllegalArgumentException();
-        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-
-    }
-
     public void setBaseItem(ItemStack baseItem) {
         base = baseItem;
     }
@@ -163,6 +142,27 @@ public abstract class TimeEditorButton extends AGuiButton {
         if (changeAmount.doubleValue() < 0)
             throw new IllegalArgumentException();
         this.changeAmount = changeAmount;
+    }
+
+    private static Long addNumbers(Long a, Long b) {
+        return a + b;
+    }
+
+    private static Long subtractNumbers(Long a, Long b) {
+        return a - b;
+    }
+
+    private void checkBounds() {
+
+        if (minChangeAmount <= 0 || maxChangeAmount <= 0)
+            throw new IllegalArgumentException();
+        if ((minChangeAmount).compareTo((maxChangeAmount)) > 0)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+
     }
 
     private Long multiply() {

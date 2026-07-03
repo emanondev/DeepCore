@@ -24,9 +24,9 @@ public final class CompleteUtility {
      * Completes a prefix based on an enum class. This method returns a list of enum constant names
      * (in lowercase) that start with the provided prefix. The comparison is case-insensitive.
      *
-     * @param prefix     The prefix to match against the enum constant names.
-     * @param enumClass  The enum class to extract the values from.
-     * @param <T>        The type of the enum.
+     * @param prefix    The prefix to match against the enum constant names.
+     * @param enumClass The enum class to extract the values from.
+     * @param <T>       The type of the enum.
      * @return A list of matching enum constant names (in lowercase).
      */
     @NotNull
@@ -40,10 +40,10 @@ public final class CompleteUtility {
      * This method returns a list of enum constant names (in lowercase) that start with the provided prefix
      * and satisfy the predicate condition. The comparison is case-insensitive.
      *
-     * @param prefix     The prefix to match against the enum constant names.
-     * @param enumClass       The enum class to extract the values from.
-     * @param predicate  A predicate used to filter the enum constants.
-     * @param <T>        The type of the enum.
+     * @param prefix    The prefix to match against the enum constant names.
+     * @param enumClass The enum class to extract the values from.
+     * @param predicate A predicate used to filter the enum constants.
+     * @param <T>       The type of the enum.
      * @return A list of matching enum constant names (in lowercase) that satisfy the predicate.
      */
     @NotNull
@@ -226,9 +226,9 @@ public final class CompleteUtility {
      * The search is case-insensitive. This method allows specifying a command sender,
      * which can be used for visibility checks.
      *
-     * @param forWho     The command sender requesting the completion (can be null).
-     * @param prefix     The prefix to match against player names.
-     * @param predicate  A filter to apply to the player list (can be null).
+     * @param forWho    The command sender requesting the completion (can be null).
+     * @param prefix    The prefix to match against player names.
+     * @param predicate A filter to apply to the player list (can be null).
      * @return A list of matching player names after applying the filter.
      */
     @NotNull
@@ -244,10 +244,10 @@ public final class CompleteUtility {
      * and an optional predicate. This method allows specifying a command sender,
      * which can be used for visibility checks.
      *
-     * @param forWho     The command sender requesting the completion (can be null).
-     * @param prefix     The prefix to match against player names.
-     * @param players    The collection of players to search within.
-     * @param predicate  An optional filter to apply to the players.
+     * @param forWho    The command sender requesting the completion (can be null).
+     * @param prefix    The prefix to match against player names.
+     * @param players   The collection of players to search within.
+     * @param predicate An optional filter to apply to the players.
      * @return A list of matching player names after applying the filter and visibility checks.
      */
     @NotNull

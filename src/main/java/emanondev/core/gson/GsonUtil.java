@@ -30,6 +30,14 @@ public class GsonUtil {
         return (Map<String, Object>) fix(serializable);
     }
 
+    public static <T extends ConfigurationSerializable> T deserialize(Map<String, Object> map, Class<T> clazz) {
+        return (T) deserialize(map);
+    }
+
+    public static ConfigurationSerializable deserialize(Map<String, Object> map) {
+        return (ConfigurationSerializable) defix(map);
+    }
+
     private static Object fix(Object o) {
         if (o == null)
             return null;
@@ -37,8 +45,7 @@ public class GsonUtil {
             case Integer i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
             case Short i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
             case Long i -> Collections.singletonMap(SERIALIZED_INT_KEY, o);
-            case Float aFloat ->
-                 Collections.singletonMap(SERIALIZED_FLOAT_KEY, o);
+            case Float aFloat -> Collections.singletonMap(SERIALIZED_FLOAT_KEY, o);
 
             case ConfigurationSerializable s -> {
                 Map<String, Object> map = new LinkedHashMap<>();
@@ -114,13 +121,5 @@ public class GsonUtil {
         if (map.containsKey(SERIALIZED_FLOAT_KEY))
             return ((Number) map.get(SERIALIZED_FLOAT_KEY)).floatValue();
         return map;
-    }
-
-    public static <T extends ConfigurationSerializable> T deserialize(Map<String, Object> map, Class<T> clazz) {
-        return (T) deserialize(map);
-    }
-
-    public static ConfigurationSerializable deserialize(Map<String, Object> map) {
-        return (ConfigurationSerializable) defix(map);
     }
 }

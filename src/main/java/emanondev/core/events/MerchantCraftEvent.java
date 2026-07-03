@@ -32,6 +32,10 @@ public class MerchantCraftEvent extends CraftEvent {
         return HANDLERS_LIST;
     }
 
+    public MerchantInventory getMerchantInventory() {
+        return (MerchantInventory) this.getClickEvent().getView().getTopInventory();
+    }
+
     /*
      * https://www.spigotmc.org/threads/villager-trade-item-prices.487937/
      * https://minecraft.gamepedia.com/Trading#Economics
@@ -62,10 +66,6 @@ public class MerchantCraftEvent extends CraftEvent {
         }
         return maxTrades * getResult().getAmount();
 
-    }
-
-    public MerchantInventory getMerchantInventory() {
-        return (MerchantInventory) this.getClickEvent().getView().getTopInventory();
     }
 
 }

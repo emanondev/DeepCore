@@ -23,10 +23,6 @@ public final class CoreMain extends CorePlugin {
         return inst;
     }
 
-    protected boolean registerReloadCommand() {
-        return false;
-    }
-
     @Override
     public void disable() {
         ConfigurationSerialization.unregisterClass(SoundInfo.class);
@@ -85,5 +81,9 @@ public final class CoreMain extends CorePlugin {
         this.logDone("Registered &aSoundInfo &fas ConfigurationSerializable");
         ConfigurationSerialization.registerClass(PlayerSnapshot.class, "PlayerSnapshot");
         this.logDone("Registered &aPlayerSnapshot &fas ConfigurationSerializable");
+    }
+
+    protected boolean registerReloadCommand() {
+        return false;
     }
 }

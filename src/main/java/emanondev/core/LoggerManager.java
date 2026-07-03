@@ -59,6 +59,39 @@ public class LoggerManager {
         }
     }
 
+    public String getDefaultDateFormat() {
+        return data.loadString("default.DateFormat", "[dd.MM.yyyy HH:mm:ss] ");
+    }
+
+    public void logText(String fileName, List<String> text) {
+        synchronized (requests) {
+            requests.add(new Request(fileName, text, RequestType.LOG_LIST_OF_TEXT));
+            requests.notify();
+        }
+    }
+
+    public void logText(String fileName, String[] text) {
+        synchronized (requests) {
+            requests.add(new Request(fileName, text, RequestType.LOG_ARRAY_OF_TEXT));
+            requests.notify();
+        }
+    }
+
+    public void logText(String fileName, String text) {
+        synchronized (requests) {
+            requests.add(new Request(fileName, text, RequestType.LOG_TEXT));
+            requests.notify();
+        }
+    }
+
+    protected void disable() {
+        if (task != null && !task.isCancelled())
+            task.cancel();
+        synchronized (requests) {
+            requests.notifyAll();
+        }
+    }
+
     private void reloadLoggers() {
         loggers.values().forEach(Logger::reload);
     }
@@ -103,39 +136,6 @@ public class LoggerManager {
 
     private void registerLogger(Logger logger, String fileName) {
         loggers.put(new String(fileName), logger);
-    }
-
-    public String getDefaultDateFormat() {
-        return data.loadString("default.DateFormat", "[dd.MM.yyyy HH:mm:ss] ");
-    }
-
-    protected void disable() {
-        if (task != null && !task.isCancelled())
-            task.cancel();
-        synchronized (requests) {
-            requests.notifyAll();
-        }
-    }
-
-    public void logText(String fileName, List<String> text) {
-        synchronized (requests) {
-            requests.add(new Request(fileName, text, RequestType.LOG_LIST_OF_TEXT));
-            requests.notify();
-        }
-    }
-
-    public void logText(String fileName, String[] text) {
-        synchronized (requests) {
-            requests.add(new Request(fileName, text, RequestType.LOG_ARRAY_OF_TEXT));
-            requests.notify();
-        }
-    }
-
-    public void logText(String fileName, String text) {
-        synchronized (requests) {
-            requests.add(new Request(fileName, text, RequestType.LOG_TEXT));
-            requests.notify();
-        }
     }
 
     private enum RequestType {

@@ -243,16 +243,6 @@ public interface YMLSection extends ConfigurationSection {
                 color, holders);
     }
 
-    private void holdersCheck(String path, String... holders) {
-        if (holders.length > 0 && this.getComments(path).isEmpty()) {
-            StringBuilder build = new StringBuilder("PlaceHolders: ");
-            for (int i = 0; i < holders.length; i += 2)
-                build.append(holders[i]).append(" ");
-            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
-            saveAsync();
-        }
-    }
-
     /**
      * Save the config object in RAM to the file.<br>
      * Overwrites any changes that the configurator has made to the file unless
@@ -1180,7 +1170,6 @@ public interface YMLSection extends ConfigurationSection {
         return val;
     }
 
-
     @Contract("_,!null->!null")
     @Nullable
     default ItemBuilder getGuiItem(@NotNull String path, @Nullable ItemStack def) {
@@ -1241,7 +1230,6 @@ public interface YMLSection extends ConfigurationSection {
             b.setCustomModelData(section.getInteger("damage", 0));
         return b;
     }
-
 
     @Contract("_,!null->!null")
     @Nullable
@@ -1519,5 +1507,15 @@ public interface YMLSection extends ConfigurationSection {
 
     default String getMessage(@NotNull String path, boolean color, @Nullable CommandSender target, String... holders) {
         return getMessage(path, null, color, target, holders);
+    }
+
+    private void holdersCheck(String path, String... holders) {
+        if (holders.length > 0 && this.getComments(path).isEmpty()) {
+            StringBuilder build = new StringBuilder("PlaceHolders: ");
+            for (int i = 0; i < holders.length; i += 2)
+                build.append(holders[i]).append(" ");
+            this.setComments(path, List.of(build.substring(0, build.length() - 1)));
+            saveAsync();
+        }
     }
 }

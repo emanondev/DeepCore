@@ -70,17 +70,6 @@ public final class UtilsWorld {
         }
     }
 
-    private static void deleteDirectoryRecursion(Path path) throws IOException {
-        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-            try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
-                for (Path entry : entries) {
-                    deleteDirectoryRecursion(entry);
-                }
-            }
-        }
-        Files.delete(path);
-    }
-
     /**
      * @param name      world name
      * @param saveWorld should save chunks?
@@ -109,6 +98,17 @@ public final class UtilsWorld {
         list.remove(world);
         return result;
 
+    }
+
+    private static void deleteDirectoryRecursion(Path path) throws IOException {
+        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+            try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
+                for (Path entry : entries) {
+                    deleteDirectoryRecursion(entry);
+                }
+            }
+        }
+        Files.delete(path);
     }
 
     private static Location getFallbackLocation(Location l, World w) {

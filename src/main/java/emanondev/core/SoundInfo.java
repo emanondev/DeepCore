@@ -39,16 +39,6 @@ public class SoundInfo implements ConfigurationSerializable {
         this.selfSound = selfSound;
     }
 
-    private static Sound getStringSound(String obj) {
-        try {
-            if (obj == null || obj.isEmpty())
-                return null;
-            return Sound.valueOf(obj);
-        } catch (Exception ignored) {
-        }
-        return null;
-    }
-
     public static SoundInfo getSelfVillagerNo() {
         return new SoundInfo(Sound.ENTITY_VILLAGER_NO, 1, 1, true);
     }
@@ -112,6 +102,16 @@ public class SoundInfo implements ConfigurationSerializable {
         map.put("pitch", pitch);
         map.put("selfSound", selfSound);
         return map;
+    }
+
+    private static Sound getStringSound(String obj) {
+        try {
+            if (obj == null || obj.isEmpty())
+                return null;
+            return Sound.valueOf(obj);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
 }

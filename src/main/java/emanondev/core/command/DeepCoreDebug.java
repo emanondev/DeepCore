@@ -71,15 +71,6 @@ public class DeepCoreDebug extends CoreCommand {
         }
     }
 
-    private List<String> debugList(CorePlugin plugin) {
-        ArrayList<String> lines = new ArrayList<>();
-        for (String option : getOptions(plugin))
-            lines.add("<gold>" + option + ":</gold> " + (plugin.debug(option) ? "<blue>on</blue>" : "<yellow>off</yellow>"));
-        if (lines.isEmpty())
-            lines.add("<red>No debug found</red>");
-        return lines;
-    }
-
     @Override
     public @Nullable List<String> onComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args, @Nullable Location loc) {
         return switch (args.length) {
@@ -93,6 +84,15 @@ public class DeepCoreDebug extends CoreCommand {
             }
             default -> Collections.emptyList();
         };
+    }
+
+    private List<String> debugList(CorePlugin plugin) {
+        ArrayList<String> lines = new ArrayList<>();
+        for (String option : getOptions(plugin))
+            lines.add("<gold>" + option + ":</gold> " + (plugin.debug(option) ? "<blue>on</blue>" : "<yellow>off</yellow>"));
+        if (lines.isEmpty())
+            lines.add("<red>No debug found</red>");
+        return lines;
     }
 
     private Set<String> getOptions(CorePlugin plugin) {

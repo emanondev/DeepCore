@@ -41,16 +41,6 @@ public class PacketHologram extends PacketEntity {
         return EntityType.TEXT_DISPLAY;
     }
 
-    @Override
-    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
-        getManager().spawnHologram(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
-        getManager().updateHologram(players, this);
-    }
-
     public boolean hasShadow() {
         return this.hasShadow;
     }
@@ -62,7 +52,6 @@ public class PacketHologram extends PacketEntity {
     public @Nullable DMessage getText() {
         return this.text;
     }
-
 
     @Contract("_->this")
     public PacketHologram setSeeThrough(boolean seeThrough) {
@@ -170,5 +159,15 @@ public class PacketHologram extends PacketEntity {
 
     public @Nullable Color getBackGroundColor() {
         return this.backGroundColor;
+    }
+
+    @Override
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
+        getManager().spawnHologram(players, this);
+    }
+
+    @Override
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
+        getManager().updateHologram(players, this);
     }
 }

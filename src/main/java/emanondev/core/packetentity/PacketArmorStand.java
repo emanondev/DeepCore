@@ -92,16 +92,6 @@ public class PacketArmorStand extends PacketEntity {
         return (PacketArmorStand) super.setVisible(value);
     }
 
-    @Override
-    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
-        getManager().spawnArmorStand(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
-        getManager().updateArmorStand(players, this);
-    }
-
     @Contract("_->this")
     public PacketArmorStand setCustomName(@NotNull String customName) {
         this.customName = new TextComponent(customName);
@@ -232,11 +222,6 @@ public class PacketArmorStand extends PacketEntity {
         this.velocity = vector.clone();
         return this;
     }
-/*
-    public WrappedDataWatcher updateAndGetWrappedDataWatcher() {
-        dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
-        return dataWatcher;
-    }*/
 
     public WrappedDataWatcher getWrappedDataWatcher() {
         //WrappedDataWatcher watcher = new WrappedDataWatcher();
@@ -279,7 +264,11 @@ public class PacketArmorStand extends PacketEntity {
     public double getHeight() {
         return this.isSmall ? 0.5D : 1.975D;
     }
-
+/*
+    public WrappedDataWatcher updateAndGetWrappedDataWatcher() {
+        dataWatcher = WatchableCollection.getWatchableCollection(this, getDataWatcher());
+        return dataWatcher;
+    }*/
 
     @Contract("->this")
     public PacketArmorStand update() {
@@ -290,5 +279,15 @@ public class PacketArmorStand extends PacketEntity {
 
     public boolean shouldUpdateEquipment() {
         return shouldUpdateEquipment;
+    }
+
+    @Override
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
+        getManager().spawnArmorStand(players, this);
+    }
+
+    @Override
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
+        getManager().updateArmorStand(players, this);
     }
 }

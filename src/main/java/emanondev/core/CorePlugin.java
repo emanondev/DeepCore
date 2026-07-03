@@ -54,15 +54,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     private PacketManager packetManager = null;
     private BukkitAudiences adventure;
 
-    @SuppressWarnings("unchecked")
-    private static Map<String, Command> getKnownCommands(Object object) throws Exception {
-        Field objectField = ReflectionUtility.getDeclaredField(SimpleCommandMap.class,"knownCommands");
-        objectField.setAccessible(true);
-        Object result = objectField.get(object);
-        ReflectionUtility.getFieldValue(object,"knownCommands");
-        return (Map<String, Command>) result;
-    }
-
     public @NonNull BukkitAudiences adventure() {
         if (this.adventure == null) {
             throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
@@ -191,17 +182,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         YMLConfig conf = new YMLConfig(this, fileName);
         languageConfigs.put(locale, conf);
         return conf;
-    }
-
-    private void setupLanguageConfig() {
-        defaultLocale = getConfig().loadString("language.default-locale", "en");
-        useMultiLanguage = getConfig().loadBoolean("language.multilanguage", true);
-
-        if (useMultiLanguage) {
-            this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
-        } else {
-            this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
-        }
     }
 
     /**
@@ -337,17 +317,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
     public void registerPermission(@NotNull Permission perm) {
         registerPermission(perm, true);
     }
-
-    /**
-     * Generate a reload command for this plugin?<br>
-     * <p>
-     * If true on enable a command "/{pluginname}reload" is registered<br>
-     * with permission "{pluginname}.command.reload" to use, by default for OP only.
-     *
-     * @return true if you wish to auto generate a reload command for this plugin
-     * @see ReloadCommand
-     */
-    protected abstract boolean registerReloadCommand();
 
     /**
      * Register permission to the Server.<br>
@@ -607,20 +576,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         return packetManager;
     }
 
-    protected void registerModule(@NotNull Module module) {
-        modules.put(module.getID(), module);
-        if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true)) {
-            enabledModules.add(module);//.put(module.getID(), true);
-            this.registerListener(module);
-            module.enable();
-            this.logDone("Registered and &aenabled &fmodule &e" + module.getID());
-        } else {
-            //enabledModules.put(module.getID(), false);
-            this.logDone("Registered as &cdisabled &fmodule &e" + module.getID());
-            // HandlerList.unregisterAll(module);
-        }
-    }
-
     /**
      * Send to sender a text based on sender language.<br>
      * Message is not send if text is null or empty<br>
@@ -688,7 +643,6 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         }
     }
 
-
     public void setDebug(boolean value) {
         setDebug("standard", value);
     }
@@ -707,5 +661,50 @@ public abstract class CorePlugin extends JavaPlugin implements ConsoleHelper {
         if (!UtilsString.isLowcasedValidID(type))
             throw new IllegalArgumentException();
         return getConfig().loadBoolean("debug." + type, false);
+    }
+
+    /**
+     * Generate a reload command for this plugin?<br>
+     * <p>
+     * If true on enable a command "/{pluginname}reload" is registered<br>
+     * with permission "{pluginname}.command.reload" to use, by default for OP only.
+     *
+     * @return true if you wish to auto generate a reload command for this plugin
+     * @see ReloadCommand
+     */
+    protected abstract boolean registerReloadCommand();
+
+    protected void registerModule(@NotNull Module module) {
+        modules.put(module.getID(), module);
+        if (getConfig("modules.yml").loadBoolean(module.getID() + ".enable", true)) {
+            enabledModules.add(module);//.put(module.getID(), true);
+            this.registerListener(module);
+            module.enable();
+            this.logDone("Registered and &aenabled &fmodule &e" + module.getID());
+        } else {
+            //enabledModules.put(module.getID(), false);
+            this.logDone("Registered as &cdisabled &fmodule &e" + module.getID());
+            // HandlerList.unregisterAll(module);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Command> getKnownCommands(Object object) throws Exception {
+        Field objectField = ReflectionUtility.getDeclaredField(SimpleCommandMap.class, "knownCommands");
+        objectField.setAccessible(true);
+        Object result = objectField.get(object);
+        ReflectionUtility.getFieldValue(object, "knownCommands");
+        return (Map<String, Command>) result;
+    }
+
+    private void setupLanguageConfig() {
+        defaultLocale = getConfig().loadString("language.default-locale", "en");
+        useMultiLanguage = getConfig().loadBoolean("language.multilanguage", true);
+
+        if (useMultiLanguage) {
+            this.logTetraStar(ChatColor.BLUE, "Default language &e" + defaultLocale);
+        } else {
+            this.logTetraStar(ChatColor.BLUE, "Language &e" + defaultLocale);
+        }
     }
 }

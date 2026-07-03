@@ -44,7 +44,7 @@ public final class VersionUtility {
     public static String getVersionType() {
         return hasFoliaAPI() ? "Folia" :
                 (hasPurpurAPI() ? "Purpur" :
-                        (hasPaperAPI() ? "Paper" : "Spigot"));
+                 (hasPaperAPI() ? "Paper" : "Spigot"));
     }
 
     /**
@@ -67,21 +67,13 @@ public final class VersionUtility {
         return getVersionType() + " " + getVersionNumber();
     }
 
-    private static String[] safeSplitVersion() {
-        try {
-            return Bukkit.getBukkitVersion().split("-")[0].split("\\.");
-        } catch (Exception e) {
-            throw new IllegalStateException("Invalid Bukkit version format: " + Bukkit.getBukkitVersion(), e);
-        }
-    }
-
     /**
      * Checks if the current version is up to (or equal to) the specified version.
      * Inclusive comparison.
      *
      * @param mainVersion the main version.
-     * @param version the minor version.
-     * @param subVersion the sub version.
+     * @param version     the minor version.
+     * @param subVersion  the sub version.
      * @return true if the current version is up to the specified version.
      */
     public static boolean isOlderEquals(final int mainVersion,
@@ -99,8 +91,8 @@ public final class VersionUtility {
      * Inclusive comparison.
      *
      * @param mainVersion the main version.
-     * @param version the minor version.
-     * @param subVersion the sub version.
+     * @param version     the minor version.
+     * @param subVersion  the sub version.
      * @return true if the current version is after the specified version.
      */
     public static boolean isNewerEquals(final int mainVersion,
@@ -118,11 +110,11 @@ public final class VersionUtility {
      * Inclusive comparison.
      *
      * @param mainVersionMin the minimum main version.
-     * @param versionMin the minimum minor version.
-     * @param subVersionMin the minimum sub version.
+     * @param versionMin     the minimum minor version.
+     * @param subVersionMin  the minimum sub version.
      * @param mainVersionMax the maximum main version.
-     * @param versionMax the maximum minor version.
-     * @param subVersionMax the maximum sub version.
+     * @param versionMax     the maximum minor version.
+     * @param subVersionMax  the maximum sub version.
      * @return true if the current version is within the range.
      */
     public static boolean isInRange(final int mainVersionMin,
@@ -160,5 +152,13 @@ public final class VersionUtility {
      */
     public static boolean hasFoliaAPI() {
         return HAS_FOLIA;
+    }
+
+    private static String[] safeSplitVersion() {
+        try {
+            return Bukkit.getBukkitVersion().split("-")[0].split("\\.");
+        } catch (Exception e) {
+            throw new IllegalStateException("Invalid Bukkit version format: " + Bukkit.getBukkitVersion(), e);
+        }
     }
 }

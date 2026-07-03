@@ -97,16 +97,6 @@ public class LongEditorFButton extends AGuiButton {
                 getValue, setValue, baseItem, true);
     }
 
-    private void checkBounds() {
-        if (minChangeAmount <= 0 || minChangeAmount > maxChangeAmount)
-            throw new IllegalArgumentException();
-        if (changeAmount > maxChangeAmount)
-            changeAmount = maxChangeAmount;
-        if (changeAmount < minChangeAmount)
-            changeAmount = minChangeAmount;
-
-    }
-
     @Override
     public boolean onClick(@NotNull InventoryClickEvent event) {
         switch (event.getClick()) {
@@ -150,18 +140,6 @@ public class LongEditorFButton extends AGuiButton {
         this.changeAmount = changeAmount;
     }
 
-    private long multiplyEditor(double b) {
-        return bound((long) Math.max(1L, this.changeAmount * b));
-    }
-
-    private long bound(long num) {
-        if (num > maxChangeAmount)
-            num = maxChangeAmount;
-        if (num < minChangeAmount)
-            num = minChangeAmount;
-        return num;
-    }
-
     @Override
     public ItemStack getItem() {
         ItemStack base = getBaseItem();
@@ -180,6 +158,28 @@ public class LongEditorFButton extends AGuiButton {
 
     public DMessage getInstructionsDescription() {
         return new DMessage(CoreMain.get(), getTargetPlayer()).appendLang("gui_button.number_editor.instructions");
+    }
+
+    private void checkBounds() {
+        if (minChangeAmount <= 0 || minChangeAmount > maxChangeAmount)
+            throw new IllegalArgumentException();
+        if (changeAmount > maxChangeAmount)
+            changeAmount = maxChangeAmount;
+        if (changeAmount < minChangeAmount)
+            changeAmount = minChangeAmount;
+
+    }
+
+    private long multiplyEditor(double b) {
+        return bound((long) Math.max(1L, this.changeAmount * b));
+    }
+
+    private long bound(long num) {
+        if (num > maxChangeAmount)
+            num = maxChangeAmount;
+        if (num < minChangeAmount)
+            num = minChangeAmount;
+        return num;
     }
 
     private String[] getPlaceholders() {

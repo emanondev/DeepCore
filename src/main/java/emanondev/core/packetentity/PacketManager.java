@@ -34,18 +34,6 @@ public class PacketManager {
             throw new IllegalStateException("unsupported version");
     }
 
-    private static EnumWrappers.ItemSlot equipmentSlotToWrapper(EquipmentSlot slot) {
-        return switch (slot) {
-            case CHEST -> EnumWrappers.ItemSlot.CHEST;
-            case FEET -> EnumWrappers.ItemSlot.FEET;
-            case HAND -> EnumWrappers.ItemSlot.MAINHAND;
-            case HEAD -> EnumWrappers.ItemSlot.HEAD;
-            case LEGS -> EnumWrappers.ItemSlot.LEGS;
-            case OFF_HAND -> EnumWrappers.ItemSlot.OFFHAND;
-            default -> throw new IllegalStateException("unable to check equipment slot");
-        };
-    }
-
     public void clearAll() {
         for (PacketEntity pEntity : packetEntities)
             pEntity.remove();
@@ -205,7 +193,6 @@ public class PacketManager {
         sendPackets(players, packet1, packet2);
     }
 
-
     protected void spawnDisplayItem(Collection<Player> players, PacketDisplayItem entity) {
         PacketContainer packet1 = spawnEntityPacket(entity);
         PacketContainer packet2 = entityMetadataPacket(entity);
@@ -222,6 +209,18 @@ public class PacketManager {
 
     void trackPacketEntity(PacketEntity p) {
         packetEntities.add(p);
+    }
+
+    private static EnumWrappers.ItemSlot equipmentSlotToWrapper(EquipmentSlot slot) {
+        return switch (slot) {
+            case CHEST -> EnumWrappers.ItemSlot.CHEST;
+            case FEET -> EnumWrappers.ItemSlot.FEET;
+            case HAND -> EnumWrappers.ItemSlot.MAINHAND;
+            case HEAD -> EnumWrappers.ItemSlot.HEAD;
+            case LEGS -> EnumWrappers.ItemSlot.LEGS;
+            case OFF_HAND -> EnumWrappers.ItemSlot.OFFHAND;
+            default -> throw new IllegalStateException("unable to check equipment slot");
+        };
     }
 
     private PacketContainer spawnEntityPacket(PacketEntity entity) {

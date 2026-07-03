@@ -47,16 +47,6 @@ public class PacketItem extends PacketEntity {
         this.velocity = new Vector(0.0D, 0.0D, 0.0D);
     }
 
-    @Override
-    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
-        getManager().spawnItem(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
-        getManager().updateItem(players, this);
-    }
-
     public PacketItem setCustomName(String customName) {
         this.customName = new TextComponent(customName);
         return this;
@@ -120,5 +110,15 @@ public class PacketItem extends PacketEntity {
 
     public double getHeight() {
         return 0.25D;
+    }
+
+    @Override
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
+        getManager().spawnItem(players, this);
+    }
+
+    @Override
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
+        getManager().updateItem(players, this);
     }
 }

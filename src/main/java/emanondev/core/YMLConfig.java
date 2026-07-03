@@ -44,13 +44,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
     private BukkitTask delayedSave = null;
     @Getter
     private boolean dirty = false;
-
-    public void setAutosaveOnSet(boolean autosaveOnSet) {
-        if (file != null) {
-            this.autosaveOnSet = autosaveOnSet;
-        }
-    }
-
     private boolean autosaveOnSet = true;
 
     /**
@@ -107,6 +100,12 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             name += ".yml";
         }
         return name;
+    }
+
+    public void setAutosaveOnSet(boolean autosaveOnSet) {
+        if (file != null) {
+            this.autosaveOnSet = autosaveOnSet;
+        }
     }
 
     /**
@@ -292,10 +291,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return autosaveOnSet;
     }
 
-    void setDirty() {
-        dirty = true;
-    }
-
     public @Nullable FireworkEffect loadFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
         try {
             Type type = loadFireworkEffectType(path + ".type", def == null ? null : def.getType());
@@ -322,10 +317,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
         return stringListToColorList(loadStringList(path, colorCollectionToStringList(def)));
     }
 
-    private String getError(String path) {
-        return "Value has wrong type or wrong value at '" + path + ":' on file " + name;
-    }
-
     public void set(String path, Object value, boolean save) {
         super.set(path, value);
         dirty = true;
@@ -334,28 +325,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
                 saveAsync();
             else
                 save();
-    }
-
-    private ArrayList<Color> stringListToColorList(@Nullable Collection<String> rgb) {
-        ArrayList<Color> colors = new ArrayList<>();
-        for (String color : rgb) {
-            try {
-                String[] args = color.split(" ");
-                colors.add(Color.fromRGB(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-            } catch (Exception e) {
-                e.printStackTrace();
-                new IllegalArgumentException("color rgb format example '0 20 255'").printStackTrace();
-            }
-        }
-        return colors;
-    }
-
-    private ArrayList<String> colorCollectionToStringList(@Nullable Collection<Color> colors) {
-        ArrayList<String> list = new ArrayList<>();
-        if (colors != null)
-            for (Color color : colors)
-                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
-        return list;
     }
 
     public @Nullable FireworkEffect getFireworkEffect(@NotNull String path, @Nullable FireworkEffect def) {
@@ -389,14 +358,6 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             e.printStackTrace();
             return def == null ? Collections.emptyList() : def;
         }
-    }
-
-    private @NotNull List<String> colorsToStringList(Collection<Color> colors) {
-        ArrayList<String> list = new ArrayList<>();
-        if (colors != null)
-            for (Color color : colors)
-                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
-        return list;
     }
 
     /**
@@ -602,7 +563,7 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             return UtilsString.fix(get(path, def, List.class), target, color, args);
         } catch (Exception e) {
             e.printStackTrace();
-            if (def==null){
+            if (def == null) {
                 return List.of();
             }
             return UtilsString.fix(def, target, color, args);
@@ -689,5 +650,43 @@ public class YMLConfig extends YamlConfiguration implements YMLSection {
             else
                 section.set(key, value);
         }
+    }
+
+    void setDirty() {
+        dirty = true;
+    }
+
+    private String getError(String path) {
+        return "Value has wrong type or wrong value at '" + path + ":' on file " + name;
+    }
+
+    private ArrayList<Color> stringListToColorList(@Nullable Collection<String> rgb) {
+        ArrayList<Color> colors = new ArrayList<>();
+        for (String color : rgb) {
+            try {
+                String[] args = color.split(" ");
+                colors.add(Color.fromRGB(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+            } catch (Exception e) {
+                e.printStackTrace();
+                new IllegalArgumentException("color rgb format example '0 20 255'").printStackTrace();
+            }
+        }
+        return colors;
+    }
+
+    private ArrayList<String> colorCollectionToStringList(@Nullable Collection<Color> colors) {
+        ArrayList<String> list = new ArrayList<>();
+        if (colors != null)
+            for (Color color : colors)
+                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
+        return list;
+    }
+
+    private @NotNull List<String> colorsToStringList(Collection<Color> colors) {
+        ArrayList<String> list = new ArrayList<>();
+        if (colors != null)
+            for (Color color : colors)
+                list.add(color.getRed() + " " + color.getGreen() + " " + color.getBlue());
+        return list;
     }
 }

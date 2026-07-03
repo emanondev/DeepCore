@@ -69,25 +69,6 @@ public abstract class TextEditorGui extends AnvilGui {
         updateInventory();
     }
 
-    private List<String> format(String info, String text) {
-        List<String> list = new ArrayList<>();
-        list.add(UtilsString.fix("&b[&9" + info + "&b]", null, true));
-        if (text.isEmpty()) {
-            list.add("");
-            return list;
-        }
-        list.addAll(UtilsString.textLineSplitter(text));
-        String line = text;
-
-        text = UtilsString.fix(line, null, true);
-        if (line.equals(text))
-            return list;
-
-        list.add(UtilsString.fix("&b[&9" + info + " with Color&b]", null, true));
-        list.addAll(UtilsString.textLineSplitter(text));
-        return list;
-    }
-
     @Override
     public void onTextChange(String newText) {
         if (newText == null)
@@ -188,6 +169,25 @@ public abstract class TextEditorGui extends AnvilGui {
             original = "";
         else
             original = value.replace("§", "&");
+    }
+
+    private List<String> format(String info, String text) {
+        List<String> list = new ArrayList<>();
+        list.add(UtilsString.fix("&b[&9" + info + "&b]", null, true));
+        if (text.isEmpty()) {
+            list.add("");
+            return list;
+        }
+        list.addAll(UtilsString.textLineSplitter(text));
+        String line = text;
+
+        text = UtilsString.fix(line, null, true);
+        if (line.equals(text))
+            return list;
+
+        list.add(UtilsString.fix("&b[&9" + info + " with Color&b]", null, true));
+        list.addAll(UtilsString.textLineSplitter(text));
+        return list;
     }
 
 }

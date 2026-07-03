@@ -39,16 +39,6 @@ public class PacketDisplayItem extends PacketEntity {
         return EntityType.BLOCK_DISPLAY;
     }
 
-    @Override
-    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
-        getManager().spawnDisplayItem(players, this);
-    }
-
-    @Override
-    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
-        getManager().updateDisplayItem(players, this);
-    }
-
     public boolean hasShadow() {
         return this.hasShadow;
     }
@@ -147,6 +137,16 @@ public class PacketDisplayItem extends PacketEntity {
             this.displayItem = displayItem;
         }
         return this;
+    }
+
+    @Override
+    protected void handleSpawnPackets(@NotNull Collection<Player> players) {
+        getManager().spawnDisplayItem(players, this);
+    }
+
+    @Override
+    protected void handleUpdatePackets(@NotNull Collection<Player> players) {
+        getManager().updateDisplayItem(players, this);
     }
 
 }

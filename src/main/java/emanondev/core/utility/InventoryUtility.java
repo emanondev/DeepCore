@@ -58,16 +58,6 @@ public final class InventoryUtility {
         return getTopInventoryP(player.getOpenInventory());
     }
 
-    private static Inventory getTopInventoryP(@NotNull Object view) {
-        Method method = getTopInventory.get(view.getClass());
-        if (method == null) {
-            method = ReflectionUtility.getMethod(view.getClass(), "getTopInventory");
-            getTopInventory.put(view.getClass(), method);
-        }
-        return (Inventory) ReflectionUtility.invokeMethod(view, method);
-    }
-
-
     /**
      * Returns the bottom Inventory object from the event's InventoryView.<br><br>
      * This method may use reflections to get the top Inventory object from the
@@ -83,16 +73,6 @@ public final class InventoryUtility {
             return event.getView().getBottomInventory();
         return getBottomInventoryP(event.getView());
     }
-
-    private static Inventory getBottomInventoryP(@NotNull Object view) {
-        Method method = getBottomInventory.get(view.getClass());
-        if (method == null) {
-            method = ReflectionUtility.getMethod(view.getClass(), "getBottomInventory");
-            getBottomInventory.put(view.getClass(), method);
-        }
-        return (Inventory) ReflectionUtility.invokeMethod(view, method);
-    }
-
 
     /**
      * Update InventoryView for player.<br><br>
@@ -233,6 +213,24 @@ public final class InventoryUtility {
                 yield amount - map.get(0).getAmount();
             }
         };
+    }
+
+    private static Inventory getTopInventoryP(@NotNull Object view) {
+        Method method = getTopInventory.get(view.getClass());
+        if (method == null) {
+            method = ReflectionUtility.getMethod(view.getClass(), "getTopInventory");
+            getTopInventory.put(view.getClass(), method);
+        }
+        return (Inventory) ReflectionUtility.invokeMethod(view, method);
+    }
+
+    private static Inventory getBottomInventoryP(@NotNull Object view) {
+        Method method = getBottomInventory.get(view.getClass());
+        if (method == null) {
+            method = ReflectionUtility.getMethod(view.getClass(), "getBottomInventory");
+            getBottomInventory.put(view.getClass(), method);
+        }
+        return (Inventory) ReflectionUtility.invokeMethod(view, method);
     }
 
     public enum ExcessMode {

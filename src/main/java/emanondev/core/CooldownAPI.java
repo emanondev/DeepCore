@@ -56,29 +56,13 @@ public class CooldownAPI {
         }
     }
 
-    void save() {
-        if (conf != null) {
-            long now = System.currentTimeMillis();
-            conf.set("users", null, false);
-            for (UUID uuid : cooldowns.keySet()) {
-                Map<String, Long> values = cooldowns.get(uuid);
-                for (String id : values.keySet()) {
-                    if (values.get(id) > now) {
-                        conf.set("users." + uuid.toString() + "." + id, values.get(id), false);
-                    }
-                }
-            }
-            conf.save();
-        }
-    }
-
     /**
      * Sets a cooldown for a block with a specified duration.
      *
      * @param block      the block whose cooldown is to be set.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration of the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration of the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void setCooldown(final @NotNull Block block,
@@ -92,9 +76,9 @@ public class CooldownAPI {
      * Adds to the cooldown for a block.
      *
      * @param block      the block whose cooldown is to be added to.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to add to the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to add to the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void addCooldown(final @NotNull Block block,
@@ -108,9 +92,9 @@ public class CooldownAPI {
      * Reduces the cooldown for a block.
      *
      * @param block      the block whose cooldown is to be reduced.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to reduce from the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to reduce from the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void reduceCooldown(final @NotNull Block block,
@@ -124,7 +108,7 @@ public class CooldownAPI {
      * Removes a cooldown for a block.
      *
      * @param block      the block whose cooldown is to be removed.
-     * @param cooldownId  the ID of the cooldown.
+     * @param cooldownId the ID of the cooldown.
      */
     public void removeCooldown(final @NotNull Block block,
                                final @NotNull String cooldownId) {
@@ -134,7 +118,7 @@ public class CooldownAPI {
     /**
      * Checks if the given block has an active cooldown for the specified cooldown ID.
      *
-     * @param block The offline block to check.
+     * @param block      The offline block to check.
      * @param cooldownId The ID of the cooldown.
      * @return {@code true} if the block has an active cooldown, {@code false} otherwise.
      */
@@ -147,8 +131,8 @@ public class CooldownAPI {
      * Retrieves the cooldown for a block and cooldown ID, converted to a specified time unit.
      *
      * @param block      the block whose cooldown is to be retrieved.
-     * @param cooldownId  the ID of the cooldown.
-     * @param timeUnit    the time unit to convert the cooldown to.
+     * @param cooldownId the ID of the cooldown.
+     * @param timeUnit   the time unit to convert the cooldown to.
      * @return the cooldown duration in the specified time unit, or 0 if no cooldown is active.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
@@ -161,10 +145,10 @@ public class CooldownAPI {
     /**
      * Sets a cooldown for a player with a specified duration.
      *
-     * @param player      the player whose cooldown is to be set.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration of the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param player     the player whose cooldown is to be set.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration of the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void setCooldown(final @NotNull OfflinePlayer player,
@@ -177,10 +161,10 @@ public class CooldownAPI {
     /**
      * Adds to the cooldown for a player.
      *
-     * @param player      the player whose cooldown is to be added to.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to add to the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param player     the player whose cooldown is to be added to.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to add to the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void addCooldown(final @NotNull OfflinePlayer player,
@@ -193,10 +177,10 @@ public class CooldownAPI {
     /**
      * Reduces the cooldown for a player.
      *
-     * @param player      the player whose cooldown is to be reduced.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to reduce from the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param player     the player whose cooldown is to be reduced.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to reduce from the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void reduceCooldown(final @NotNull OfflinePlayer player,
@@ -209,8 +193,8 @@ public class CooldownAPI {
     /**
      * Removes a cooldown for a player.
      *
-     * @param player      the player whose cooldown is to be removed.
-     * @param cooldownId  the ID of the cooldown.
+     * @param player     the player whose cooldown is to be removed.
+     * @param cooldownId the ID of the cooldown.
      */
     public void removeCooldown(final @NotNull OfflinePlayer player,
                                final @NotNull String cooldownId) {
@@ -220,7 +204,7 @@ public class CooldownAPI {
     /**
      * Checks if the given player has an active cooldown for the specified cooldown ID.
      *
-     * @param player The offline player to check.
+     * @param player     The offline player to check.
      * @param cooldownId The ID of the cooldown.
      * @return {@code true} if the player has an active cooldown, {@code false} otherwise.
      */
@@ -232,9 +216,9 @@ public class CooldownAPI {
     /**
      * Retrieves the cooldown for a player and cooldown ID, converted to a specified time unit.
      *
-     * @param player      the player whose cooldown is to be retrieved.
-     * @param cooldownId  the ID of the cooldown.
-     * @param timeUnit    the time unit to convert the cooldown to.
+     * @param player     the player whose cooldown is to be retrieved.
+     * @param cooldownId the ID of the cooldown.
+     * @param timeUnit   the time unit to convert the cooldown to.
      * @return the cooldown duration in the specified time unit, or 0 if no cooldown is active.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
@@ -247,10 +231,10 @@ public class CooldownAPI {
     /**
      * Sets a cooldown for a UUID with a specified duration.
      *
-     * @param uuid      the UUID.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration of the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param uuid       the UUID.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration of the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void setCooldown(final @NotNull UUID uuid,
@@ -273,10 +257,10 @@ public class CooldownAPI {
     /**
      * Adds to the cooldown for a UUID.
      *
-     * @param uuid      the UUID.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to add to the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param uuid       the UUID.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to add to the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void addCooldown(final @NotNull UUID uuid,
@@ -293,10 +277,10 @@ public class CooldownAPI {
     /**
      * Reduces the cooldown for a UUID.
      *
-     * @param uuid      the UUID.
-     * @param cooldownId  the ID of the cooldown.
-     * @param duration    the duration to reduce from the cooldown.
-     * @param timeUnit    the time unit of the duration.
+     * @param uuid       the UUID.
+     * @param cooldownId the ID of the cooldown.
+     * @param duration   the duration to reduce from the cooldown.
+     * @param timeUnit   the time unit of the duration.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
     public void reduceCooldown(final @NotNull UUID uuid,
@@ -313,8 +297,8 @@ public class CooldownAPI {
     /**
      * Removes a cooldown for a UUID.
      *
-     * @param uuid      the UUID whose cooldown is to be removed.
-     * @param cooldownId  the ID of the cooldown.
+     * @param uuid       the UUID whose cooldown is to be removed.
+     * @param cooldownId the ID of the cooldown.
      */
     public void removeCooldown(final @NotNull UUID uuid,
                                final @NotNull String cooldownId) {
@@ -326,7 +310,7 @@ public class CooldownAPI {
     /**
      * Checks if the player (by UUID) has an active cooldown for the specified cooldown ID.
      *
-     * @param player The UUID of the player to check.
+     * @param player     The UUID of the player to check.
      * @param cooldownId The ID of the cooldown.
      * @return {@code true} if the player has an active cooldown, {@code false} otherwise.
      */
@@ -338,9 +322,9 @@ public class CooldownAPI {
     /**
      * Retrieves the cooldown for a UUID and cooldown ID, converted to a specified time unit.
      *
-     * @param uuid      the UUID.
-     * @param cooldownId  the ID of the cooldown.
-     * @param timeUnit    the time unit to convert the cooldown to.
+     * @param uuid       the UUID.
+     * @param cooldownId the ID of the cooldown.
+     * @param timeUnit   the time unit to convert the cooldown to.
      * @return the cooldown duration in the specified time unit, or 0 if no cooldown is active.
      * @throws UnsupportedOperationException if the time unit is less than {@link TimeUnit#MILLISECONDS}.
      */
@@ -541,6 +525,22 @@ public class CooldownAPI {
     @Deprecated
     public long getCooldownHours(Block block, String cooldownId) {
         return getCooldownHours(blockToUUID(block), cooldownId);
+    }
+
+    void save() {
+        if (conf != null) {
+            long now = System.currentTimeMillis();
+            conf.set("users", null, false);
+            for (UUID uuid : cooldowns.keySet()) {
+                Map<String, Long> values = cooldowns.get(uuid);
+                for (String id : values.keySet()) {
+                    if (values.get(id) > now) {
+                        conf.set("users." + uuid.toString() + "." + id, values.get(id), false);
+                    }
+                }
+            }
+            conf.save();
+        }
     }
 
     private UUID blockToUUID(Block block) {

@@ -97,6 +97,14 @@ abstract class CraftEvent extends InventoryEvent implements Cancellable {
         }
     }
 
+    public ItemStack getResult() {
+        return clickEvent.getCurrentItem();
+    }
+
+    public Player getPlayer() {
+        return (Player) clickEvent.getWhoClicked();
+    }
+
     /**
      * returns the amount of how many item you may craft with a shift click with no
      * inventory space limits
@@ -119,14 +127,6 @@ abstract class CraftEvent extends InventoryEvent implements Cancellable {
         maxCraftable = maxCraftable * clickEvent.getCurrentItem().getAmount();
         return maxCraftable;
 
-    }
-
-    public ItemStack getResult() {
-        return clickEvent.getCurrentItem();
-    }
-
-    public Player getPlayer() {
-        return (Player) clickEvent.getWhoClicked();
     }
 
 }

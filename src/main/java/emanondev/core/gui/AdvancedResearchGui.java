@@ -217,28 +217,6 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         recalculateButtons();
     }
 
-    private void recalculateButtons() {
-        activeButtons.clear();
-        if (show == null) {
-            for (ContainerButton button : buttons)
-                if (button.match(getRenameText()))
-                    activeButtons.add(button);
-        } else
-            for (ContainerButton button : buttons)
-                if (show.test(button.getValue()) && button.match(getRenameText()))
-                    activeButtons.add(button);
-
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            reloadInventory();
-        controlButtons[nextPageSlot] = nextB;
-        controlButtons[previousPageSlot] = prevB;
-        controlButtons[backGuiSlot] = backB;
-    }
-
-    private String getRenameText() {
-        return lastText;
-    }
-
     public void sort(Comparator<T> comparator) {
         buttons.sort((o1, o2) -> comparator.compare(o1.getValue(), o2.getValue()));
         recalculateButtons();
@@ -333,10 +311,6 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         }
     }
 
-    private ContainerButton getContainer(T value) {
-        return new ContainerButton(value);
-    }
-
     public void clearElements() {
         buttons.clear();
         activeButtons.clear();
@@ -419,6 +393,32 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
     public abstract boolean onElementClick(InventoryClickEvent event, T value);
 
     public abstract ItemStack getElementItem(T value);
+
+    private void recalculateButtons() {
+        activeButtons.clear();
+        if (show == null) {
+            for (ContainerButton button : buttons)
+                if (button.match(getRenameText()))
+                    activeButtons.add(button);
+        } else
+            for (ContainerButton button : buttons)
+                if (show.test(button.getValue()) && button.match(getRenameText()))
+                    activeButtons.add(button);
+
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            reloadInventory();
+        controlButtons[nextPageSlot] = nextB;
+        controlButtons[previousPageSlot] = prevB;
+        controlButtons[backGuiSlot] = backB;
+    }
+
+    private String getRenameText() {
+        return lastText;
+    }
+
+    private ContainerButton getContainer(T value) {
+        return new ContainerButton(value);
+    }
 
     private class ContainerButton implements GuiButton {
 

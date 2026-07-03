@@ -127,24 +127,6 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
         recalculateButtons();
     }
 
-    private void recalculateButtons() {
-        activeButtons.clear();
-        if (show == null) {
-            activeButtons.addAll(buttons);
-        }else {
-            for (ContainerButton button : buttons) {
-                if (show.test(button.getValue())) {
-                    activeButtons.add(button);
-                }
-            }
-        }
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            reloadInventory();
-        controlButtons[nextPageSlot] = nextB;
-        controlButtons[previousPageSlot] = prevB;
-        controlButtons[backGuiSlot] = backB;
-    }
-
     public void sort(@NotNull Comparator<T> comparator) {
         buttons.sort((o1, o2) -> comparator.compare(o1.getValue(), o2.getValue()));
         recalculateButtons();
@@ -300,6 +282,24 @@ public abstract class PagedListGui<T> extends ChestGui implements PagedGui {
             }
         if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
             reloadInventory();
+    }
+
+    private void recalculateButtons() {
+        activeButtons.clear();
+        if (show == null) {
+            activeButtons.addAll(buttons);
+        } else {
+            for (ContainerButton button : buttons) {
+                if (show.test(button.getValue())) {
+                    activeButtons.add(button);
+                }
+            }
+        }
+        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            reloadInventory();
+        controlButtons[nextPageSlot] = nextB;
+        controlButtons[previousPageSlot] = prevB;
+        controlButtons[backGuiSlot] = backB;
     }
 
     public abstract class ContainerButton implements GuiButton {

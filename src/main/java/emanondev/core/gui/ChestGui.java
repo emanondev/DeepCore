@@ -77,22 +77,6 @@ public abstract class ChestGui implements Gui {
         this.plugin = plugin;
     }
 
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
-        giveMessageFeedback(receiver, path, def, color, receiver, holders);
-    }
-
-    @Deprecated
-    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, CommandSender target, String... holders) {
-        UtilsMessages.sendMessage(receiver, getMessage(receiver, path, def, color, target, holders));
-    }
-
-    @Deprecated
-    protected String getMessage(CommandSender receiver, @NotNull String path, String def, boolean color, CommandSender target, String... holders) {
-        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
-                def, color, target, holders);
-    }
-
     public @NotNull CorePlugin getPlugin() {
         return plugin;
     }
@@ -134,6 +118,22 @@ public abstract class ChestGui implements Gui {
     @Override
     public void setTimerUpdated(boolean value) {
         timerUpdated = value;
+    }
+
+    @Deprecated
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, String... holders) {
+        giveMessageFeedback(receiver, path, def, color, receiver, holders);
+    }
+
+    @Deprecated
+    protected void giveMessageFeedback(CommandSender receiver, @NotNull String path, String def, boolean color, CommandSender target, String... holders) {
+        UtilsMessages.sendMessage(receiver, getMessage(receiver, path, def, color, target, holders));
+    }
+
+    @Deprecated
+    protected String getMessage(CommandSender receiver, @NotNull String path, String def, boolean color, CommandSender target, String... holders) {
+        return getPlugin().getLanguageConfig(receiver).loadMessage("gui." + path,
+                def, color, target, holders);
     }
 
     @Deprecated

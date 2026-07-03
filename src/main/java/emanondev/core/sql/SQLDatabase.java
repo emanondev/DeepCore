@@ -35,18 +35,6 @@ public class SQLDatabase {
         connect(true);
     }
 
-    private void connect(boolean message) throws ClassNotFoundException, SQLException {
-
-        if (isConnected()) {
-            if (message) {
-                Bukkit.getConsoleSender().sendMessage(
-                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: Already connected");
-            }
-        } else {
-            setConnection();
-        }
-    }
-
     public boolean isConnected() throws SQLException {
         if (con != null) {
             try {
@@ -154,5 +142,17 @@ public class SQLDatabase {
     public void reconnect() throws ClassNotFoundException, SQLException {
         disconnect();
         connect();
+    }
+
+    private void connect(boolean message) throws ClassNotFoundException, SQLException {
+
+        if (isConnected()) {
+            if (message) {
+                Bukkit.getConsoleSender().sendMessage(
+                        ChatColor.RED + "✗  " + ChatColor.WHITE + type.name() + " Connect Error: Already connected");
+            }
+        } else {
+            setConnection();
+        }
     }
 }
