@@ -27,6 +27,14 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <release>21</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.46</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>
@@ -99,6 +107,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.46</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- slf4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.17</version>
             <scope>provided</scope>
         </dependency>
         <!-- MiniMessage -->

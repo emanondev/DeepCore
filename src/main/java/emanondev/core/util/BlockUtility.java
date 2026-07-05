@@ -1,9 +1,11 @@
 package emanondev.core.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+@Slf4j
 public class BlockUtility {
 
     private BlockUtility() {
@@ -23,7 +25,7 @@ public class BlockUtility {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn("warning",e);
             }
         return false;
     }

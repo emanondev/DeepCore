@@ -34,6 +34,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import emanondev.core.Hooks;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.function.Consumer;
 
+@Slf4j
 public final class ClipboardContainer implements Clipboard {
 
     private final Clipboard parent;
@@ -503,7 +505,7 @@ public final class ClipboardContainer implements Clipboard {
         try {
             clean();
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.warn("warning",t);
         }
     }
 
