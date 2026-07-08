@@ -1,5 +1,6 @@
 package emanondev.core.utility;
 
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,22 +8,44 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Utility class for managing server version information and compatibility checks.
  */
+@Slf4j
 public final class VersionUtility {
+    private static int initVersion(int slot){
+        String[] split;
+        try {
+            split = Bukkit.getBukkitVersion().split("-")[0].split("\\.");
+        } catch (Exception e) {
+            log.warn("(slot "+slot+") Invalid Bukkit version format: " + Bukkit.getBukkitVersion(), e);
+            return 100; //avoid stopping the load, try to start with wrong version
+        }
+        try {
+            if (split.length<=slot) {
+                return 0;
+            }
+            if ("build".equals(split[slot])) {
+                return 0;
+            }
+            return Integer.parseInt(split[slot]);
+        } catch (Exception e){
+            log.warn("(slot "+slot+") Invalid Bukkit version format: " + Bukkit.getBukkitVersion(),e);
+            return 100; //avoid stopping the load, try to start with wrong version
+        }
+    }
 
     /**
-     * The main version of the game (e.g., the first number in the version string).
+     * The major version of the game (e.g., the first number in the version string).
      */
-    public static final int GAME_MAIN_VERSION = Integer.parseInt(safeSplitVersion()[0]);
+    public static final int GAME_MAIN_VERSION = initVersion(0);
 
     /**
      * The minor version of the game (e.g., the second number in the version string).
      */
-    public static final int GAME_VERSION = Integer.parseInt(safeSplitVersion()[1]);
+    public static final int GAME_VERSION = initVersion(1);
 
     /**
-     * The sub-version of the game, or 0 if the version string has fewer than three parts.
+     * The patch version of the game, or 0 if the version string has fewer than three parts.
      */
-    public static final int GAME_SUB_VERSION = safeSplitVersion().length < 3 ? 0 : Integer.parseInt(safeSplitVersion()[2]);
+    public static final int GAME_SUB_VERSION = initVersion(2);
 
     private static final boolean HAS_PAPER = ReflectionUtility
             .isClassPresent("com.destroystokyo.paper.VersionHistoryManager$VersionData");
