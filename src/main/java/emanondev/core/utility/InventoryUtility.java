@@ -2,6 +2,7 @@ package emanondev.core.utility;
 
 import emanondev.itemedit.ItemEdit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryEvent;
@@ -21,6 +22,13 @@ public final class InventoryUtility {
             VersionUtility.hasFoliaAPI() ? new ConcurrentHashMap<>() : new HashMap<>();
     private static final Map<Class<?>, Method> getBottomInventory =
             VersionUtility.hasFoliaAPI() ? new ConcurrentHashMap<>() : new HashMap<>();
+
+    /**
+     * A utility method to support versions that use null or air ItemStacks.
+     */
+    public static boolean isAirOrNull(ItemStack item) {
+        return item == null || item.getType().equals(Material.AIR);
+    }
 
     private InventoryUtility() {
         throw new UnsupportedOperationException();
