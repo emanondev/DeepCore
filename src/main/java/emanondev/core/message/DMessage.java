@@ -25,8 +25,9 @@ import java.util.function.Predicate;
 
 public class DMessage {
 
-    private static final LegacyComponentSerializer UNGLY_LEGACY = LegacyComponentSerializer.legacySection().toBuilder()
-            .hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+    private static final LegacyComponentSerializer UNGLY_LEGACY = LegacyComponentSerializer.legacySection();
+//            .legacySection().toBuilder()
+//            .hexColors().useUnusualXRepeatedCharacterHexFormat().build();
     private final StringBuilder raw = new StringBuilder();
     private final CorePlugin plugin;
     private final CommandSender target;
