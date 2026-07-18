@@ -3,7 +3,7 @@ package emanondev.core.packetentity;
 import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import emanondev.core.UtilsInventory;
+import emanondev.core.utility.InventoryUtility;
 import lombok.Getter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -199,7 +199,7 @@ public class PacketArmorStand extends PacketEntity {
 
     @Contract("_,_->this")
     public PacketArmorStand setItem(@NotNull EquipmentSlot slot, @Nullable ItemStack item) {
-        if (UtilsInventory.isAirOrNull(item))
+        if (InventoryUtility.isAirOrNull(item))
             equip.remove(slot);
         else
             equip.put(slot, item);

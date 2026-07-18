@@ -75,15 +75,24 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
      * @param slot must be 0-8 value if button should be shown
      */
     public void setNextPageSlot(int slot) {
-        if (slot == nextPageSlot)
-            return;
-        if (nextPageSlot >= 0 && nextPageSlot < 9)
-            controlButtons[nextPageSlot] = null;
+        setControlButtonSlot(nextPageSlot, slot, nextB);
         nextPageSlot = slot;
-        if (nextPageSlot >= 0 && nextPageSlot < 9)
-            controlButtons[nextPageSlot] = nextB;
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            updateControlButtons();
+    }
+
+    /**
+     * @param slot must be 0-8 value if button should be shown
+     */
+
+    public void setPreviousPageSlot(int slot) {
+        setControlButtonSlot(previousPageSlot, slot, prevB);
+        previousPageSlot = slot;
+    }
+
+    /**
+     * @param slot must be 0-8 value if button should be shown
+     */
+    public void setBackGuiSlot(int slot) {
+        setControlButtonSlot(backGuiSlot, slot, backB);
     }
 
     public void updateControlButtons() {
@@ -92,30 +101,6 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
                 getInventory().setItem(getInventory().getSize() - 9 + i, controlButtons[i].getItem());
             else
                 getInventory().setItem(getInventory().getSize() - 9 + i, null);
-    }
-
-    public void setPreviousPageSlot(int slot) {
-        if (slot == previousPageSlot)
-            return;
-        if (previousPageSlot >= 0 && previousPageSlot < 9)
-            controlButtons[previousPageSlot] = null;
-        previousPageSlot = slot;
-        if (previousPageSlot >= 0 && previousPageSlot < 9)
-            controlButtons[previousPageSlot] = prevB;
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            updateControlButtons();
-    }
-
-    public void setBackGuiSlot(int slot) {
-        if (slot == backGuiSlot)
-            return;
-        if (backGuiSlot >= 0 && backGuiSlot < 9)
-            controlButtons[backGuiSlot] = null;
-        backGuiSlot = slot;
-        if (backGuiSlot >= 0 && backGuiSlot < 9)
-            controlButtons[backGuiSlot] = backB;
-        if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-            updateControlButtons();
     }
 
     @Override
@@ -318,6 +303,20 @@ public abstract class ListGui<T> extends ChestGui implements PagedGui {
     public abstract boolean onElementClick(InventoryClickEvent event, T value);
 
     public abstract ItemStack getElementItem(T value);
+
+    private void setControlButtonSlot(int oldSlot, int newSlot, AGuiButton button) {
+        if (oldSlot == newSlot)
+            return;
+
+        if (oldSlot >= 0 && oldSlot < 9)
+            controlButtons[oldSlot] = null;
+
+        if (newSlot >= 0 && newSlot < 9)
+            controlButtons[newSlot] = button;
+
+        if (!isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
+            updateControlButtons();
+    }
 
     private ContainerButton getContainer(T value) {
         return new ContainerButton(value);

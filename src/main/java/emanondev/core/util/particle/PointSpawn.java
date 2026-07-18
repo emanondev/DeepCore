@@ -9,11 +9,11 @@ import java.util.Objects;
 
 public class PointSpawn {
 
-    private ParticleWrapper particle;
-    private LocationBuilder loc;
-    private LocationBuilder offset;
-    private int count;
-    private int extra;
+    private final ParticleWrapper particle;
+    private final LocationBuilder loc;
+    private final LocationBuilder offset;
+    private final int count;
+    private final int extra;
 
     public PointSpawn(ParticleWrapper particle,
                       LocationBuilder loc, LocationBuilder offset,
