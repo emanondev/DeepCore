@@ -39,11 +39,8 @@ public class PacketItemFrame extends PacketEntity {
 
     public float getYaw() {
         return switch (this.facing) {
-            case DOWN -> 0.0F;
             case EAST -> -90.0F;
             case NORTH -> 180.0F;
-            case SOUTH -> 0.0F;
-            case UP -> 0.0F;
             case WEST -> 90.0F;
             default -> 0.0F;
         };
@@ -52,11 +49,7 @@ public class PacketItemFrame extends PacketEntity {
     public float getPitch() {
         return switch (this.facing) {
             case DOWN -> 90.0F;
-            case EAST -> 0.0F;
-            case NORTH -> 0.0F;
-            case SOUTH -> 0.0F;
             case UP -> -90.0F;
-            case WEST -> 0.0F;
             default -> 0.0F;
         };
     }

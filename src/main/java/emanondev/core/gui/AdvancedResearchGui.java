@@ -147,6 +147,7 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
      */
     public void setBackGuiSlot(int slot) {
         setControlButtonSlot(backGuiSlot, slot, backB);
+        backGuiSlot = slot;
     }
 
     public void updateControlButtons() {

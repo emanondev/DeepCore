@@ -239,8 +239,7 @@ public class StringListEditorFButton extends AGuiButton {
     }
 
     private String actionLine() {
-        return "" +
-                (action == Action.ADD_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
+        return (action == Action.ADD_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
                         : "&8[" + Action.ADD_LINE.getSymbol(getTargetPlayer()) + "&8] ") +
                 (action == Action.EDIT_LINE ? "&b[" + action.getSymbol(getTargetPlayer()) + "&b] "
                         : "&8[" + Action.EDIT_LINE.getSymbol(getTargetPlayer()) + "&8] ") +

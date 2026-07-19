@@ -15,7 +15,7 @@ public final class VersionUtility {
         try {
             split = Bukkit.getBukkitVersion().split("-")[0].split("\\.");
         } catch (Exception e) {
-            log.warn("(slot "+slot+") Invalid Bukkit version format: " + Bukkit.getBukkitVersion(), e);
+            log.warn("(slot {}) Invalid Bukkit version format: {}", slot, Bukkit.getBukkitVersion(), e);
             return 100; //avoid stopping the load, try to start with wrong version
         }
         try {
@@ -27,7 +27,7 @@ public final class VersionUtility {
             }
             return Integer.parseInt(split[slot]);
         } catch (Exception e){
-            log.warn("(slot "+slot+") Invalid Bukkit version format: " + Bukkit.getBukkitVersion(),e);
+            log.warn("(slot {}) Invalid Bukkit version format: {}", slot, Bukkit.getBukkitVersion(), e);
             return 100; //avoid stopping the load, try to start with wrong version
         }
     }

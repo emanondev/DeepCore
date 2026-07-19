@@ -377,7 +377,7 @@ public final class UtilsString {
                     if (j == -1)
                         break;
                     try {
-                        format.append(line.substring(j, j + 2));
+                        format.append(line, j, j + 2);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
