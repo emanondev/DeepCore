@@ -6,13 +6,17 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,15 +27,15 @@ public final class InventoryUtility {
     private static final Map<Class<?>, Method> getBottomInventory =
             VersionUtility.hasFoliaAPI() ? new ConcurrentHashMap<>() : new HashMap<>();
 
+    private InventoryUtility() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * A utility method to support versions that use null or air ItemStacks.
      */
     public static boolean isAirOrNull(ItemStack item) {
         return item == null || item.getType().equals(Material.AIR);
-    }
-
-    private InventoryUtility() {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -223,6 +227,31 @@ public final class InventoryUtility {
         };
     }
 
+    public static boolean isSimilarIgnoreDamage(ItemStack item, ItemStack item2) {
+        if (isAirOrNull(item))
+            return isAirOrNull(item2);
+        if (isAirOrNull(item2))
+            return false;
+        if (item.isSimilar(item2))
+            return true;
+        if (item.getType() != item2.getType())
+            return false;
+        ItemMeta meta1 = item.getItemMeta();
+        if (!(meta1 instanceof Damageable))
+            return false;
+        ItemMeta meta2 = item2.getItemMeta();
+        if (meta1.isUnbreakable() && meta2.isUnbreakable())
+            return false;
+        ((Damageable) meta2).setDamage(((Damageable) meta1).getDamage());
+        return meta1.equals(meta2);
+    }
+
+    public static List<EquipmentSlot> getPlayerEquipmentSlots() {
+        return List.of(EquipmentSlot.HAND, EquipmentSlot.HEAD,
+                EquipmentSlot.CHEST, EquipmentSlot.LEGS,
+                EquipmentSlot.FEET, EquipmentSlot.OFF_HAND);
+    }
+
     private static Inventory getTopInventoryP(@NotNull Object view) {
         Method method = getTopInventory.get(view.getClass());
         if (method == null) {
@@ -266,4 +295,5 @@ public final class InventoryUtility {
          */
         CANCEL
     }
+
 }
