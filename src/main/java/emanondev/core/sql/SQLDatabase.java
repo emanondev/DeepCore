@@ -94,14 +94,12 @@ public class SQLDatabase {
         if (command == null) {
             return false;
         }
-        boolean result = false;
 
         connect(false);
         try {
             Statement st = getConnection().createStatement();
             st.executeUpdate(command);
             st.close();
-            result = true;
         } catch (SQLException e) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + type.name() + " Update:");
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "Command: " + command);
@@ -110,7 +108,7 @@ public class SQLDatabase {
             throw e;
         }
         disconnect(false);
-        return result;
+        return true;
     }
 
     public ResultSet query(String command) throws SQLException, ClassNotFoundException {

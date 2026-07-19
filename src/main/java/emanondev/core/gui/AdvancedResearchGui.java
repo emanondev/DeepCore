@@ -281,16 +281,6 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
         return controlButtons[slot];
     }
 
-    public void addElement(T value) {
-        AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
-        buttons.add(container);
-        if (show == null || show.test(value)) {
-            activeButtons.add(container);
-            if (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())
-                reloadInventory();
-        }
-    }
-
     public void clearElements() {
         buttons.clear();
         activeButtons.clear();
@@ -298,62 +288,38 @@ public abstract class AdvancedResearchGui<T> extends AnvilGui implements PagedGu
             reloadInventory();
     }
 
+    public void addElement(T value) {
+        addElements(List.of(value), null);
+    }
+
     public void addElements(Collection<T> values) {
-        boolean added = false;
-        for (T value : values) {
-            AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
-            buttons.add(container);
-            if (show == null || show.test(value)) {
-                activeButtons.add(container);
-                added = true;
-            }
-        }
-        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
-            reloadInventory();
+        addElements(values, null);
     }
 
     public void addElements(T[] values) {
-        boolean added = false;
-        for (T value : values) {
-            AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
-            buttons.add(container);
-            if (show == null || show.test(value)) {
-                activeButtons.add(container);
-                added = true;
-            }
-        }
-        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
-            reloadInventory();
+        addElements(List.of(values), null);
     }
 
     public void addElements(Collection<T> values, Predicate<T> shouldAdd) {
         boolean added = false;
-        for (T value : values)
-            if (shouldAdd.test(value)) {
-                AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
-                buttons.add(container);
-                if (show == null || show.test(value)) {
-                    activeButtons.add(container);
-                    added = true;
-                }
+        for (T value : values) {
+            if (shouldAdd != null && !shouldAdd.test(value)) {
+                continue;
             }
-        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
+            AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
+            buttons.add(container);
+            if (show == null || show.test(value)) {
+                activeButtons.add(container);
+                added = true;
+            }
+        }
+        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty())) {
             reloadInventory();
+        }
     }
 
     public void addElements(T[] values, Predicate<T> shouldAdd) {
-        boolean added = false;
-        for (T value : values)
-            if (shouldAdd.test(value)) {
-                AdvancedResearchGui<T>.ContainerButton container = getContainer(value);
-                buttons.add(container);
-                if (show == null || show.test(value)) {
-                    activeButtons.add(container);
-                    added = true;
-                }
-            }
-        if (added && (!this.isUpdateOnOpen() || !getInventory().getViewers().isEmpty()))
-            reloadInventory();
+        addElements(List.of(values), shouldAdd);
     }
 
     public void onTextChange(String newText) {
